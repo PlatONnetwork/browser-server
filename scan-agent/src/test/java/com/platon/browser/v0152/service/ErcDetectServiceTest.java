@@ -3,7 +3,6 @@ package com.platon.browser.v0152.service;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.protocol.Web3j;
@@ -70,7 +69,7 @@ public class ErcDetectServiceTest extends AgentTestBase {
         //when(ercContract.name()).thenReturn(remoteCall);
         //when(remoteCall.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
         //ercDetectService.getContractId(contractAddress);
-        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.getErcContractId(ErcTypeEnum.ERC20, contractAddress, new BigInteger("8748738")));
+        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.getErcContractId(contractAddress, new BigInteger("8748738"), "0x"));
     }
 
 }

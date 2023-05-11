@@ -20,6 +20,7 @@ import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
+import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -70,82 +71,70 @@ public class ErcTokenAnalyzer {
      * @param blockNumber
      * @return 如果不是ERC标准，则返回null
      */
-    public Token resolveNewToken(ErcTypeEnum ercTypeEum, String contractAddress, BigInteger blockNumber) {
-        if (ercTypeEum==null){
-            return null;
-        }
-        try {
-            ErcContractId contractId = ercDetectService.getErcContractId(ercTypeEum, contractAddress, blockNumber);
-            if (contractId != null) {
-                Token token = new Token();
-                token.setAddress(contractAddress);
-                token.setName(contractId.getName());
-                token.setSymbol(contractId.getSymbol());
-                token.setDecimal(contractId.getDecimal());
-                token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
-                token.setType(contractId.getTypeEnum().name().toLowerCase());
-                token.setCreatedBlockNumber(blockNumber.longValue());
-                token.setTokenTxQty(0);
-                token.setHolder(0);
-                token.setContractDestroyBlock(0L);
-                token.setContractDestroyUpdate(false);
+    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId) throws PlatonCallTimeoutException {
+        Token token = new Token();
+        token.setAddress(contractAddress);
+        token.setName(contractId.getName());
+        token.setSymbol(contractId.getSymbol());
+        token.setDecimal(contractId.getDecimal());
+        token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
+        token.setType(contractId.getTypeEnum().name().toLowerCase());
+        token.setCreatedBlockNumber(blockNumber.longValue());
+        token.setTokenTxQty(0);
+        token.setHolder(0);
+        token.setContractDestroyBlock(0L);
+        token.setContractDestroyUpdate(false);
 
-                switch (contractId.getTypeEnum()) {
-                    case ERC20:
-                        token.setIsSupportErc20(true);
-                        token.setIsSupportErc165(false);
-                        token.setIsSupportErc721(false);
-                        token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                        token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                        token.setIsSupportErc1155(false);
-                        token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
-                        // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
-                        // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
-                        // 把新地址类型加入NewAddressCache
-                        //ercCache.erc20AddressCache.add(contractAddress);
-                        break;
-                    case ERC721:
-                        token.setIsSupportErc20(false);
-                        token.setIsSupportErc165(true);
-                        token.setIsSupportErc721(true);
-                        token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
-                        token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
-                        token.setIsSupportErc1155(false);
-                        token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
-                        // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
-                        // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
-                        // 把新地址类型加入NewAddressCache
-                        //ercCache.erc721AddressCache.add(contractAddress);
-                        break;
-                    case ERC1155:
-                        token.setIsSupportErc20(false);
-                        token.setIsSupportErc165(true);
-                        token.setIsSupportErc721(false);
-                        token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                        token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                        //
-                        token.setIsSupportErc1155(true);
-                        token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
-                        // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
-                        // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
-                        // 把新地址类型加入NewAddressCache
-                        //ercCache.erc1155AddressCache.add(contractAddress);
-                        break;
-                }
-
-
-                // 检查token是否合法
-                checkToken(token);
-                tokenMapper.insert(token);
-                newAddressCache.addTokenCache(token.getAddress(), token);
-                log.debug("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
-                return token;
-            }
-        } catch (Exception e) {
-            log.warn("合约创建,解析是否符合ERC标准时异常", e);
+        switch (contractId.getTypeEnum()) {
+            case ERC20:
+                token.setIsSupportErc20(true);
+                token.setIsSupportErc165(false);
+                token.setIsSupportErc721(false);
+                token.setIsSupportErc721Enumeration(false);
+                token.setIsSupportErc721Metadata(false);
+                token.setIsSupportErc1155(false);
+                token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
+                // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
+                // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
+                // 把新地址类型加入NewAddressCache
+                //ercCache.erc20AddressCache.add(contractAddress);
+                break;
+            case ERC721:
+                token.setIsSupportErc20(false);
+                token.setIsSupportErc165(true);
+                token.setIsSupportErc721(true);
+                token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
+                token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
+                token.setIsSupportErc1155(false);
+                token.setIsSupportErc1155Metadata(false);
+                // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
+                // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
+                // 把新地址类型加入NewAddressCache
+                //ercCache.erc721AddressCache.add(contractAddress);
+                break;
+            case ERC1155:
+                token.setIsSupportErc20(false);
+                token.setIsSupportErc165(true);
+                token.setIsSupportErc721(false);
+                token.setIsSupportErc721Enumeration(false);
+                token.setIsSupportErc721Metadata(false);
+                //
+                token.setIsSupportErc1155(true);
+                token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
+                // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
+                // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
+                // 把新地址类型加入NewAddressCache
+                //ercCache.erc1155AddressCache.add(contractAddress);
+                break;
         }
 
-        return null;
+
+        // 检查token是否合法
+        checkToken(token);
+        tokenMapper.insert(token);
+        newAddressCache.addTokenCache(token.getAddress(), token);
+        log.debug("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
+        return token;
     }
 
     /**

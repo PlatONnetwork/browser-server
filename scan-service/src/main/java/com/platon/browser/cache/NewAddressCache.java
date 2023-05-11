@@ -57,7 +57,12 @@ public class NewAddressCache {
     public void clearBlockRelatedAddressCache(){
         blockRelatedAddressCache.clear();
     }
-    public void addNewContractAddressToBlockCtx(CustomAddress address){
+
+    /**
+     * 这里加入的地址有可能以前就已经存在了，如果存在，则需要修原地址的类型，以及相关的缓存
+     * @param address
+     */
+    public void addPossibleNewContractAddressToBlockCtx(CustomAddress address){
         AddressTypeEnum addressTypeEnum = this.getAddressType(address.getAddress());
         if (addressTypeEnum!=null && addressTypeEnum != AddressTypeEnum.getEnum(address.getType())){
             // todo: 2023/05/04 lvxiaoyi

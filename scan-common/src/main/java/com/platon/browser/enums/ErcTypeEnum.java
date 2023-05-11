@@ -36,4 +36,14 @@ public enum ErcTypeEnum {
         return null;
     }
 
+    public ContractTypeEnum convertToContractType() {
+        switch (this) {
+            case ERC721:
+                return ContractTypeEnum.ERC721_EVM;
+            case ERC1155:
+                return ContractTypeEnum.ERC1155_EVM;
+            default:
+                return ContractTypeEnum.ERC20_EVM;
+        }
+    }
 }

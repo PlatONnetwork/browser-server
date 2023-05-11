@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
+import com.platon.browser.decoder.TxInputDecodeUtil;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractTypeEnum;
@@ -19,6 +20,7 @@ import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
+import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -133,29 +135,35 @@ public class TransactionAnalyzer {
                     log.warn("发现bin为空的新合约地址:{}", contract.getAddress());
                     break;
                 }
-
-
-                ContractTypeEnum contractType = ercDetectService.getContractType(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode, dtoTransaction.getInput());
-
-                //解析token
-                if(contractType.equals(ContractTypeEnum.ERC20_EVM) || contractType.equals(ContractTypeEnum.ERC721_EVM) || contractType.equals(ContractTypeEnum.ERC1155_EVM) ){
+                ContractTypeEnum contractType;
+                ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode);
+                if (ercContractId != null){
+                    contractType = ercContractId.getTypeEnum().convertToContractType();
+                    //解析token
                     // solidity 类型 erc20 或 721 token检测及入口
                     watch.start("解析新建合约的具体类型");
-                    Token token = ercTokenAnalyzer.resolveNewToken(contractType.convertToErcType(), contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
                     watch.stop();
+                }else{
+                    if (TxInputDecodeUtil.isWASM(dtoTransaction.getInput())){
+                        contractType = ContractTypeEnum.WASM;
+                    }else{
+                        contractType = ContractTypeEnum.EVM;
+                    }
                 }
 
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
                 //设置地址类型
                 relatedAddress.setType(contractType.convertToAddressType().getCode());
-                relatedAddress.setOption(CustomAddress.Option.NEW); //todo: 2023/05/04 lvxiaoyi 返回的地址并不一定都是新地址
+                //relatedAddress.setOption(CustomAddress.Option.NEW);
                 relatedAddress.setContractBin(binCode);
                 relatedAddress.setContractType(contractType);
                 relatedAddress.setContractCreate(dtoTransaction.getFrom());
                 relatedAddress.setContractCreatehash(dtoTransaction.getHash());
 
                 //把新建的合约地址保存在当前block的上下文中
-                newAddressCache.addNewContractAddressToBlockCtx(relatedAddress);
+                ////todo: 2023/05/04 lvxiaoyi 这个地址有可能是存在的（参考create2地址算法）
+                newAddressCache.addPossibleNewContractAddressToBlockCtx(relatedAddress);
             }
         }
 
