@@ -2,6 +2,7 @@ package com.platon.browser.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
@@ -239,6 +240,7 @@ public class TransactionAnalyzer {
         // 合约内部转账记录
         if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
             result.setTransferTxList(resolveContactTransferTx(collectionBlock, result, receipt));
+            result.setTransferTxInfo(JSON.toJSONString(result.getTransferTxList()));
         }
 
         // 累加总交易数

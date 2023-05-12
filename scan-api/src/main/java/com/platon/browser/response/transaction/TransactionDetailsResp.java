@@ -144,6 +144,8 @@ public class TransactionDetailsResp {
 
     private List<Arc1155Param> erc1155Params;
 
+    private List<InternalTransferParam> internalTransferParams;
+
     /**
      * 总领取解锁的委托
      */
@@ -662,6 +664,14 @@ public class TransactionDetailsResp {
 
     public void setErc1155Params(List<Arc1155Param> erc1155Params) {
         this.erc1155Params = erc1155Params;
+    }
+
+    public List<InternalTransferParam> getInternalTransferParams() {
+        return internalTransferParams;
+    }
+
+    public void setInternalTransferParams(List<InternalTransferParam> internalTransferParams) {
+        this.internalTransferParams = internalTransferParams;
     }
 
     public BigDecimal getRedeemDelegationValue() {
