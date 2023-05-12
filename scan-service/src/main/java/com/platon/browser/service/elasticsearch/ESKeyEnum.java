@@ -13,7 +13,8 @@ public enum ESKeyEnum {
     DelegateReward("DelegateReward"),
     Erc20Tx("Erc20Tx"),
     Erc721Tx("Erc721Tx"),
-    Erc1155Tx("Erc1155Tx");
+    Erc1155Tx("Erc1155Tx"),
+    TransferTx("TransferTx");
 
     private String key;
 

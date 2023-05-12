@@ -73,6 +73,12 @@ public class ConsistencyService {
     private CustomTx1155BakMapper customTx1155BakMapper;
 
     @Resource
+    private TxTransferBakMapper txTransferBakMapper;
+
+    @Resource
+    private CustomTxTransferBakMapper customTxTransferBakMapper;
+
+    @Resource
     private EsImportService esImportService;
 
     @Resource
@@ -104,6 +110,10 @@ public class ConsistencyService {
 
     @Resource
     private EsErc1155TxRepository esErc1155TxRepository;
+
+    @Resource
+    private EsTransferTxRepository esTransferTxRepository;
+
     /**
      * 开机自检,一致性开机自检子流程,检查es、redis中的区块高度和交易序号是否和mysql数据库一致，以mysql的数据为准
      *
@@ -124,6 +134,7 @@ public class ConsistencyService {
         syncErc20Tx(esErc20TxRepository, syncData);
         syncErc721Tx(esErc721TxRepository, syncData);
         syncErc1155Tx(esErc1155TxRepository, syncData);
+        syncTransferTx(esTransferTxRepository, syncData);
         syncDataToESAndRedis(syncData);
         log.info("MYSQL/ES/REDIS中的数据同步完成!");
     }
@@ -347,6 +358,46 @@ public class ConsistencyService {
         }
     }
 
+    private void syncTransferTx(AbstractEsRepository abstractEsRepository, SyncData syncData) throws Exception {
+        try {
+            long mysqlTxId = customTxTransferBakMapper.findMaxId();
+            ESQueryBuilderConstructor constructor = new ESQueryBuilderConstructor();
+            constructor.setDesc("id");
+            constructor.setResult(new String[]{"id", "seq", "hash", "bn"});
+            constructor.setUnmappedType("long");
+            ESResult<TxTransferBak> queryResultFromES = abstractEsRepository.search(constructor, TxTransferBak.class, 1, 1);
+            List<TxTransferBak> list = queryResultFromES.getRsData();
+            long esTxId = getTransferTxId(list);
+            if (mysqlTxId > esTxId) {
+                TxTransferBakExample example = new TxTransferBakExample();
+                example.createCriteria().andIdGreaterThan(esTxId).andIdLessThanOrEqualTo(mysqlTxId);
+                List<TxTransferBak> txErc1155BakList = txTransferBakMapper.selectByExample(example);
+                for (TxTransferBak txErc1155Bak : txErc1155BakList) {
+                    TxTransferBak ercTx = new TxTransferBak();
+                    BeanUtil.copyProperties(txErc1155Bak, ercTx);
+                    syncData.getTxTransferBakSet().add(ercTx);
+                }
+                log.info("MYSQL/ES/REDIS txTransfer交易数据同步区间:[{},{}]", esTxId, mysqlTxId);
+            } else {
+                log.info("MySQL没有 txTransfer交易数据需要同步");
+            }
+        } catch (Exception e) {
+            log.error("MySQL同步txTransfer交易数据异常", e);
+            throw new Exception("MySQL同步txTransfer交易数据异常");
+        }
+    }
+
+    private long getTransferTxId(List<TxTransferBak> list) {
+        long esTxId = 0;
+        if ( CollUtil.isNotEmpty(list)) {
+            TxTransferBak ercTx = CollUtil.getFirst(list);
+            if (ercTx.getId() != null) {
+                esTxId = ercTx.getId();
+            }
+        }
+        return esTxId;
+    }
+
     private long getEsTxId(List<ErcTx> list ) {
         long esTxId = 0;
         if ( CollUtil.isNotEmpty(list)) {
@@ -365,7 +416,7 @@ public class ConsistencyService {
      * @date: 2022/1/20
      */
     private void syncDataToESAndRedis(SyncData syncData) throws Exception {
-        esImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getErc1155BakSet(), syncData.getDelegationRewardBakSet());
+        esImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getErc1155BakSet(), syncData.getTxTransferBakSet(), syncData.getDelegationRewardBakSet());
         redisImportService.batchImport(syncData.getBlockSet(), syncData.getTxBakSet(), syncData.getErc20BakSet(), syncData.getErc721BakSet(), syncData.getErc1155BakSet());
     }
 

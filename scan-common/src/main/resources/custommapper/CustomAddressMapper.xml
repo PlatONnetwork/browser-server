@@ -140,5 +140,11 @@
             t.`address` = #{item.address}
         </foreach>
     </update>
+    <update id="batchUpdateAddressTxTransferQty">
+        <foreach collection="list" item="item" separator=";">
+            update address set transfer_tx_qty = transfer_tx_qty + #{item.txTransferQty}
+            where address = #{item.address}
+        </foreach>
+    </update>
 
 </mapper>

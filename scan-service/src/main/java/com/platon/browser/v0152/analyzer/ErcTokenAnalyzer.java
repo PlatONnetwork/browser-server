@@ -296,6 +296,7 @@ public class ErcTokenAnalyzer {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         try {
+            // TODO CD - 如果代理模式， 该方法可以存在优化空间
             // 过滤交易回执日志，地址不能为空且在token缓存里的
             List<Log> tokenLogs = receipt.getLogs()
                                          .stream()

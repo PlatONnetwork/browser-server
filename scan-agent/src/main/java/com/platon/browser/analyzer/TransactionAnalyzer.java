@@ -2,15 +2,13 @@ package com.platon.browser.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.bean.ComplementInfo;
-import com.platon.browser.bean.ErcToken;
-import com.platon.browser.bean.Receipt;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.decoder.TxInputDecodeResult;
@@ -38,6 +36,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 交易分析器
@@ -138,6 +137,7 @@ public class TransactionAnalyzer {
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
                 log.info("当前交易[{}]合约地址[{}]的合约类型为[{}]", result.getHash(), contract.getAddress(), contractTypeEnum);
                 if (!AddressUtil.isAddrZero(contract.getAddress())) {
+                    // TODO CD-如何合约类型变更可能存在问题，如第一次部署失败，但是地址已经采集。当成普通合约地址
                     // 补充address
                     addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
                 } else {
@@ -176,6 +176,8 @@ public class TransactionAnalyzer {
                     TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(result, platOnClient, ci, contractTypeEnum, log);
                     // 普通合约调用的交易是否成功只看回执的status,不用看log中的状态
                     result.setStatus(receipt.getStatus());
+
+                    // TODO CD - 如何部分成功，如何确认虚拟交易的成功性？
                     if (result.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
                         List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
@@ -233,6 +235,11 @@ public class TransactionAnalyzer {
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
+
+        // 合约内部转账记录
+        if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
+            result.setTransferTxList(resolveContactTransferTx(collectionBlock, result, receipt));
+        }
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);
@@ -296,6 +303,27 @@ public class TransactionAnalyzer {
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());
         proxyContract(result.getHash());
         return result;
+    }
+
+    private List<TxTransferBak> resolveContactTransferTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
+        List<TxTransferBak> transferBakList = new ArrayList<>();
+        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfers()) {
+            if(embedTransfer.getAmount() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
+                log.warn("当前交易[{}]的合约内部转账记录不全, embedTransfer = [{}]", tx.getHash(), embedTransfer);
+                continue;
+            }
+            TxTransferBak transferBak =  new TxTransferBak();
+            transferBak.setSeq(collectionBlock.getSeq().incrementAndGet());
+            transferBak.setFrom(embedTransfer.getFrom());
+            transferBak.setFromType(addressCache.getTypeData(embedTransfer.getFrom()));
+            transferBak.setTo(embedTransfer.getTo());
+            transferBak.setToType(addressCache.getTypeData(embedTransfer.getTo()));
+            transferBak.setValue(embedTransfer.getAmount().toBigInteger().toString());
+            transferBak.setHash(tx.getHash());
+            transferBak.setbTime(tx.getTime());
+            transferBakList.add(transferBak);
+        }
+        return transferBakList;
     }
 
     /**

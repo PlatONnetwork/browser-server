@@ -10,7 +10,9 @@ import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.*;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.TxTransferBakMapper;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -73,6 +75,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
     private CustomTx1155BakMapper customTx1155BakMapper;
+
+    @Resource
+    private TxTransferBakMapper txTransferBakMapper;
 
     @Resource
     private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
@@ -146,6 +151,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 addTxErc20Bak(transactions);
                 addTxErc721Bak(transactions);
                 addTxErc1155Bak(transactions);
+                addTxTransferBak(transactions);
             }
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
             // 委托奖励交易入库
@@ -175,7 +181,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             addressCache.cleanAll();
         }
     }
-
     /**
      * 模拟深拷贝
      * 因为CollectionEvent引用了第三方的jar对象，没有实现系列化接口，没法做深拷贝
@@ -272,6 +277,18 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         });
         if (CollUtil.isNotEmpty(erc1155Set)) {
             customTx1155BakMapper.batchInsert(erc1155Set);
+        }
+    }
+
+    private void addTxTransferBak(List<Transaction> transactions) {
+        List<TxTransferBak> transferSet = new ArrayList<>();
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getTransferTxList())) {
+                transferSet.addAll(transaction.getTransferTxList());
+            }
+        });
+        if (CollUtil.isNotEmpty(transferSet)) {
+            txTransferBakMapper.batchInsert(transferSet);
         }
     }
 }

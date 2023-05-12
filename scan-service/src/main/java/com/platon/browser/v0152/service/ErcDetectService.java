@@ -452,6 +452,8 @@ public class ErcDetectService {
                 return getErc1155ContractId(contractAddress, blockNumber);
             }
 
+
+            // TODO CD= 需要区分是方法是否存在，getErc20ContractId时
             // 不是ERC721，则检测是否是ERC20
             log.info("该合约[{}]不是721合约，开始检测是否是ERC20", contractAddress);
             contractId = getErc20ContractId(contractAddress, blockNumber);
