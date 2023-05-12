@@ -161,7 +161,7 @@ public class InitializationService {
             // 初始化网络缓存
             networkStatCache.init(networkStat);
             // 初始化内置地址
-            newAddressCache.init();
+            newAddressCache.initForBlock0();
             return initialResult;
         }
 
@@ -251,6 +251,8 @@ public class InitializationService {
         for (int index = 0; index < nodeList.size(); index++) {
             Node v = nodeList.get(index);
             Staking staking = new Staking();
+            staking.init();
+
             staking.updateWithVerifier(v);
             staking.setStakingTxIndex(index);
             // 提前设置验证轮数

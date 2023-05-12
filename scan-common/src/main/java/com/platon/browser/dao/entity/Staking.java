@@ -871,4 +871,54 @@ public class Staking extends StakingKey {
             }
         }
     }
+
+
+    public void init() {
+        Date date = new Date();
+        this.setCreateTime(date);
+        this.setUpdateTime(date);
+        this.setJoinTime(date);
+        /* 初始化默认值 */
+        // 质押金额(犹豫期金额)
+        this.setStakingHes(BigDecimal.ZERO);
+//        // 质押金额(锁定金额)
+        this.setStakingLocked(BigDecimal.ZERO);
+//        // 委托交易总金额(犹豫期金额)
+        this.setStatDelegateHes(BigDecimal.ZERO);
+//        // 委托交易总金额(锁定期金额)
+        this.setStatDelegateLocked(BigDecimal.ZERO);
+        setStatDelegateReleased(BigDecimal.ZERO);
+//        // 质押金额(退回中金额)
+        this.setStakingReduction(BigDecimal.ZERO);
+//        // 节点名称(质押节点名称)
+        this.setNodeName("Unknown");
+//        // 节点头像(关联external_id，第三方软件获取)
+        this.setNodeIcon("");
+//        // 预计年化率
+        this.setAnnualizedRate(0.0);
+//        // 出块奖励
+        this.setBlockRewardValue(BigDecimal.ZERO);
+//        // 程序版本
+        this.setProgramVersion(BigInteger.ZERO.toString());
+//        // 质押奖励
+        this.setStakingRewardValue(BigDecimal.ZERO);
+//        // 结算周期标识
+        this.setStakingReductionEpoch(0);
+//        // 进入共识验证论次数
+        this.setStakingReductionEpoch(0);
+//        // 上个共识周期出块数
+        this.setPreConsBlockQty(0l);
+//        // 当前共识周期出块数
+        this.setCurConsBlockQty(0l);
+//        // 节点状态 1：候选中 2：退出中 3：已退出
+        this.setStatus(StatusEnum.CANDIDATE.code);
+//        //是否结算周期验证人
+        this.setIsSettle(YesNoEnum.NO.code);
+//        //是否共识周期验证人
+        this.setIsConsensus(YesNoEnum.NO.code);
+//        // 是否为链初始化时内置的候选人
+        this.setIsInit(YesNoEnum.NO.code);
+//        //节点质押期间手续费
+        this.setFeeRewardValue(BigDecimal.ZERO);
+    }
 }

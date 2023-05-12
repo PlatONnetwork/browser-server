@@ -1,5 +1,6 @@
 package com.platon.browser.cache;
 
+import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,11 +167,25 @@ public class NewAddressCache {
         return this.getAddressType(address)==null ? null : this.getAddressType(address).convertToContractType();
     }
 
-    public void init() {
+    /**
+     * 0区块时，把特殊流程处理完：
+     * 1. 把内置地址入库，并把内置地址类型放入类型缓存。
+     * 2. 至于内置地址本身不需要再加入缓存，这样在com.platon.browser.service.statistic.StatisticService#analyze(com.platon.browser.bean.CollectionEvent)中，不需要对0区块做特殊处理。
+     *
+     */
+    public void initForBlock0() {
+        List<Address> innerAddressList = new ArrayList<>();
+        for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
+            Address address = CustomAddress.createNewAccountAddress(contractDescEnum.getAddress());
+            address.setType(AddressTypeEnum.INNER_CONTRACT.getCode());
+            innerAddressList.add(address);
+        }
+        addressMapper.batchInsertNewly(innerAddressList);
+        log.debug("初始化内置地址入库成功:{}", JSONUtil.toJsonStr(innerAddressList));
+
         log.debug("初始化内置地址的合约类型到缓存");
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
-            this.AllAddressTypeCache.put(contractDescEnum.getAddress(), AddressTypeEnum.INNER_CONTRACT);
-            //this.ContractTypeCache.put(contractDescEnum.getAddress(), ContractTypeEnum.INNER);
+            this.addAddressTypeCache(contractDescEnum.getAddress(), AddressTypeEnum.INNER_CONTRACT);
         }
         log.debug("预加载所有token到缓存");
         List<Token> tokens = tokenMapper.selectByExample(null);

@@ -177,9 +177,10 @@ public class ErcTokenAnalyzer {
     private List<ErcTx> resolveErcTransferTxFromEvent(Token token, com.platon.browser.elasticsearch.dto.Transaction tx, List<ErcContract.ErcTxEvent> eventList, Long seq) {
         List<ErcTx> txList = new ArrayList<>();
         eventList.forEach(event -> {
-            //event.to地址可能是新地址
+            //event.from/to地址可能是新地址
+            newAddressCache.addPendingAddressToBlockCtx(event.getFrom());
             newAddressCache.addPendingAddressToBlockCtx(event.getTo());
-            log.debug("event.to:{}地址可能是新地址", event.getTo());
+            log.debug("event.from:{} to:{}地址可能是新地址", event.getFrom(), event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
                                .seq(seq)

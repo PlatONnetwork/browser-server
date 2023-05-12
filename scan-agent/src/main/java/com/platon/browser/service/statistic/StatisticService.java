@@ -65,6 +65,9 @@ public class StatisticService {
             this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
             watch.stop();
         }
+        if (block.getNum() == 0) {
+            return;
+        }
         watch.start("NetworkStatus统计分析");
         this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
         watch.stop();
