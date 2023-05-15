@@ -37,7 +37,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 交易分析器
@@ -238,7 +237,7 @@ public class TransactionAnalyzer {
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 合约内部转账记录
-        if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
+        if(CollUtil.isNotEmpty(receipt.getEmbedTransfer())){
             result.setTransferTxList(resolveContactTransferTx(collectionBlock, result, receipt));
             result.setTransferTxInfo(JSON.toJSONString(result.getTransferTxList()));
         }
@@ -309,8 +308,8 @@ public class TransactionAnalyzer {
 
     private List<TxTransferBak> resolveContactTransferTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         List<TxTransferBak> transferBakList = new ArrayList<>();
-        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfers()) {
-            if(embedTransfer.getAmount() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
+        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfer()) {
+            if(embedTransfer.getValue() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
                 log.warn("当前交易[{}]的合约内部转账记录不全, embedTransfer = [{}]", tx.getHash(), embedTransfer);
                 continue;
             }
@@ -320,8 +319,9 @@ public class TransactionAnalyzer {
             transferBak.setFromType(addressCache.getTypeData(embedTransfer.getFrom()));
             transferBak.setTo(embedTransfer.getTo());
             transferBak.setToType(addressCache.getTypeData(embedTransfer.getTo()));
-            transferBak.setValue(embedTransfer.getAmount().toBigInteger().toString());
+            transferBak.setValue(embedTransfer.getValue().toBigInteger().toString());
             transferBak.setHash(tx.getHash());
+            transferBak.setBn(collectionBlock.getNum());
             transferBak.setbTime(tx.getTime());
             transferBakList.add(transferBak);
         }

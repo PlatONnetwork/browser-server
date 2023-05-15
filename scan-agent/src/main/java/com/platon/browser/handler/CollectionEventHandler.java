@@ -77,7 +77,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private CustomTx1155BakMapper customTx1155BakMapper;
 
     @Resource
-    private TxTransferBakMapper txTransferBakMapper;
+    private CustomTxTransferBakMapper customTxTransferBakMapper;
 
     @Resource
     private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
@@ -288,7 +288,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
         });
         if (CollUtil.isNotEmpty(transferSet)) {
-            txTransferBakMapper.batchInsert(transferSet);
+            customTxTransferBakMapper.batchInsert(transferSet);
         }
     }
 }
