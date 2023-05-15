@@ -104,7 +104,7 @@ public class ReqTest {
         QueryHolderTokenListReq queryHolderTokenListReq = new QueryHolderTokenListReq();
         assertNotNull(queryHolderTokenListReq);
 
-        QueryTokenHolderListReq queryTokenHolderListReq = new QueryTokenHolderListReq("");
+        QueryTokenHolderListReq queryTokenHolderListReq = new QueryTokenHolderListReq("", "");
         assertNotNull(queryTokenHolderListReq);
 
         QueryTokenTransferRecordListReq queryTokenTransferRecordListReq = new QueryTokenTransferRecordListReq();
