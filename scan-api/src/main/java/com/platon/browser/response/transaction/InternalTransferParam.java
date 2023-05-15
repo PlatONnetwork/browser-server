@@ -13,13 +13,13 @@ public class InternalTransferParam {
     /**
      * 内部交易from
      */
-    private String fromType;
+    private Integer fromType;
 
 
     /**
      * 内部交易from类型
      */
-    private Integer to;
+    private String to;
 
     /**
      * 内部交易to类型

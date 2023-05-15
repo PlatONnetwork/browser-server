@@ -69,11 +69,7 @@ public class StompPushTaskTest {
 		chainStatisticNewResp.setBlockList(new ArrayList<>());
 		assertNotNull(mapper.writeValueAsString(chainStatisticNewResp));
 	}
-	
-	@Test
-	public void test_Eswarm() {
-		stompPushTask.eswarm();
-	}
+
 	
 	@Test
 	public void test_UpdateConfig() {

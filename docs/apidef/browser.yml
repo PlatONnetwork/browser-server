@@ -1166,6 +1166,27 @@ paths:
           description: 返回奖励列表
           schema:
             $ref: '#/definitions/QueryClaimByStakingListResult'
+
+  /internalTransfer/listByOwnerAddress:
+    post:
+      operationId: listByOwnerAddress
+      tags:
+        - 合约内置转账
+      summary: 地址关联的内部转账
+      description: 通过es查询地址关联的内部转账
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          description: 参数对象
+          in: body
+          schema:
+            $ref: '#/definitions/InternalTransferOfAddressParam'
+      responses:
+        '200':
+          description: 返回地址详情
+          schema:
+            $ref: '#/definitions/InternalTransferOfAddressResult'
 #实体定义
 definitions:
   #通用参数对象
@@ -3499,6 +3520,11 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Reward'
+      internalTransferParams:
+        description: 合约内置转账参数
+        type: array
+        items:
+          $ref: '#/definitions/InternalTransferParams'
       # 可选信息结束
   RPPlan:
     type: object
@@ -3577,6 +3603,24 @@ definitions:
         type: string
       reward:
         description: 领取的奖励
+        type: string
+  InternalTransferParams:
+    type: object
+    properties:
+      from:
+        description: from
+        type: string
+      fromType:
+        description: from地址类型
+        type: string
+      to:
+        description: to
+        type: string
+      toType:
+        description: to地址类型
+        type: string
+      value:
+        description: 交易金额
         type: string
   TransactionDetailsResult:
     type: object
@@ -3762,3 +3806,35 @@ definitions:
       updateTime:
         description: 修改时间
         type: string
+  # 合约内部转账记录接口
+  InternalTransferOfAddressParam:
+    type: object
+    properties:
+      pageNo:
+        description: 页数(必填)
+        type: integer
+      pageSize:
+        description: 页大小(必填)
+        type: integer
+      address:
+        description: 合约地址(必填)
+        type: string
+  InternalTransferOfAddressResult:
+    type: object
+    properties:
+      errMsg:
+        description: 描述信息
+        type: string
+      code:
+        description: 成功（0），失败则有相关失败码
+        type: integer
+      totalCount:
+        description: 记录总数
+        type: integer
+      totalPages:
+        description: 总页数
+        type: integer
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/InternalTransferParams'
