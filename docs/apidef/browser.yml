@@ -3607,6 +3607,9 @@ definitions:
   InternalTransferParams:
     type: object
     properties:
+      hash:
+        description: 交易hash
+        type: string
       from:
         description: from
         type: string

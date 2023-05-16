@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class InternalTransferParam {
 
+    private String hash;
+
     /**
      * 内部交易from
      */
