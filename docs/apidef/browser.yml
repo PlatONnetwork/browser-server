@@ -1257,6 +1257,9 @@ definitions:
       erc721TxQty:
         description: erc20交易总数
         type: integer
+      internalTransferQty:
+        description: 合约内部转账数量
+        type: integer
       candidateCount:
         description: 已委托验证人
         type: integer
