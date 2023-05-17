@@ -131,27 +131,28 @@ public class TransactionAnalyzer {
                 // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
                 String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
                 watch.stop();
-                if(StringUtils.isBlank(binCode) || binCode.equalsIgnoreCase("0x")){
-                    log.warn("发现bin为空的新合约地址:{}", contract.getAddress());
-                    break;
-                }
                 ContractTypeEnum contractType;
-                ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode);
-                if (ercContractId != null){
-                    contractType = ercContractId.getTypeEnum().convertToContractType();
-                    //解析token
-                    // solidity 类型 erc20 或 721 token检测及入口
-                    watch.start("解析新建合约的具体类型");
-                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
-                    watch.stop();
+                if(StringUtils.isBlank(binCode) || binCode.equalsIgnoreCase("0x")){
+                    contractType = ContractTypeEnum.EVM;
+                    log.warn("发现bin为空的新合约地址，默认为普通EVM合约:{}", contract.getAddress());
+                    break;
                 }else{
-                    if (TxInputDecodeUtil.isWASM(dtoTransaction.getInput())){
-                        contractType = ContractTypeEnum.WASM;
+                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode);
+                    if (ercContractId != null){
+                        contractType = ercContractId.getTypeEnum().convertToContractType();
+                        //解析token
+                        // solidity 类型 erc20 或 721 token检测及入口
+                        watch.start("解析新建合约的具体类型");
+                        Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
+                        watch.stop();
                     }else{
-                        contractType = ContractTypeEnum.EVM;
+                        if (TxInputDecodeUtil.isWASM(dtoTransaction.getInput())){
+                            contractType = ContractTypeEnum.WASM;
+                        }else{
+                            contractType = ContractTypeEnum.EVM;
+                        }
                     }
                 }
-
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
                 //设置地址类型
                 relatedAddress.setType(contractType.convertToAddressType().getCode());
