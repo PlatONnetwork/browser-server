@@ -19,96 +19,127 @@ contract PScanQueryFacade {
     bytes4 public constant IID_IERC721_ENUMERABLE = type(IERC721Enumerable).interfaceId;
     bytes4 public constant IID_IERC1155 = type(IERC1155).interfaceId;
     bytes4 public constant IID_IERC1155_METADATA = type(IERC1155MetadataURI).interfaceId;
-    
-    function erc20Info(IERC20Metadata erc20) public view returns (bool support20, string memory, string memory, uint8, uint256) {
-        bool is20 = true;
 
+
+    function ercInfo(address addr) public view returns (uint8, string memory, string memory, uint8, uint256) {
+        uint8 bitmap;
+        string memory name;
+        string memory symbol;
+        uint8 decimals;
+        uint256 totalSupply;
+
+        (bitmap, name, symbol, totalSupply) = erc721Info(addr);
+        if(bitmap & 4 == 4){
+            return (bitmap, name, symbol, decimals, totalSupply);
+        }
+
+        (bitmap, name, symbol) = erc1155Info(addr);
+        if(bitmap & 32 == 32){
+            return (bitmap, name, symbol, decimals, totalSupply);
+        }
+
+        (bitmap, name, symbol, decimals, totalSupply) = erc20Info(IERC20Metadata(addr));
+        return (bitmap, name, symbol, decimals,totalSupply);
+    }
+
+
+    function erc20Info(IERC20Metadata erc20) public view returns (uint8, string memory, string memory, uint8, uint256) {
+        uint8 bitmap = 1;
         uint8 decimals = 0;
         try erc20.decimals() returns (uint8 result) {
             decimals = result;
         } catch {
-            is20 = false;
+            bitmap = 0;
         }
 
         string memory name = '';
-        if(is20){
+        if(bitmap == 1){
             try erc20.name() returns (string memory result) {
                 name = result;
             } catch {
-                is20 = false;
+                bitmap = 0;
             }
         }
 
         string memory symbol = '';
-        if(is20){
+        if(bitmap == 1){
             try erc20.symbol() returns (string memory result) {
                 symbol = result;
             } catch {
-                is20 = false;
+                bitmap = 0;
             }
         }
 
-       uint256 totalSupply = 0;    
-        if(is20){
+        uint256 totalSupply = 0;
+        if(bitmap == 1){
             try erc20.totalSupply() returns (uint256 result) {
                 totalSupply = result;
             } catch {
-                is20 = false;
+                bitmap = 0;
             }
         }
-           
-        return (is20, name, symbol, decimals, totalSupply); 
+
+        return (bitmap, name, symbol, decimals, totalSupply);
     }
 
-    function erc721Info(address addr) public view returns (bool support165, bool support721, bool support721Metadata, bool support721Enumeration, string memory, string memory, uint256) {
-        bool is165 = addr.supportsERC165();
-        bool is721 = false;
-        if(is165){
-            is721 = addr.supportsInterface(IID_IERC721);
+    function erc721Info(address addr) public view returns (uint8, string memory, string memory, uint256) {
+        uint8 bitmap;
+        bitmap = bitmap | (addr.supportsERC165() ? 2 : 0);
+
+        if(bitmap & 2 == 2){
+            bitmap = bitmap | (addr.supportsInterface(IID_IERC721) ? 4 : 0);
         }
-        bool is721Metadata = false;
-        bool is721Enumerable = false;
-        if(is721){
-            is721Metadata = addr.supportsInterface(IID_IERC721_METADATA);
-            is721Enumerable = addr.supportsInterface(IID_IERC721_ENUMERABLE);  
+
+        if(bitmap & 4 == 4){
+            bitmap = bitmap | (addr.supportsInterface(IID_IERC721_METADATA) ? 8 : 0);
+            bitmap = bitmap | (addr.supportsInterface(IID_IERC721_ENUMERABLE) ? 16 : 0);
         }
         string memory name = '';
         string memory symbol = '';
-        if(is721Metadata){
+        if(bitmap & 8 == 8){
             name = IERC721Metadata(addr).name();
             symbol = IERC721Metadata(addr).symbol();
         }
-        uint256 totalSupply = 0;   
-        if(is721Enumerable){
-            totalSupply = IERC721Enumerable(addr).totalSupply();   
+        uint256 totalSupply = 0;
+        if(bitmap & 16 == 16){
+            totalSupply = IERC721Enumerable(addr).totalSupply();
         }
-        return (is165, is721, is721Metadata, is721Enumerable, name, symbol, totalSupply);
+        return (bitmap, name, symbol, totalSupply);
     }
 
 
-    function erc1155Info(address addr) public view returns (bool support165, bool support1155, bool support1155Metadata) {
-        bool is165 = addr.supportsERC165();
-        bool is1155 = false;
-        if(is165){
-            is1155 = addr.supportsInterface(IID_IERC1155);
+    function erc1155Info(address addr) public view returns (uint8, string memory, string memory) {
+        uint8 bitmap;
+        bitmap = bitmap | (addr.supportsERC165() ? 2 : 0);
+
+        if(bitmap & 2 == 2){
+            bitmap = bitmap | (addr.supportsInterface(IID_IERC1155) ? 32 : 0);
         }
-        bool is1155Metadata = false;
+
+        bool is1155 = bitmap & 32 == 32;
         if(is1155){
-            is1155Metadata = addr.supportsInterface(IID_IERC1155_METADATA);
+            bitmap = bitmap | (addr.supportsInterface(IID_IERC1155_METADATA) ? 64 : 0);
         }
-        return (is165, is1155, is1155Metadata);
+
+        // 非标准检测, 因为scan目前存在此逻辑
+        string memory name = '';
+        if(is1155){
+            try IERC20Metadata(addr).name() returns (string memory result) {
+                name = result;
+            } catch {
+
+            }
+        }
+
+        // 非标准检测, 因为scan目前存在此逻辑
+        string memory symbol = '';
+        if(is1155){
+            try IERC20Metadata(addr).symbol() returns (string memory result) {
+                symbol = result;
+            } catch {
+
+            }
+        }
+        return (bitmap, name, symbol);
     }
-
-
-    // function erc721Info(IERC20Metadata erc20) public view returns (string memory, string memory, uint8, uint256) {
-    //     string memory name = erc20.name();
-    //     string memory symbol = erc20.symbol();
-    //     uint256 totalSupply = erc20.totalSupply();        
-    //     return (name, symbol, decimals, totalSupply); 
-    // }
-
-    // https://ethereum.stackexchange.com/questions/83991/how-do-i-check-for-the-existence-of-a-function-in-solidity-when-i-have-an-addres
 }
-
-
-
