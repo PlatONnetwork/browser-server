@@ -135,7 +135,6 @@ public class TransactionAnalyzer {
                 if(StringUtils.isBlank(binCode) || binCode.equalsIgnoreCase("0x")){
                     contractType = ContractTypeEnum.EVM;
                     log.warn("发现bin为空的新合约地址，默认为普通EVM合约:{}", contract.getAddress());
-                    break;
                 }else{
                     ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode);
                     if (ercContractId != null){
