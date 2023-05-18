@@ -64,7 +64,7 @@
     <update id="batchChange">
         <foreach collection="list" item="item" separator=";">
             INSERT INTO token_1155_holder (token_address, token_id, address, balance, token_owner_tx_qty )
-            VALUES (#{item.tokenAddress}, #{item.address}, #{item.tokenId}, #{item.increment}, 1)
+            VALUES (#{item.tokenAddress},#{item.tokenId},  #{item.address}, #{item.increment}, 1)
             ON DUPLICATE KEY
             UPDATE balance = balance + #{item.increment}, token_owner_tx_qty = token_owner_tx_qty + 1
         </foreach>
