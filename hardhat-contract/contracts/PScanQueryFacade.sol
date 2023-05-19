@@ -27,18 +27,19 @@ contract PScanQueryFacade {
         string memory symbol;
         uint8 decimals;
         uint256 totalSupply;
+        if(isContract(addr)) {
+            (bitmap, name, symbol, totalSupply) = erc721Info(addr);
+            if(bitmap & 4 == 4){
+                return (bitmap, name, symbol, decimals, totalSupply);
+            }
 
-        (bitmap, name, symbol, totalSupply) = erc721Info(addr);
-        if(bitmap & 4 == 4){
-            return (bitmap, name, symbol, decimals, totalSupply);
+            (bitmap, name, symbol) = erc1155Info(addr);
+            if(bitmap & 32 == 32){
+                return (bitmap, name, symbol, decimals, totalSupply);
+            }
+
+            (bitmap, name, symbol, decimals, totalSupply) = erc20Info(IERC20Metadata(addr));
         }
-
-        (bitmap, name, symbol) = erc1155Info(addr);
-        if(bitmap & 32 == 32){
-            return (bitmap, name, symbol, decimals, totalSupply);
-        }
-
-        (bitmap, name, symbol, decimals, totalSupply) = erc20Info(IERC20Metadata(addr));
         return (bitmap, name, symbol, decimals,totalSupply);
     }
 
@@ -141,5 +142,9 @@ contract PScanQueryFacade {
             }
         }
         return (bitmap, name, symbol);
+    }
+
+    function isContract(address account) internal view returns (bool) {
+        return account.code.length > 0;
     }
 }

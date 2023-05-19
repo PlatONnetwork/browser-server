@@ -83,39 +83,15 @@ public class ErcTokenAnalyzer {
             token.setAddress(contractAddress);
             ErcContractId contractId = ercDetectService.getContractId(contractAddress, blockNumber);
             BeanUtils.copyProperties(contractId, token);
-            token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
-            token.setTypeEnum(contractId.getTypeEnum());
             token.setType(contractId.getTypeEnum().name().toLowerCase());
             switch (contractId.getTypeEnum()) {
                 case ERC20:
-                    token.setIsSupportErc20(true);
-                    token.setIsSupportErc165(false);
-                    token.setIsSupportErc721(false);
-                    token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                    token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                    token.setIsSupportErc1155(false);
-                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc20AddressCache.add(contractAddress);
                     break;
                 case ERC721:
-                    token.setIsSupportErc20(false);
-                    token.setIsSupportErc165(true);
-                    token.setIsSupportErc721(true);
-                    token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
-                    token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
-                    token.setIsSupportErc1155(false);
-                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc721AddressCache.add(contractAddress);
                     break;
                 case ERC1155:
-                    token.setIsSupportErc20(false);
-                    token.setIsSupportErc165(true);
-                    token.setIsSupportErc721(false);
-                    token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                    token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                    //
-                    token.setIsSupportErc1155(true);
-                    token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
                     ercCache.erc1155AddressCache.add(contractAddress);
                     break;
                 default:
