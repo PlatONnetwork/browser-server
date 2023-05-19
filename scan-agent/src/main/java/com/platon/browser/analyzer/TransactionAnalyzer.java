@@ -8,7 +8,6 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
@@ -118,7 +117,7 @@ public class TransactionAnalyzer {
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
-                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), false);
                 // solidity or wasm
                 TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
                 // 内存中更新地址类型
@@ -142,6 +141,18 @@ public class TransactionAnalyzer {
                     addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
                 } else {
                     log.error("该地址{}是0地址,不加载到地址缓存中", contract.getAddress());
+                }
+            });
+        }
+
+        // 普通EVM合约变成Token合约
+        Set<String> specificEventAddressList = ercTokenAnalyzer.listAddressOfSpecificEvent(receipt);
+        if (CollUtil.isNotEmpty(specificEventAddressList)) {
+            specificEventAddressList.forEach( specificEventAddress -> {
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM && ercTokenAnalyzer.needTracker(specificEventAddress)){
+                    log.info("当前交易[{}]日志中合约地址[{}]存在token事件并设置为需要探测", result.getHash(), specificEventAddress);
+                    ErcToken ercToken = tokenTracker(specificEventAddress,  collectionBlock.getNum());
+                    log.info("当前交易[{}]日志中合约地址[{}]探测结果[{}]", result.getHash(), specificEventAddress, ercToken.getTypeEnum());
                 }
             });
         }
@@ -302,8 +313,59 @@ public class TransactionAnalyzer {
         collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());
-        proxyContract(result.getHash());
         return result;
+    }
+
+
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void instantlyTokenTracker(Block collectionBlock) {
+        // 使用地址缓存初始化普通合约缓存信息
+        initGeneralContractCache();
+        List<String> contractAddress = ercTokenAnalyzer.listNeedTrackerAddress();
+
+        if (CollUtil.isNotEmpty(contractAddress)) {
+            contractAddress.forEach( specificEventAddress -> {
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM && ercTokenAnalyzer.needTracker(specificEventAddress)){
+                    log.info("当前区块[{}]中执行立即探测token类型的地址[{}]", collectionBlock.getNum(), specificEventAddress);
+                    ErcToken ercToken = tokenTracker(specificEventAddress,  collectionBlock.getNum());
+                    log.info("当前区块[{}]日志中合约地址[{}]探测结果[{}]", collectionBlock.getNum(), specificEventAddress, ercToken.getTypeEnum());
+                }
+            });
+        }
+
+    }
+
+    private ErcToken tokenTracker(String address, Long blockNumber){
+        ErcToken ercToken = ercTokenAnalyzer.resolveToken(address, BigInteger.valueOf(blockNumber), true);
+        switch(ercToken.getTypeEnum()){
+            case ERC20 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC20_EVM);
+                break;
+            case ERC721 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC721_EVM);
+                break; //可选
+            case ERC1155 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC1155_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC1155_EVM);
+                break;
+        }
+        return ercToken;
+    }
+
+    private void changeEvmAddressType(String specificEventAddress, ContractTypeEnum contractTypeEnum) {
+        // 更新缓存
+        GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(specificEventAddress, contractTypeEnum);
+        addressCache.changeEvmAddress2TokenAddress(specificEventAddress, contractTypeEnum);
+        // 更新db
+        Address address = addressMapper.selectByPrimaryKey(specificEventAddress);
+        if (ObjectUtil.isNotNull(address)) {
+            Address newAddress = new Address();
+            newAddress.setAddress(address.getAddress());
+            newAddress.setType(addressCache.convertContractTypeEnum2Type(contractTypeEnum));
+            addressMapper.updateByPrimaryKeySelective(newAddress);
+        }
     }
 
     private List<TxTransferBak> resolveContactTransferTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
@@ -327,48 +389,4 @@ public class TransactionAnalyzer {
         }
         return transferBakList;
     }
-
-    /**
-     * 针对特殊合约修改，仅对主网生效
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/2/9
-     */
-    private void proxyContract(String txHash) {
-        // 创建合约后的第一条交易，会设置合约的721属性
-        if ("0x908a9f487a1c9d39a17afe1a868705eec9b0ec899998eb7036412634388755ad".equalsIgnoreCase(txHash)) {
-            Address address = addressMapper.selectByPrimaryKey("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            if (ObjectUtil.isNotNull(address)) {
-                Address newAddress = new Address();
-                newAddress.setAddress(address.getAddress());
-                newAddress.setType(6);
-                addressMapper.updateByPrimaryKeySelective(newAddress);
-                Token token = new Token();
-                token.setAddress("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-                token.setType("erc721");
-                token.setName("QPassport");
-                token.setSymbol("QPT");
-                token.setTotalSupply("0");
-                token.setDecimal(0);
-                token.setIsSupportErc165(true);
-                token.setIsSupportErc20(false);
-                token.setIsSupportErc721(true);
-                token.setIsSupportErc721Enumeration(true);
-                token.setIsSupportErc721Metadata(true);
-                token.setTokenTxQty(0);
-                token.setHolder(0);
-                token.setContractDestroyBlock(0L);
-                token.setContractDestroyUpdate(false);
-                tokenMapper.insertSelective(token);
-                // 重置缓存
-                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.clear();
-                ercCache.init();
-                addressCache.getEvmContractAddressCache().remove("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            } else {
-                log.error("找不到该代理合约地址{}", "lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            }
-        }
-    }
-
 }

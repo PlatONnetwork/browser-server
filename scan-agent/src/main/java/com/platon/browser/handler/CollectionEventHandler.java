@@ -12,7 +12,6 @@ import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.*;
 import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.NodeMapper;
-import com.platon.browser.dao.mapper.TxTransferBakMapper;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.publisher.ComplementEventPublisher;
 import com.platon.browser.service.block.BlockService;
@@ -119,6 +118,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         // 确保event是原始副本，重试机制每一次使用的都是copyEvent
         CollectionEvent copyEvent = copyCollectionEvent(event);
         try {
+            transactionAnalyzer.instantlyTokenTracker(copyEvent.getBlock());
             Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
             List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
             for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {

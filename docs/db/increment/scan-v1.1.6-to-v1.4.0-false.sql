@@ -22,3 +22,12 @@ ALTER TABLE `address`
 
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`)
 VALUES (11, 1, 'tx_transfer_bak', '从tx_transfer_bak备份表统计地址表', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
+
+DROP TABLE IF EXISTS `token_tracker`;
+CREATE TABLE `token_tracker` (
+    `address` varchar(64) NOT NULL COMMENT '合约地址',
+    `trigger` int(11) NOT NULL DEFAULT 0 COMMENT '出发检测时机 0-当交易中存在token相关事件时  1-立即',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`address`)
+)  COMMENT ='token探测表';
