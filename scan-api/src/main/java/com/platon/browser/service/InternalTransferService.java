@@ -35,7 +35,7 @@ public class InternalTransferService {
         constructor.buildMust(new BoolQueryBuilder().should(QueryBuilders.termQuery("from", req.getAddress())).should(QueryBuilders.termQuery("to", req.getAddress())));
         constructor.setDesc("seq");
         constructor.setUnmappedType("long");
-        constructor.setResult(new String[]{"hash", "from", "fromType", "to", "toType", "value"});
+        constructor.setResult(new String[]{"hash", "from", "fromType", "to", "toType", "value", "bn"});
         try {
             items = esTransferTxRepository.search(constructor, InternalTransferParam.class, req.getPageNo(), req.getPageSize());
         } catch (Exception e) {
