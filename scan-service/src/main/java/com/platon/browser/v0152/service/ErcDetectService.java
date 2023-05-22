@@ -370,7 +370,12 @@ public class ErcDetectService {
             } else {
                 ercInfo = getErcInfoForLocal(contractAddress, blockNumber);
             }
-            return ercInfo2ErcContractId(ercInfo);
+
+            ErcContractId ercContractId = ercInfo2ErcContractId(ercInfo);
+            if(ercContractId.getTypeEnum() == ErcTypeEnum.ERC20 && (StringUtils.isBlank(ercContractId.getName()) || StringUtils.isBlank(ercContractId.getSymbol()) | ercContractId.getDecimal() == null || ercContractId.getTotalSupply() == null)){
+                ercContractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
+            }
+            return  ercContractId;
         } catch (PlatonCallTimeoutException e) {
             log.error("获取合约[{}]id超时异常", contractAddress);
             throw e;

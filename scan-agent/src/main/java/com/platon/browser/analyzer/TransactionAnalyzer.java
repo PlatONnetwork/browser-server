@@ -325,7 +325,7 @@ public class TransactionAnalyzer {
 
         if (CollUtil.isNotEmpty(contractAddress)) {
             contractAddress.forEach( specificEventAddress -> {
-                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM && ercTokenAnalyzer.needTracker(specificEventAddress)){
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM){
                     log.info("当前区块[{}]中执行立即探测token类型的地址[{}]", collectionBlock.getNum(), specificEventAddress);
                     ErcToken ercToken = tokenTracker(specificEventAddress,  collectionBlock.getNum());
                     log.info("当前区块[{}]日志中合约地址[{}]探测结果[{}]", collectionBlock.getNum(), specificEventAddress, ercToken.getTypeEnum());
