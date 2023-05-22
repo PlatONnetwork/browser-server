@@ -33,4 +33,9 @@ public class InternalTransferParam {
      */
     private String value;
 
+    /**
+     * 内部内部交易块高
+     */
+    private Integer bn;
+
 }

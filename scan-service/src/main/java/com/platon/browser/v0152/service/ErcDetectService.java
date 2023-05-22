@@ -372,7 +372,7 @@ public class ErcDetectService {
             }
 
             ErcContractId ercContractId = ercInfo2ErcContractId(ercInfo);
-            if(ercContractId.getTypeEnum() == ErcTypeEnum.ERC20 && (StringUtils.isBlank(ercContractId.getName()) || StringUtils.isBlank(ercContractId.getSymbol()) | ercContractId.getDecimal() == null || ercContractId.getTotalSupply() == null)){
+            if(ercContractId.getTypeEnum() == ErcTypeEnum.ERC20 && (StringUtils.isBlank(ercContractId.getName()) || StringUtils.isBlank(ercContractId.getSymbol()))){
                 ercContractId.setTypeEnum(ErcTypeEnum.UNKNOWN);
             }
             return  ercContractId;
