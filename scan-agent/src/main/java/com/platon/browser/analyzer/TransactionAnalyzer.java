@@ -248,7 +248,7 @@ public class TransactionAnalyzer {
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
 
         // 合约内部转账记录
-        if(CollUtil.isNotEmpty(receipt.getEmbedTransfer())){
+        if(CollUtil.isNotEmpty(receipt.getEmbedTransfer()) && status == Receipt.SUCCESS){
             result.setTransferTxList(resolveContactTransferTx(collectionBlock, result, receipt));
             result.setTransferTxInfo(JSON.toJSONString(result.getTransferTxList()));
         }
