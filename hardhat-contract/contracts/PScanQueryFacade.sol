@@ -22,7 +22,7 @@ contract PScanQueryFacade {
 
 
     function ercInfo(address addr) public view returns (uint8, string memory, string memory, uint8, uint256) {
-        uint8 bitmap;
+        uint8 bitmap;    
         string memory name;
         string memory symbol;
         uint8 decimals;
@@ -43,7 +43,7 @@ contract PScanQueryFacade {
         return (bitmap, name, symbol, decimals,totalSupply);
     }
 
-
+    
     function erc20Info(IERC20Metadata erc20) public view returns (uint8, string memory, string memory, uint8, uint256) {
         uint8 bitmap = 1;
         uint8 decimals = 0;
@@ -71,7 +71,7 @@ contract PScanQueryFacade {
             }
         }
 
-        uint256 totalSupply = 0;
+       uint256 totalSupply = 0;    
         if(bitmap == 1){
             try erc20.totalSupply() returns (uint256 result) {
                 totalSupply = result;
@@ -79,8 +79,8 @@ contract PScanQueryFacade {
                 bitmap = 0;
             }
         }
-
-        return (bitmap, name, symbol, decimals, totalSupply);
+           
+        return (bitmap, name, symbol, decimals, totalSupply); 
     }
 
     function erc721Info(address addr) public view returns (uint8, string memory, string memory, uint256) {
@@ -101,9 +101,9 @@ contract PScanQueryFacade {
             name = IERC721Metadata(addr).name();
             symbol = IERC721Metadata(addr).symbol();
         }
-        uint256 totalSupply = 0;
+        uint256 totalSupply = 0;   
         if(bitmap & 16 == 16){
-            totalSupply = IERC721Enumerable(addr).totalSupply();
+            totalSupply = IERC721Enumerable(addr).totalSupply();   
         }
         return (bitmap, name, symbol, totalSupply);
     }
