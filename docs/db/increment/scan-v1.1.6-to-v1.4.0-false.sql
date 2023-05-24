@@ -14,14 +14,14 @@ CREATE TABLE `tx_transfer_bak`
     `bn`        BIGINT(20) DEFAULT NULL COMMENT '区块高度',
     `b_time`    DATETIME     DEFAULT NULL COMMENT '区块时间',
     PRIMARY KEY (`id`)
-) COMMENT ='内部转账备份表';
+) AUTO_INCREMENT=10000000 COMMENT ='内部转账备份表';
 
 
 ALTER TABLE `address`
     ADD COLUMN `transfer_tx_qty` INT(11) DEFAULT 0  NOT NULL   COMMENT '合约内部转账 对应的交易数' AFTER `erc20_tx_qty`;
 
 INSERT INTO `point_log`(`id`, `type`, `name`, `desc`, `position`, `create_time`, `update_time`)
-VALUES (11, 1, 'tx_transfer_bak', '从tx_transfer_bak备份表统计地址表', '0', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
+VALUES (11, 1, 'tx_transfer_bak', '从tx_transfer_bak备份表统计地址表', '9999999', '2021-12-10 02:44:32', '2021-12-10 02:44:32');
 
 DROP TABLE IF EXISTS `token_tracker`;
 CREATE TABLE `token_tracker` (
