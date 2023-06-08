@@ -1,8 +1,6 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
-import com.platon.abi.solidity.datatypes.BytesType;
-import com.platon.abi.solidity.datatypes.Utf8String;
 import com.platon.abi.solidity.datatypes.generated.Uint256;
 import com.platon.browser.bean.*;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -20,6 +18,7 @@ import com.platon.protocol.Web3j;
 import com.platon.protocol.core.DefaultBlockParameterName;
 import com.platon.protocol.core.RemoteCall;
 import com.platon.protocol.core.Request;
+import com.platon.protocol.core.Response;
 import com.platon.protocol.core.methods.request.Transaction;
 import com.platon.protocol.core.methods.response.PlatonCall;
 import com.platon.tx.exceptions.ContractCallException;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -147,8 +147,13 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<Node> getHistoryVerifierList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        return nodeCall(web3j, blockNumber, GET_HISTORY_VERIFIER_LIST_FUNC_TYPE);
+    public List<Node> getHistoryVerifierList(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException ,BlankResponseException  {
+        Request<?, NodeResult> request = new Request<>("monitor_getVerifiersByBlockNumber", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), NodeResult.class);
+        NodeResult result = request.send();
+        if (result == null || result.getResult() == null) {
+            throw new BlankResponseException(String.format("【根据区块号获取结算周期验证人列表出错】函数类型:%s,区块号:%s,返回为空!%s", "monitor_getVerifiersByBlockNumber", blockNumber, JSON.toJSONString(Thread.currentThread().getStackTrace())));
+        }
+        return convertValidatorExToNode(result.getResult());
     }
 
     /**
@@ -158,8 +163,44 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<Node> getHistoryValidatorList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        return nodeCall(web3j, blockNumber, GET_HISTORY_VALIDATOR_LIST_FUNC_TYPE);
+    public List<Node> getHistoryValidatorList(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException,BlankResponseException {
+        Request<?, NodeResult> request = new Request<>("monitor_getValidatorsByBlockNumber", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), NodeResult.class);
+        NodeResult result = request.send();
+        if (result == null || result.getResult() == null) {
+            throw new BlankResponseException(String.format("【根据区块号获取共识周期验证人列表出错】函数类型:%s,区块号:%s,返回为空!%s", "monitor_getValidatorsByBlockNumber", blockNumber, JSON.toJSONString(Thread.currentThread().getStackTrace())));
+        }
+        return convertValidatorExToNode(result.getResult());
+    }
+
+    private List<Node> convertValidatorExToNode(List<ValidatorEx> validatorExes){
+        List<Node> nodes= new ArrayList<>();
+        for (ValidatorEx validatorEx :validatorExes){
+            Node node = new Node();
+            node.setNodeId(validatorEx.getNodeId());
+            node.setStakingAddress(validatorEx.getStakingAddress());
+            node.setBenifitAddress(validatorEx.getBenifitAddress());
+            node.setNextRewardPer(validatorEx.getNextRewardPer());
+            node.setStakingTxIndex(validatorEx.getStakingTxIndex());
+            node.setProgramVersion(validatorEx.getProgramVersion());
+            node.setStatus(validatorEx.getStatus());
+            node.setStakingEpoch(validatorEx.getStakingEpoch());
+            node.setStakingBlockNum(validatorEx.getStakingBlockNum());
+            node.setShares(Numeric.encodeQuantity(validatorEx.getShares()));
+            node.setReleased(Numeric.encodeQuantity(validatorEx.getReleased()));
+            node.setReleasedHes(Numeric.encodeQuantity(validatorEx.getReleasedHes()));
+            node.setRestrictingPlan(Numeric.encodeQuantity(validatorEx.getRestrictingPlan()));
+            node.setRestrictingPlanHes(Numeric.encodeQuantity(validatorEx.getRestrictingPlanHes()));
+            node.setExternalId(validatorEx.getExternalId());
+            node.setNodeName(validatorEx.getNodeName());
+            node.setWebsite(validatorEx.getWebsite());
+            node.setDetails(validatorEx.getDetails());
+            node.setValidatorTerm(validatorEx.getValidatorTerm());
+            node.setDelegateEpoch(validatorEx.getDelegateEpoch());
+            node.setDelegateTotal(Numeric.encodeQuantity(validatorEx.getDelegateTotal()));
+            node.setDelegateRewardTotal(Numeric.encodeQuantity(validatorEx.getDelegateRewardTotal()));
+            nodes.add(node);
+        }
+        return nodes;
     }
 
     /**
@@ -169,29 +210,17 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        final Function function = new Function(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.NODE_CONTRACT.getAddress(), InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if (br == null) {
-            throw new BlankResponseException(String.format("【查询历史低出块处罚信息出错】函数类型:%s,区块号:%s,返回为空!%s",
-                                                           String.valueOf(GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE),
-                                                           blockNumber,
-                                                           JSON.toJSONString(Thread.currentThread().getStackTrace())));
+    public List<HistoryLowRateSlash> getHistoryLowRateSlashList(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws BlankResponseException, IOException {
+        Request<?, HistoryLowRateSlashResult> request = new Request<>("monitor_getSlashInfoByBlockNumber", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), HistoryLowRateSlashResult.class);
+        HistoryLowRateSlashResult result = request.send();
+        if (result == null || result.getResult() == null) {
+            throw new BlankResponseException(String.format("【根据区块号获取历史低出块处罚信息列表出错】函数类型:%s,区块号:%s,返回为空!%s", "monitor_getSlashInfoByBlockNumber", blockNumber, JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
-        if (br.getData() == null) {
+        if (result.getResult() == null) {
             // 找不到数据，返回空列表
             return Collections.emptyList();
         }
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            return JSON.parseArray(data, HistoryLowRateSlash.class);
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询历史低出块处罚信息出错】函数类型:%s,区块号:%s,返回数据:%s", GET_HISTORY_LOW_RATE_SLASH_LIST_FUNC_TYPE, blockNumber.toString(), msg));
-        }
+        return result.getResult();
     }
 
     /**
@@ -226,22 +255,13 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<NodeVersion> getNodeVersionList(Web3j web3j) throws ContractInvokeException, BlankResponseException {
-        final Function function = new Function(GET_NODE_VERSION, Collections.emptyList());
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.NODE_CONTRACT.getAddress(), InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if (br == null || br.getData() == null) {
-            throw new BlankResponseException(String.format("【查询节点版本出错】函数类型:%s,返回为空!%s", GET_NODE_VERSION, JSON.toJSONString(Thread.currentThread().getStackTrace())));
+    public List<NodeVersion> getNodeVersionList(Web3jWrapper web3jWrapper) throws  BlankResponseException,IOException {
+        Request<?, NodeVersionResult> request = new Request<>("monitor_getNodeVersion", Arrays.asList(), web3jWrapper.getWeb3jService(), NodeVersionResult.class);
+        NodeVersionResult result = request.send();
+        if (result == null || result.getResult() == null) {
+            throw new BlankResponseException(String.format("【查询节点版本出错】函数类型:%s,返回为空!%s", "monitor_getNodeVersion", JSON.toJSONString(Thread.currentThread().getStackTrace())));
         }
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            return JSON.parseArray(data, NodeVersion.class);
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询节点版本出错】函数类型:%s,返回数据:%s", GET_NODE_VERSION, msg));
-        }
+        return result.getResult();
     }
 
     /**
@@ -251,22 +271,13 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
-        final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE, Collections.singletonList(new Utf8String(addresses)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress());
-        if (br == null || br.getData() == null) {
+    public List<RestrictingBalance> getRestrictingBalance(Web3jWrapper web3jWrapper, String addresses) throws BlankResponseException,IOException {
+        Request<?, RestrictingBalanceResult> request = new Request<>("monitor_getAccountView", Arrays.asList(addresses), web3jWrapper.getWeb3jService(), RestrictingBalanceResult.class);
+        RestrictingBalanceResult result = request.send();
+        if (result == null || result.getResult() == null) {
             throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!", addresses));
         }
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            return JSON.parseArray(data, RestrictingBalance.class);
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:%s,返回数据:%s", addresses, msg));
-        }
+        return result.getResult();
     }
 
     /**
@@ -276,80 +287,37 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public EpochInfo getEpochInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        final Function function = new Function(GET_HISTORY_REWARD, Collections.singletonList(new Uint256(blockNumber)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.NODE_CONTRACT.getAddress(), InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if (br == null || br.getData() == null) {
+    public EpochInfo getEpochInfo(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws  BlankResponseException,IOException {
+        Request<?, EpochInfoResult> request = new Request<>("monitor_getEpochInfoByBlockNumber", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), EpochInfoResult.class);
+        Response<EpochInfo> response = request.send();
+        if (response == null || response.getResult() == null) {
             throw new BlankResponseException(String.format("查询历史周期信息出错【blockNumber:%s)】,返回为空!", blockNumber));
         }
-
-        log.info("总发行量 特殊节点 req = {}  resp = {}", blockNumber, cn.hutool.json.JSONUtil.toJsonStr(br));
-
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            EpochInfo ei = JSON.parseObject(data, EpochInfo.class);
-            if (ei.getYearEndNum().compareTo(ei.getYearStartNum()) < 0) {
-                String msg = "查询历史周期信息出错【blockNumber:" + blockNumber + ")】:增发周期结束区块号【" + ei.getYearEndNum() + "】<开始区块号【" + ei.getYearStartNum() + "】";
-                log.error(msg);
-                throw new ContractInvokeException(msg);
-            }
-            return ei;
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询历史周期信息出错】区块号:%s,返回数据:%s", blockNumber, msg));
-        }
+        log.info("总发行量 特殊节点 req = {}  resp = {}", blockNumber, cn.hutool.json.JSONUtil.toJsonStr(response));
+        return response.getResult();
     }
 
     /**
      * 获取某个提案的所有参与者
      *
-     * @param web3j
+     * @param web3jWrapper
      * @param proposalHash
      * @param blockHash
      * @return
      * @throws Exception
      */
-    public ProposalParticipantStat getProposalParticipants(Web3j web3j, String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
+    public ProposalParticipantStat getProposalParticipants(Web3jWrapper web3jWrapper, String proposalHash, String blockHash) throws BlankResponseException,IOException {
 
-        final Function function = new Function(GET_PROPOSAL_RES_FUNC_TYPE,
-                                               Arrays.asList(new BytesType(Numeric.hexStringToByteArray(proposalHash)), new BytesType(Numeric.hexStringToByteArray(blockHash))));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress(), InnerContractAddrEnum.PROPOSAL_CONTRACT.getAddress());
-        if (br == null || br.getData() == null) {
+        Request<?, ProposalParticipantStatResult> request = new Request<>("monitor_getProposalParticipants", Arrays.asList(proposalHash,blockHash), web3jWrapper.getWeb3jService(), ProposalParticipantStatResult.class);
+        ProposalParticipantStatResult result = request.send();
+        if (result == null || result.getResult() == null) {
             throw new BlankResponseException(String.format("查询提案参与人出错【提案Hash:%s,区块Hash:%s】", proposalHash, blockHash));
         }
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            String[] a = data.replace("[", "").replace("]", "").split(",");
-            String voterCount = "0";
-            String supportCount = "0";
-            String opposeCount = "0";
-            String abstainCount = "0";
-            if (a.length >= 4) {
-                voterCount = a[0].trim();
-                supportCount = a[1].trim();
-                opposeCount = a[2].trim();
-                abstainCount = a[3].trim();
-            }
-            ProposalParticipantStat pps = new ProposalParticipantStat();
-            pps.setVoterCount(Long.parseLong(voterCount));
-            pps.setSupportCount(Long.parseLong(supportCount));
-            pps.setOpposeCount(Long.parseLong(opposeCount));
-            pps.setAbstainCount(Long.parseLong(abstainCount));
-            return pps;
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询提案参与者出错】提案Hash:%s,区块Hash:%s,返回数据:%s", proposalHash, blockHash, msg));
-        }
+        return result.getResult();
     }
 
     public ReceiptResult getReceiptResult(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws IOException {
-        Request<?, ReceiptResult> request = new Request<>("platon_getTransactionByBlock", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), ReceiptResult.class);
+        Request<?, ReceiptResult> request = new Request<>("monitor_getReceiptExtsByBlockNumber", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), ReceiptResult.class);
         return request.send();
     }
 
@@ -360,22 +328,10 @@ public class SpecialApi {
      * @return
      * @throws Exception
      */
-    public List<PPosInvokeContractInput> getPPosInvokeInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
-        final Function function = new Function(GET_PPOS_INFO_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
-        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.NODE_CONTRACT.getAddress(), InnerContractAddrEnum.NODE_CONTRACT.getAddress());
-        if (br == null || br.getData() == null) {
-            return Collections.EMPTY_LIST;
-        }
-        if (br.isStatusOk()) {
-            String data = br.getData();
-            if (data == null) {
-                throw new BlankResponseException(BLANK_RES);
-            }
-            return JSON.parseArray(data, PPosInvokeContractInput.class);
-        } else {
-            String msg = JSON.toJSONString(br);
-            throw new ContractInvokeException(String.format("【查询PPOS调用信息出错】函数类型:%s,区块号:%s,返回数据:%s", GET_PPOS_INFO_FUNC_TYPE, blockNumber.toString(), msg));
-        }
+    public ImplicitPPOSTxResult getPPosInvokeInfo(Web3jWrapper web3jWrapper, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException,IOException {
+        Request<?, ImplicitPPOSTxResult> request = new Request<>("monitor_getImplicitPPOSTx", Arrays.asList(blockNumber), web3jWrapper.getWeb3jService(), ImplicitPPOSTxResult.class);
+        ImplicitPPOSTxResult result = request.send();
+        return result;
     }
 
     /**

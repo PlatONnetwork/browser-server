@@ -4,13 +4,13 @@ import com.platon.browser.bean.ProposalParticipantStat;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.contracts.ppos.dto.CallResponse;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 /**
  * @description: 提案服务
@@ -34,8 +34,8 @@ public class ProposalService {
      * @return
      * @throws Exception
      */
-    public ProposalParticipantStat getProposalParticipantStat(String proposalHash, String blockHash) throws ContractInvokeException, BlankResponseException {
-        return specialApi.getProposalParticipants(platOnClient.getWeb3jWrapper().getWeb3j(), proposalHash, blockHash);
+    public ProposalParticipantStat getProposalParticipantStat(String proposalHash, String blockHash) throws BlankResponseException, IOException {
+        return specialApi.getProposalParticipants(platOnClient.getWeb3jWrapper(), proposalHash, blockHash);
     }
 
     /**

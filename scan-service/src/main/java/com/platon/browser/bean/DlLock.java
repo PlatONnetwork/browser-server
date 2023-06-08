@@ -1,5 +1,6 @@
 package com.platon.browser.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.platon.utils.Numeric;
 
 import java.math.BigInteger;
@@ -30,22 +31,25 @@ public class DlLock {
         return lockBalance;
     }
 
-    public void setLockBalance(String lockBalance) {
-        this.lockBalance = Numeric.decodeQuantity(lockBalance);
+    @JSONField(name = "restrictingPlanAmount")
+    public void setLockBalance(BigInteger lockBalance) {
+        this.lockBalance = lockBalance;
     }
 
     public BigInteger getFreeBalance() {
         return freeBalance;
     }
 
-    public void setFreeBalance(String freeBalance) {
-        this.freeBalance = Numeric.decodeQuantity(freeBalance);
+    @JSONField(name = "FreeBalance")
+    public void setFreeBalance(BigInteger freeBalance) {
+        this.freeBalance = freeBalance;
     }
 
     public BigInteger getEpoch() {
         return epoch;
     }
 
+    @JSONField(name = "expiredEpoch")
     public void setEpoch(BigInteger epoch) {
         this.epoch = epoch;
     }

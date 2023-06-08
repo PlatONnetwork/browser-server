@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
-	
+
 	@Mock
 	private NetworkStatCache networkStatCache;
     @Mock
@@ -74,9 +74,9 @@ public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
         when(web3jWrapper.getWeb3j()).thenReturn(web3j);
         EpochInfo epochInfo = new EpochInfo();
         epochInfo.setAvgPackTime(BigDecimal.ONE);
-        epochInfo.setPackageReward("0x99999");
+        epochInfo.setPackageReward(new BigInteger("99999"));
         epochInfo.setRemainEpoch(BigDecimal.TEN);
-        epochInfo.setStakingReward("0x333333");
+        epochInfo.setStakingReward(new BigInteger("33333"));
         epochInfo.setYearEndNum(BigDecimal.TEN);
         epochInfo.setYearStartNum(BigDecimal.ONE);
         epochInfo.setYearNum(BigDecimal.TEN);

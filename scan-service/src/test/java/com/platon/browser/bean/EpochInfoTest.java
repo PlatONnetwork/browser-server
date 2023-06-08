@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,9 +16,9 @@ public class EpochInfoTest {
     public void test(){
         EpochInfo epochInfo = new EpochInfo();
         epochInfo.setAvgPackTime(BigDecimal.ONE);
-        epochInfo.setPackageReward("0x1");
+        epochInfo.setPackageReward(new BigInteger("1"));
         epochInfo.setRemainEpoch(BigDecimal.ONE);
-        epochInfo.setStakingReward("0x1");
+        epochInfo.setStakingReward(new BigInteger("1"));
         epochInfo.setYearEndNum(BigDecimal.ONE);
         epochInfo.setYearNum(BigDecimal.ONE);
         epochInfo.setYearStartNum(BigDecimal.ONE);

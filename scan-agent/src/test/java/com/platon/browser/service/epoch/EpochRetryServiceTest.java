@@ -75,9 +75,9 @@ public class EpochRetryServiceTest extends AgentTestBase {
 
         EpochInfo epochInfo = new EpochInfo();
         epochInfo.setAvgPackTime(BigDecimal.ONE);
-        epochInfo.setPackageReward("0x99999");
+        epochInfo.setPackageReward(new BigInteger("99999"));
         epochInfo.setRemainEpoch(BigDecimal.TEN);
-        epochInfo.setStakingReward("0x333333");
+        epochInfo.setStakingReward(new BigInteger("333333"));
         epochInfo.setYearEndNum(BigDecimal.TEN);
         epochInfo.setYearStartNum(BigDecimal.ONE);
         epochInfo.setYearNum(BigDecimal.ONE);

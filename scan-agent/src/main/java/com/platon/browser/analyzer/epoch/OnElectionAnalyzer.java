@@ -64,7 +64,7 @@ public class OnElectionAnalyzer {
         List<NodeOpt> nodeOpts = new ArrayList<>();
         try {
             Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
-            List<HistoryLowRateSlash> slashList = specialApi.getHistoryLowRateSlashList(web3j, BigInteger.valueOf(block.getNum()));
+            List<HistoryLowRateSlash> slashList = specialApi.getHistoryLowRateSlashList(platOnClient.getWeb3jWrapper(), BigInteger.valueOf(block.getNum()));
             if (!slashList.isEmpty()) {
                 List<String> slashNodeIdList = new ArrayList<>();
                 // 统一节点ID格式： 0x开头

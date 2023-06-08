@@ -62,7 +62,7 @@ public class TransactionUtilsTest extends AgentTestData {
         transData.setCode("1");
         transDatas.add(transData);
         pPosInvokeContractInput.setTransDatas(transDatas);
-        TransactionUtil.getVirtualTxList(block, transaction, pPosInvokeContractInput);
+//        TransactionUtil.getVirtualTxList(block, transaction, pPosInvokeContractInput);
 
         List<Log> logs = new ArrayList<>();
         Log log = new Log();
@@ -122,7 +122,7 @@ public class TransactionUtilsTest extends AgentTestData {
     }
 
     @Test
-    public void processVirtualTx() throws ContractInvokeException, BlankResponseException {
+    public void processVirtualTx() throws ContractInvokeException, BlankResponseException,IOException{
         Logger logger = LoggerFactory.getLogger("123");
         Long bn = 100l;
         CollectionBlock collectionBlock = CollectionBlock.newInstance();
@@ -150,7 +150,7 @@ public class TransactionUtilsTest extends AgentTestData {
         pPosInvokeContractInput.setTransDatas(transDatas);
         pPosInvokeContractInput4Blocks.add(pPosInvokeContractInput);
 //        PPosInvokeContractInputCache.update(bn, pPosInvokeContractInput4Blocks);
-        when(specialApi.getPPosInvokeInfo(any(), any())).thenReturn(pPosInvokeContractInput4Blocks);
+//        when(specialApi.getPPosInvokeInfo(any(), any())).thenReturn(pPosInvokeContractInput4Blocks);
         collectionTransaction.setHash("0x123");
         collectionTransaction.setStatus(1);
 

@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.platon.utils.Numeric;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -35,16 +35,18 @@ public class RestrictingBalance {
      */
     private List<DlLock> dlLocks;
 
-    public void setFreeBalance(String freeBalance) {
-        this.freeBalance = Numeric.decodeQuantity(freeBalance);
+    public void setFreeBalance(BigInteger freeBalance) {
+        this.freeBalance = freeBalance;
     }
 
-    public void setLockBalance(String lockBalance) {
-        this.lockBalance = Numeric.decodeQuantity(lockBalance);
+    @JSONField(name = "restrictingPlanLockedAmount")
+    public void setLockBalance(BigInteger lockBalance) {
+        this.lockBalance = lockBalance;
     }
 
-    public void setPledgeBalance(String pledgeBalance) {
-        this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
+    @JSONField(name = "restrictingPlanPledgeAmount")
+    public void setPledgeBalance(BigInteger pledgeBalance) {
+        this.pledgeBalance = pledgeBalance;
     }
 
     public String getAccount() {
@@ -71,16 +73,18 @@ public class RestrictingBalance {
         return dlFreeBalance;
     }
 
-    public void setDlFreeBalance(String dlFreeBalance) {
-        this.dlFreeBalance = Numeric.decodeQuantity(dlFreeBalance);
+    @JSONField(name = "delegationUnLockedFreeBalance")
+    public void setDlFreeBalance(BigInteger dlFreeBalance) {
+        this.dlFreeBalance = dlFreeBalance;
     }
 
     public BigInteger getDlRestrictingBalance() {
         return dlRestrictingBalance;
     }
 
-    public void setDlRestrictingBalance(String dlRestrictingBalance) {
-        this.dlRestrictingBalance = Numeric.decodeQuantity(dlRestrictingBalance);
+    @JSONField(name = "delegationUnLockedRestrictingPlanAmount")
+    public void setDlRestrictingBalance(BigInteger dlRestrictingBalance) {
+        this.dlRestrictingBalance = dlRestrictingBalance;
     }
 
     public List<DlLock> getDlLocks() {

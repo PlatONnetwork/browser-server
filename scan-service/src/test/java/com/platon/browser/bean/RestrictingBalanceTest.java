@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigInteger;
+
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -13,9 +15,9 @@ public class RestrictingBalanceTest {
     public void test(){
         RestrictingBalance rb = new RestrictingBalance();
         rb.setAccount("sfsdfsfs");
-        rb.setFreeBalance("0x99999");
-        rb.setLockBalance("0x99999");
-        rb.setPledgeBalance("0x99999");
+        rb.setFreeBalance(new BigInteger("99999"));
+        rb.setLockBalance(new BigInteger("99999"));
+        rb.setPledgeBalance(new BigInteger("99999"));
 
         rb.getAccount();
         rb.getFreeBalance();

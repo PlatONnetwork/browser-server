@@ -27,6 +27,11 @@ public class Receipt {
     private List<ContractInfo> contractCreated;
     private List<String> topics;
 
+    private byte[] root;
+    private List<ContractInfo> contractSuicided;
+    private List<ProxyPattern> proxyPatterns;
+    private List<UnusualTransfer> unusualTransfer;
+
     private int logStatus;
 
     private String failReason;

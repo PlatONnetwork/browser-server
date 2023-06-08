@@ -1,8 +1,10 @@
 package com.platon.browser.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.platon.utils.Numeric;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 结算周期信息
@@ -70,22 +72,23 @@ public class EpochInfo {
         return packageReward;
     }
 
-    public void setPackageReward(String packageReward) {
-        this.packageReward = new BigDecimal(Numeric.decodeQuantity(packageReward));
+    public void setPackageReward(BigInteger packageReward) {
+        this.packageReward = new BigDecimal(packageReward);
     }
 
     public BigDecimal getStakingReward() {
         return stakingReward;
     }
 
-    public void setStakingReward(String stakingReward) {
-        this.stakingReward = new BigDecimal(Numeric.decodeQuantity(stakingReward));
+    public void setStakingReward(BigInteger stakingReward) {
+        this.stakingReward = new BigDecimal(stakingReward);
     }
 
     public BigDecimal getYearNum() {
         return yearNum;
     }
 
+    @JSONField(name = "chainAge")
     public void setYearNum(BigDecimal yearNum) {
         this.yearNum = yearNum;
     }
@@ -94,6 +97,7 @@ public class EpochInfo {
         return yearStartNum;
     }
 
+    @JSONField(name = "yearStartBlockNum")
     public void setYearStartNum(BigDecimal yearStartNum) {
         this.yearStartNum = yearStartNum;
     }
@@ -102,6 +106,7 @@ public class EpochInfo {
         return yearEndNum;
     }
 
+    @JSONField(name = "yearEndBlockNum")
     public void setYearEndNum(BigDecimal yearEndNum) {
         this.yearEndNum = yearEndNum;
     }
@@ -126,32 +131,32 @@ public class EpochInfo {
         return curPackageReward;
     }
 
-    public void setCurPackageReward(String curPackageReward) {
-        this.curPackageReward = new BigDecimal(Numeric.decodeQuantity(curPackageReward));
+    public void setCurPackageReward(BigInteger curPackageReward) {
+        this.curPackageReward = new BigDecimal(curPackageReward);
     }
 
     public BigDecimal getCurStakingReward() {
         return curStakingReward;
     }
 
-    public void setCurStakingReward(String curStakingReward) {
-        this.curStakingReward = new BigDecimal(Numeric.decodeQuantity(curStakingReward));
+    public void setCurStakingReward(BigInteger curStakingReward) {
+        this.curStakingReward = new BigDecimal(curStakingReward);
     }
 
     public BigDecimal getNextPackageReward() {
         return nextPackageReward;
     }
 
-    public void setNextPackageReward(String nextPackageReward) {
-        this.nextPackageReward = new BigDecimal(Numeric.decodeQuantity(nextPackageReward));
+    public void setNextPackageReward(BigInteger nextPackageReward) {
+        this.nextPackageReward = new BigDecimal(nextPackageReward);
     }
 
     public BigDecimal getNextStakingReward() {
         return nextStakingReward;
     }
 
-    public void setNextStakingReward(String nextStakingReward) {
-        this.nextStakingReward = new BigDecimal(Numeric.decodeQuantity(nextStakingReward));
+    public void setNextStakingReward(BigInteger nextStakingReward) {
+        this.nextStakingReward = new BigDecimal(nextStakingReward);
     }
 
 }

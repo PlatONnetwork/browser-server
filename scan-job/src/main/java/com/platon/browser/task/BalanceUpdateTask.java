@@ -122,7 +122,7 @@ public class BalanceUpdateTask {
                 log.debug("锁仓余额查询参数：{}", addresses);
 
                 Instant start = Instant.now();
-                List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(web3j, addresses);
+                List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper(), addresses);
                 Instant end = Instant.now();
                 Duration duration = Duration.between(start, end);
                 log.debug("本批次查询地址锁仓余额耗时：{} ms", duration.toMillis());
