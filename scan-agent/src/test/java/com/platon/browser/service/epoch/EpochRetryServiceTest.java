@@ -23,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -74,13 +73,13 @@ public class EpochRetryServiceTest extends AgentTestBase {
         when(response.getData()).thenReturn(verifierList);
 
         EpochInfo epochInfo = new EpochInfo();
-        epochInfo.setAvgPackTime(BigDecimal.ONE);
+        epochInfo.setAvgPackTime(new BigInteger("1"));
         epochInfo.setPackageReward(new BigInteger("99999"));
-        epochInfo.setRemainEpoch(BigDecimal.TEN);
+        epochInfo.setRemainEpoch(new BigInteger("1"));
         epochInfo.setStakingReward(new BigInteger("333333"));
-        epochInfo.setYearEndNum(BigDecimal.TEN);
-        epochInfo.setYearStartNum(BigDecimal.ONE);
-        epochInfo.setYearNum(BigDecimal.ONE);
+        epochInfo.setYearEndBlockNum(new BigInteger("1"));
+        epochInfo.setYearStartBlockNum(new BigInteger("1"));
+        epochInfo.setChainAge(new BigInteger("1"));
         when(specialApi.getEpochInfo(any(),any())).thenReturn(epochInfo);
     }
 

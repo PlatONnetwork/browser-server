@@ -1,8 +1,5 @@
 package com.platon.browser.bean;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.platon.utils.Numeric;
-
 import java.math.BigInteger;
 
 /**
@@ -15,7 +12,7 @@ public class DlLock {
     /**
      * 锁仓金额
      */
-    private BigInteger lockBalance;
+    private BigInteger restrictingPlanAmount;
 
     /**
      * 自由金金额
@@ -25,33 +22,30 @@ public class DlLock {
     /**
      * 解锁结算周期
      */
-    private BigInteger epoch;
+    private BigInteger expiredEpoch;
 
-    public BigInteger getLockBalance() {
-        return lockBalance;
+    public BigInteger getRestrictingPlanAmount() {
+        return restrictingPlanAmount;
     }
 
-    @JSONField(name = "restrictingPlanAmount")
-    public void setLockBalance(BigInteger lockBalance) {
-        this.lockBalance = lockBalance;
+    public void setRestrictingPlanAmount(BigInteger restrictingPlanAmount) {
+        this.restrictingPlanAmount = restrictingPlanAmount;
     }
 
     public BigInteger getFreeBalance() {
         return freeBalance;
     }
 
-    @JSONField(name = "FreeBalance")
     public void setFreeBalance(BigInteger freeBalance) {
         this.freeBalance = freeBalance;
     }
 
-    public BigInteger getEpoch() {
-        return epoch;
+    public BigInteger getExpiredEpoch() {
+        return expiredEpoch;
     }
 
-    @JSONField(name = "expiredEpoch")
-    public void setEpoch(BigInteger epoch) {
-        this.epoch = epoch;
+    public void setExpiredEpoch(BigInteger expiredEpoch) {
+        this.expiredEpoch = expiredEpoch;
     }
 
 }

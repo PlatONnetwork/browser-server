@@ -148,7 +148,7 @@ public class AddressService {
             // 未解冻的委托金额/待赎回委托
             BigDecimal lockBalance = BigDecimal.ZERO;
             if (CollUtil.isNotEmpty(restrictingBalances)) {
-                unLockBalance = new BigDecimal(restrictingBalances.get(0).getDlFreeBalance().add(restrictingBalances.get(0).getDlRestrictingBalance()));
+                unLockBalance = new BigDecimal(restrictingBalances.get(0).getDelegationUnLockedFreeBalance().add(restrictingBalances.get(0).getDelegationUnLockedRestrictingPlanAmount()));
                 unLockBalance = ConvertUtil.convertByFactor(unLockBalance, 18);
                 if (CollUtil.isNotEmpty(restrictingBalances.get(0).getDlLocks())) {
                     NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
@@ -159,11 +159,11 @@ public class AddressService {
                         logger.error("获取区块错误。", e);
                     }
                     for (DlLock dlLock : restrictingBalances.get(0).getDlLocks()) {
-                        BigDecimal accLockBalance = new BigDecimal(dlLock.getFreeBalance().add(dlLock.getLockBalance()));
+                        BigDecimal accLockBalance = new BigDecimal(dlLock.getFreeBalance().add(dlLock.getRestrictingPlanAmount()));
                         accLockBalance = ConvertUtil.convertByFactor(accLockBalance, 18);
                         lockBalance = lockBalance.add(accLockBalance);
                         LockDelegate lockDelegate = new LockDelegate();
-                        lockDelegate.setBlockNum(dlLock.getEpoch().multiply(blockChainConfig.getSettlePeriodBlockCount()));
+                        lockDelegate.setBlockNum(dlLock.getExpiredEpoch().multiply(blockChainConfig.getSettlePeriodBlockCount()));
                         // 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间
                         BigDecimal diff = new BigDecimal(lockDelegate.getBlockNum().subtract(BigInteger.valueOf(networkStat.getCurNumber())));
                         if (block != null) {
@@ -203,7 +203,7 @@ public class AddressService {
                 /**
                  * 可用余额为balance减去质押金额
                  */
-                queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+                queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getRestrictingPlanLockedAmount().subtract(restrictingBalances.get(0).getRestrictingPlanPledgeAmount())));
             }
             // 质押金额和待释放金额查询锁仓合约
             RestrictingPlanContract restrictingPlanContract = platonClient.getRestrictingPlanContract();
@@ -288,7 +288,7 @@ public class AddressService {
         List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper(), req.getAddress());
         if (restrictingBalances != null && !restrictingBalances.isEmpty()) {
             resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
-            resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+            resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getRestrictingPlanLockedAmount().subtract(restrictingBalances.get(0).getRestrictingPlanPledgeAmount())));
         }
         /** 特殊账户余额直接查询链  */
         if (resp.getBalance().compareTo(BigDecimal.valueOf(10000000000L)) > 0) {

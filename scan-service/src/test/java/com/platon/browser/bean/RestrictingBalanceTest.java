@@ -1,6 +1,5 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.bean.RestrictingBalance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -16,13 +15,13 @@ public class RestrictingBalanceTest {
         RestrictingBalance rb = new RestrictingBalance();
         rb.setAccount("sfsdfsfs");
         rb.setFreeBalance(new BigInteger("99999"));
-        rb.setLockBalance(new BigInteger("99999"));
-        rb.setPledgeBalance(new BigInteger("99999"));
+        rb.setRestrictingPlanLockedAmount(new BigInteger("99999"));
+        rb.setRestrictingPlanPledgeAmount(new BigInteger("99999"));
 
         rb.getAccount();
         rb.getFreeBalance();
-        rb.getLockBalance();
-        rb.getPledgeBalance();
+        rb.getRestrictingPlanLockedAmount();
+        rb.getRestrictingPlanPledgeAmount();
 
         assertTrue(true);
     }

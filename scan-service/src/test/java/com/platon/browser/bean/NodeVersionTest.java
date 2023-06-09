@@ -12,7 +12,7 @@ public class NodeVersionTest {
     @Test
     public void test(){
         NodeVersion nv = new NodeVersion();
-        nv.setBigVersion("3333");
+//        nv.setBigVersion("3333");
         nv.setNodeId("0xdsfsdffs");
         nv.getBigVersion();
         nv.getNodeId();

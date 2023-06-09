@@ -12,19 +12,19 @@ import java.math.BigInteger;
 public class RestrictingBalance {
     private String account;
     private BigInteger freeBalance;
-    private BigInteger lockBalance;
-    private BigInteger pledgeBalance;
+    private BigInteger restrictingPlanLockedAmount;
+    private BigInteger restrictingPlanPledgeAmount;
 
     public void setFreeBalance(String freeBalance) {
         this.freeBalance = Numeric.decodeQuantity(freeBalance);
     }
 
-    public void setLockBalance(String lockBalance) {
-        this.lockBalance = Numeric.decodeQuantity(lockBalance);
+    public void setRestrictingPlanLockedAmount(String restrictingPlanLockedAmount) {
+        this.restrictingPlanLockedAmount = Numeric.decodeQuantity(restrictingPlanLockedAmount);
     }
 
-    public void setPledgeBalance(String pledgeBalance) {
-        this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
+    public void setRestrictingPlanPledgeAmount(String restrictingPlanPledgeAmount) {
+        this.restrictingPlanPledgeAmount = Numeric.decodeQuantity(restrictingPlanPledgeAmount);
     }
 
 	public String getAccount() {
@@ -39,12 +39,12 @@ public class RestrictingBalance {
 		return freeBalance;
 	}
 
-	public BigInteger getLockBalance() {
-		return lockBalance;
+	public BigInteger getRestrictingPlanLockedAmount() {
+		return restrictingPlanLockedAmount;
 	}
 
-	public BigInteger getPledgeBalance() {
-		return pledgeBalance;
+	public BigInteger getRestrictingPlanPledgeAmount() {
+		return restrictingPlanPledgeAmount;
 	}
 
 }

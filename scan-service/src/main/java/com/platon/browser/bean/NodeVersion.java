@@ -16,13 +16,11 @@ public class NodeVersion {
     public Integer getProgramVersion(){
         return programVersion;
     }
-    @JSONField(name = "ProgramVersion")
     private Integer bigVersion;
-    public void setBigVersion(String bigVersion){
-        this.programVersion = Integer.valueOf(bigVersion);
-        this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(bigVersion)).intValue();
+    public void setProgramVersion(String programVersion){
+        this.programVersion = Integer.valueOf(programVersion);
+        this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(programVersion)).intValue();
     }
-    @JSONField(name = "NodeId")
     private String nodeId;
     public void setNodeId(String nodeId){
         this.nodeId = HexUtil.prefix(nodeId);
@@ -30,9 +28,9 @@ public class NodeVersion {
 	public Integer getBigVersion() {
 		return bigVersion;
 	}
-	public void setBigVersion(Integer bigVersion) {
-        this.programVersion = bigVersion;
-		this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(String.valueOf(bigVersion))).intValue();
+	public void setProgramVersion(Integer programVersion) {
+        this.programVersion = programVersion;
+		this.bigVersion = ChainVersionUtil.toBigVersion(new BigInteger(String.valueOf(programVersion))).intValue();
 	}
 	public String getNodeId() {
 		return nodeId;

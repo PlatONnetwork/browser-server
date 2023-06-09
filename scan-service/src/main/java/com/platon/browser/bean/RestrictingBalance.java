@@ -1,7 +1,5 @@
 package com.platon.browser.bean;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 import java.math.BigInteger;
 import java.util.List;
 
@@ -16,19 +14,19 @@ public class RestrictingBalance {
 
     private BigInteger freeBalance;
 
-    private BigInteger lockBalance;
+    private BigInteger restrictingPlanLockedAmount;
 
-    private BigInteger pledgeBalance;
+    private BigInteger restrictingPlanPledgeAmount;
 
     /**
      * 委托锁定待提取中余额部分
      */
-    private BigInteger dlFreeBalance;
+    private BigInteger delegationUnLockedFreeBalance;
 
     /**
      * 委托锁定待提取中锁仓部分
      */
-    private BigInteger dlRestrictingBalance;
+    private BigInteger delegationUnLockedRestrictingPlanAmount;
 
     /**
      * 委托锁定中锁定的列表
@@ -39,14 +37,12 @@ public class RestrictingBalance {
         this.freeBalance = freeBalance;
     }
 
-    @JSONField(name = "restrictingPlanLockedAmount")
-    public void setLockBalance(BigInteger lockBalance) {
-        this.lockBalance = lockBalance;
+    public void setRestrictingPlanLockedAmount(BigInteger restrictingPlanLockedAmount) {
+        this.restrictingPlanLockedAmount = restrictingPlanLockedAmount;
     }
 
-    @JSONField(name = "restrictingPlanPledgeAmount")
-    public void setPledgeBalance(BigInteger pledgeBalance) {
-        this.pledgeBalance = pledgeBalance;
+    public void setRestrictingPlanPledgeAmount(BigInteger restrictingPlanPledgeAmount) {
+        this.restrictingPlanPledgeAmount = restrictingPlanPledgeAmount;
     }
 
     public String getAccount() {
@@ -61,30 +57,28 @@ public class RestrictingBalance {
         return freeBalance;
     }
 
-    public BigInteger getLockBalance() {
-        return lockBalance;
+    public BigInteger getRestrictingPlanLockedAmount() {
+        return restrictingPlanLockedAmount;
     }
 
-    public BigInteger getPledgeBalance() {
-        return pledgeBalance;
+    public BigInteger getRestrictingPlanPledgeAmount() {
+        return restrictingPlanPledgeAmount;
     }
 
-    public BigInteger getDlFreeBalance() {
-        return dlFreeBalance;
+    public BigInteger getDelegationUnLockedFreeBalance() {
+        return delegationUnLockedFreeBalance;
     }
 
-    @JSONField(name = "delegationUnLockedFreeBalance")
-    public void setDlFreeBalance(BigInteger dlFreeBalance) {
-        this.dlFreeBalance = dlFreeBalance;
+    public void setDelegationUnLockedFreeBalance(BigInteger delegationUnLockedFreeBalance) {
+        this.delegationUnLockedFreeBalance = delegationUnLockedFreeBalance;
     }
 
-    public BigInteger getDlRestrictingBalance() {
-        return dlRestrictingBalance;
+    public BigInteger getDelegationUnLockedRestrictingPlanAmount() {
+        return delegationUnLockedRestrictingPlanAmount;
     }
 
-    @JSONField(name = "delegationUnLockedRestrictingPlanAmount")
-    public void setDlRestrictingBalance(BigInteger dlRestrictingBalance) {
-        this.dlRestrictingBalance = dlRestrictingBalance;
+    public void setDelegationUnLockedRestrictingPlanAmount(BigInteger delegationUnLockedRestrictingPlanAmount) {
+        this.delegationUnLockedRestrictingPlanAmount = delegationUnLockedRestrictingPlanAmount;
     }
 
     public List<DlLock> getDlLocks() {

@@ -1,5 +1,7 @@
 package com.platon.browser.client;
 
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.contracts.ppos.*;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.Node;
@@ -90,7 +92,7 @@ public class PlatOnClient {
         return retryableClient.getWeb3jWrapper();
     }
 
-    public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException {
+    public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException, BlankResponseException, ContractInvokeException {
         ReceiptResult receiptResult = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(), BigInteger.valueOf(blockNumber));
         receiptResult.resolve(blockNumber, logDecodeExecutor);
         return receiptResult;

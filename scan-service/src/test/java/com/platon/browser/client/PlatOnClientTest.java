@@ -1,5 +1,7 @@
 package com.platon.browser.client;
 
+import com.platon.browser.exception.BlankResponseException;
+import com.platon.browser.exception.ContractInvokeException;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.Request;
 import com.platon.protocol.core.Response;
@@ -35,7 +37,7 @@ public class PlatOnClientTest {
 	private PlatOnClient target;
 
 	@Test
-	public void testInit() throws IOException, InterruptedException {
+	public void testInit() throws IOException,ContractInvokeException,InterruptedException, BlankResponseException {
 		ReflectionTestUtils.setField(target,"logDecodeExecutor",logDecodeExecutor);
 		ReflectionTestUtils.setField(target,"retryableClient",retryableClient);
 		ReflectionTestUtils.setField(target,"specialApi",specialApi);

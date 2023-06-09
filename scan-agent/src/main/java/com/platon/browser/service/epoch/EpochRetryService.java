@@ -227,9 +227,9 @@ public class EpochRetryService {
             ConfigChange configChange = new ConfigChange();
             configChange.setAvgPackTime(epochInfo.getAvgPackTime());
             configChange.setBlockReward(epochInfo.getNextPackageReward());
-            configChange.setIssueEpoch(epochInfo.getYearNum());
-            configChange.setYearStartNum(epochInfo.getYearStartNum());
-            configChange.setYearEndNum(epochInfo.getYearEndNum());
+            configChange.setIssueEpoch(epochInfo.getChainAge());
+            configChange.setYearStartNum(epochInfo.getYearStartBlockNum());
+            configChange.setYearEndNum(epochInfo.getYearEndBlockNum());
             configChange.setRemainEpoch(epochInfo.getRemainEpoch());
             configChange.setSettleStakeReward(epochInfo.getNextStakingReward());
             configChange.setStakeReward(stakeReward);

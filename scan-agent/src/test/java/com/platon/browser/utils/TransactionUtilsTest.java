@@ -1,5 +1,6 @@
 package com.platon.browser.utils;//package com.platon.browser.utils;
 
+import com.platon.browser.exception.ResponseErrorResultException;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.Request;
 import com.platon.protocol.core.methods.response.Log;
@@ -122,7 +123,7 @@ public class TransactionUtilsTest extends AgentTestData {
     }
 
     @Test
-    public void processVirtualTx() throws ContractInvokeException, BlankResponseException,IOException{
+    public void processVirtualTx() throws ContractInvokeException, BlankResponseException,IOException, ResponseErrorResultException {
         Logger logger = LoggerFactory.getLogger("123");
         Long bn = 100l;
         CollectionBlock collectionBlock = CollectionBlock.newInstance();

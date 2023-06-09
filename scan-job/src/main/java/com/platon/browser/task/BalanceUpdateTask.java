@@ -132,7 +132,7 @@ public class BalanceUpdateTask {
                 balanceList.forEach(balance -> {
                     InternalAddress address = addressMap.get(balance.getAccount());
                     address.setBalance(new BigDecimal(balance.getFreeBalance()));
-                    address.setRestrictingBalance(new BigDecimal(balance.getLockBalance().subtract(balance.getPledgeBalance())));
+                    address.setRestrictingBalance(new BigDecimal(balance.getRestrictingPlanLockedAmount().subtract(balance.getRestrictingPlanPledgeAmount())));
                 });
 
                 // 同步更新，防止表锁争用导致的死锁

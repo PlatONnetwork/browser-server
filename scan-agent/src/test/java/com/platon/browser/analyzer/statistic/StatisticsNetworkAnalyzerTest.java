@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
-import javax.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -73,13 +73,13 @@ public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
         Web3j web3j = mock(Web3j.class);
         when(web3jWrapper.getWeb3j()).thenReturn(web3j);
         EpochInfo epochInfo = new EpochInfo();
-        epochInfo.setAvgPackTime(BigDecimal.ONE);
+        epochInfo.setAvgPackTime(new BigInteger("1"));
         epochInfo.setPackageReward(new BigInteger("99999"));
-        epochInfo.setRemainEpoch(BigDecimal.TEN);
+        epochInfo.setRemainEpoch(new BigInteger("10"));
         epochInfo.setStakingReward(new BigInteger("33333"));
-        epochInfo.setYearEndNum(BigDecimal.TEN);
-        epochInfo.setYearStartNum(BigDecimal.ONE);
-        epochInfo.setYearNum(BigDecimal.TEN);
+        epochInfo.setYearEndBlockNum(new BigInteger("10"));
+        epochInfo.setYearStartBlockNum(new BigInteger("1"));
+        epochInfo.setChainAge(new BigInteger("10"));
         when(specialApi.getEpochInfo(any(),any())).thenReturn(epochInfo);
     }
 
