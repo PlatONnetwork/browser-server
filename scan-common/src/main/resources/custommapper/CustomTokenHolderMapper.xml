@@ -35,7 +35,6 @@
                t.symbol,
                t.name,
                t.total_supply   as totalSupply,
-               th.token_id      as tokenId,
                th.balance,
                t.decimal,
                th.token_tx_qty  as txCount

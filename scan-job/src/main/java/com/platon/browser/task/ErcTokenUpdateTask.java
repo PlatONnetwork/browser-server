@@ -1260,19 +1260,28 @@ public class ErcTokenUpdateTask {
      */
     private void contractErc721DestroyUpdateBalance() {
         try {
+            //查询出被销毁的721合约地址
             List<String> contractErc721Destroys = customAddressMapper.findContractDestroy(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
             if (CollUtil.isNotEmpty(contractErc721Destroys)) {
                 for (String tokenAddress : contractErc721Destroys) {
+                    //查询每个销毁721合约，所有持有人以及他们持有tokenID的数量
                     List<Erc721ContractDestroyBalanceVO> list = customToken721InventoryMapper.findErc721ContractDestroyBalance(tokenAddress);
+
+                    //查询每个销毁721合约的所有持有人的记录
                     Page<CustomTokenHolder> ids = customTokenHolderMapper.selectERC721Holder(tokenAddress);
                     List<TokenHolder> updateParams = new ArrayList<>();
                     StringBuilder res = new StringBuilder();
+                    //遍历每个持有人
                     for (CustomTokenHolder tokenHolder : ids) {
+
+                        //过滤找出每个持有人的持有tokenID的数量
                         List<Erc721ContractDestroyBalanceVO> filterList = list.stream().filter(v -> v.getOwner().equalsIgnoreCase(tokenHolder.getAddress())).collect(Collectors.toList());
                         int balance = 0;
                         if (CollUtil.isNotEmpty(filterList)) {
+                            //设置持有销毁721合约的余额（即持有token_id数量)
                             balance = filterList.get(0).getNum();
                         }
+                        //如果持有人的持有销毁721合约的当前余额，和持有数量不一致，则更新
                         if (!tokenHolder.getBalance().equalsIgnoreCase(cn.hutool.core.convert.Convert.toStr(balance))) {
                             TokenHolder updateTokenHolder = new TokenHolder();
                             updateTokenHolder.setTokenAddress(tokenHolder.getTokenAddress());
