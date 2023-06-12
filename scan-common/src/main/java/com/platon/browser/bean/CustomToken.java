@@ -2,6 +2,7 @@ package com.platon.browser.bean;
 
 import lombok.Data;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 @Data
@@ -28,5 +29,7 @@ public class CustomToken {
     private Integer tokenTxQty;
 
     private Integer holder;
+
+    private BigInteger createdBlockNumber;
 
 }
