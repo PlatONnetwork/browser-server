@@ -23,26 +23,26 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.9.191:3306/scan_platonhyp?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
-                        userId="platon"
-                        password="platon"/>
+                        connectionURL="jdbc:mysql://192.168.120.149:20000/scan_platon?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+                        userId="scan_platon_r"
+                        password="123456"/>
 
-        <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="C:/project/browser-server/scan-common/src/main/java">
+        <javaModelGenerator targetPackage="com.platon.browser.dao.entity" targetProject="C:/work/github/PlatONnetwork/browser-server/scan-common/src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
        <sqlMapGenerator targetPackage="mapper"
-                         targetProject="C:/project/browser-server/scan-common/src/main/resources">
+                         targetProject="C:/work/github/PlatONnetwork/browser-server/scan-common/src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
         <javaClientGenerator targetPackage="com.platon.browser.dao.mapper"
-                             targetProject="C:/project/browser-server/scan-common/src/main/java" type="XMLMAPPER">
+                             targetProject="C:/work/github/PlatONnetwork/browser-server/scan-common/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="tx_bak" domainObjectName="TxBak">
+        <table tableName="token_tracker" domainObjectName="TokenTracker">
             <columnRenamingRule searchString="^D_" replaceString=""/>
         </table>
     </context>

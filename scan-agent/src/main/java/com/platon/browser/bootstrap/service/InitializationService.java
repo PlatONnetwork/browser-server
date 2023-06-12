@@ -177,11 +177,6 @@ public class InitializationService {
         List<Address> addressList = addressMapper.selectByExample(addressExample);
         addressCache.initEvmContractAddressCache(addressList);
 
-        // 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
-        addressExample = new AddressExample();
-        addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.ERC20_EVM_CONTRACT.getCode());
-        addressList = addressMapper.selectByExample(addressExample);
-
         // 初始化WASM合约地址缓存，用于后续交易的类型判断（调用WASM合约）
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.WASM_CONTRACT.getCode());

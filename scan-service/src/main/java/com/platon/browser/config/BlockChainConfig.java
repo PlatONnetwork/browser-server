@@ -373,6 +373,15 @@ public class BlockChainConfig {
     // 地址前缀
     private String addressPrefix;
 
+    /**
+     * 检测合约地址
+     */
+    private String detectContractAddress;
+    /**
+     * 检测合约部署块高
+     */
+    private BigInteger detectContractBlockNumber;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
 

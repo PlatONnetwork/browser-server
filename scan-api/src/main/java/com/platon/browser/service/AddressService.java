@@ -111,6 +111,7 @@ public class AddressService {
                 resp.setHasErc1155(true);
             }
             BeanUtils.copyProperties(item, resp);
+            resp.setInternalTransferQty(item.getTransferTxQty());
             resp.setDelegateUnlock(item.getDelegateHes());
             /** 预先设置是否展示锁仓 */
             resp.setIsRestricting(0);

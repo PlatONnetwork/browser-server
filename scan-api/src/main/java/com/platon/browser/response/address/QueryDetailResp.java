@@ -53,6 +53,11 @@ public class QueryDetailResp {
     private Integer txQty;
 
     /**
+     * 内部转账总数
+     */
+    private Integer internalTransferQty;
+
+    /**
      * 是否是erc20
      */
     private boolean hasErc20 = false;
@@ -494,6 +499,14 @@ public class QueryDetailResp {
 
     public void setLockBalance(String lockBalance) {
         this.lockBalance = lockBalance;
+    }
+
+    public Integer getInternalTransferQty() {
+        return internalTransferQty;
+    }
+
+    public void setInternalTransferQty(Integer internalTransferQty) {
+        this.internalTransferQty = internalTransferQty;
     }
 
 }
