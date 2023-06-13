@@ -51,6 +51,9 @@
     group by
       `type`
   </select>
+  <select id="listCalculableFoundationAddress" resultType="java.lang.String">
+    select address from internal_address where type = 0 and is_calculate = 1
+  </select>
 
   <sql id="Example_Where_Clause">
     <where>
@@ -101,5 +104,19 @@
       order by ${orderByClause}
     </if>
   </select>
-
+  <select id="listInternalAddress" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from internal_address
+    where type = #{internalAddressType,jdbcType=INTEGER}
+    order by address
+    limit #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+  <update id="updateBalanceAndRestrictingBalance">
+    <foreach collection="list" item="item" separator=";">
+      update internal_address
+      set balance = #{item.balance}, restricting_balance = #{item.restrictingBalance}
+      where address = #{item.address}
+    </foreach>
+  </update>
 </mapper>

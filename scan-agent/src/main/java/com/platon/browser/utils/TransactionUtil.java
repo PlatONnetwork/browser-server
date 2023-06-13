@@ -146,6 +146,9 @@ public class TransactionUtil {
      * @throws BlankResponseException
      */
     public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi, PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt, Logger logger) throws ContractInvokeException, BlankResponseException {
+
+        // TODO CD-就取一个内部ppos交易为何如此复杂？
+
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
@@ -311,6 +314,8 @@ public class TransactionUtil {
     public static void resolveGeneralContractInvokeTxComplementInfo(CollectionTransaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
         ci.setInfo("");
         String binCode = getContractBinCode(tx, platOnClient, tx.getTo(), logger);
+
+        // TODO CD-重复调用存在
         ci.setBinCode(binCode);
         // TODO: 解析出调用合约方法名
         String txInput = tx.getInput();
@@ -337,6 +342,7 @@ public class TransactionUtil {
             ci.setType(Transaction.TypeEnum.ERC1155_CONTRACT_EXEC.getCode());
         }
 
+        // TODO CD - 需要重构的点合约自杀
         if ("0x".equals(binCode)) {
             // 如果交易的binCode属性为0x,则表明掉用了合约自毁方法, 交易类型设置为 合约销毁
             ci.setType(Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode());

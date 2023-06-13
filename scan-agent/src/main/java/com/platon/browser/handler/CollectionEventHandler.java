@@ -10,6 +10,7 @@ import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.*;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.*;
 import com.platon.browser.publisher.ComplementEventPublisher;
@@ -75,6 +76,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     private CustomTx1155BakMapper customTx1155BakMapper;
 
     @Resource
+    private CustomTxTransferBakMapper customTxTransferBakMapper;
+
+    @Resource
     private CustomTxDelegationRewardBakMapper customTxDelegationRewardBakMapper;
 
     /**
@@ -114,6 +118,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         // 确保event是原始副本，重试机制每一次使用的都是copyEvent
         CollectionEvent copyEvent = copyCollectionEvent(event);
         try {
+            transactionAnalyzer.instantlyTokenTracker(copyEvent.getBlock());
             Map<String, Receipt> receiptMap = copyEvent.getBlock().getReceiptMap();
             List<com.platon.protocol.core.methods.response.Transaction> rawTransactions = copyEvent.getBlock().getOriginTransactions();
             for (com.platon.protocol.core.methods.response.Transaction tr : rawTransactions) {
@@ -146,6 +151,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 addTxErc20Bak(transactions);
                 addTxErc721Bak(transactions);
                 addTxErc1155Bak(transactions);
+                addTxTransferBak(transactions);
             }
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
             // 委托奖励交易入库
@@ -175,7 +181,6 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             addressCache.cleanAll();
         }
     }
-
     /**
      * 模拟深拷贝
      * 因为CollectionEvent引用了第三方的jar对象，没有实现系列化接口，没法做深拷贝
@@ -272,6 +277,18 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
         });
         if (CollUtil.isNotEmpty(erc1155Set)) {
             customTx1155BakMapper.batchInsert(erc1155Set);
+        }
+    }
+
+    private void addTxTransferBak(List<Transaction> transactions) {
+        List<TxTransferBak> transferSet = new ArrayList<>();
+        transactions.forEach(transaction -> {
+            if (CollUtil.isNotEmpty(transaction.getTransferTxList())) {
+                transferSet.addAll(transaction.getTransferTxList());
+            }
+        });
+        if (CollUtil.isNotEmpty(transferSet)) {
+            customTxTransferBakMapper.batchInsert(transferSet);
         }
     }
 }

@@ -8,6 +8,7 @@ import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.v0152.analyzer.ErcCache;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.cluster.metadata.AliasAction;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -324,4 +325,28 @@ public class AddressCache {
         this.addressMap.put(address.getAddress(), address);
     }
 
+    public void changeEvmAddress2TokenAddress(String address, ContractTypeEnum contractTypeEnum) {
+        evmContractAddressCache.remove(address);
+        Address addr = addressMap.get("address");
+        if(addr != null){
+            addr.setType(convertContractTypeEnum2Type(contractTypeEnum));
+        }
+    }
+
+    public int convertContractTypeEnum2Type(ContractTypeEnum contractTypeEnum){
+        switch (contractTypeEnum) {
+            case EVM:
+                return AddressTypeEnum.EVM_CONTRACT.getCode();
+            case WASM:
+                return AddressTypeEnum.WASM_CONTRACT.getCode();
+            case ERC20_EVM:
+                return AddressTypeEnum.ERC20_EVM_CONTRACT.getCode();
+            case ERC721_EVM:
+                return AddressTypeEnum.ERC721_EVM_CONTRACT.getCode();
+            case ERC1155_EVM:
+                return AddressTypeEnum.ERC1155_EVM_CONTRACT.getCode();
+            default:
+                return AddressTypeEnum.ACCOUNT.getCode();
+        }
+    }
 }

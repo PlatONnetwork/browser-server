@@ -11,6 +11,7 @@ import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
+import com.platon.browser.dao.mapper.TxTransferBakMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AddressUtil;
@@ -19,6 +20,7 @@ import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,6 +66,9 @@ public class AddressUpdateTask {
 
     @Resource
     private TxBakMapper txBakMapper;
+
+    @Resource
+    private TxTransferBakMapper txTransferBakMapper;
 
     /**
      * 用于地址表更新
@@ -244,6 +249,40 @@ public class AddressUpdateTask {
         }
     }
 
+
+    /**
+     * 更新地址合约内部转账交易数
+     * 每30秒执行一次
+     *
+     */
+    @XxlJob("updateAddressTransferTxQtyJobHandler")
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void updateTransferTxQty() throws Exception {
+        try {
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            PointLog pointLog = pointLogMapper.selectByPrimaryKey(11);
+            long oldPosition = Convert.toLong(pointLog.getPosition());
+            TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
+            List<TxTransferBak> transactionList = getTxTransferBakList(oldPosition, pageSize);
+            if (CollUtil.isNotEmpty(transactionList)) {
+                String minId = CollUtil.getFirst(transactionList).getId().toString();
+                String maxId = CollUtil.getLast(transactionList).getId().toString();
+                pointLog.setPosition(maxId);
+                TaskUtil.console("查找到[{}]条内部转账交易,交易id为[{}-{}]", transactionList.size(), minId, maxId);
+                Map<String, AddressQty> map = extractAddressTxTransferQty(transactionList);
+                TaskUtil.console("更新的数据为{}", JSONUtil.toJsonStr(map.values()));
+                customAddressMapper.batchUpdateAddressTxTransferQty(map.values());
+                pointLogMapper.updateByPrimaryKeySelective(pointLog);
+                TaskUtil.console("更新地址内部转账交易数，断点(交易id)为[{}]->[{}]，更新[{}]个地址", oldPosition, pointLog.getPosition(), map.size());
+            } else {
+                XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
+            }
+        } catch (Exception e) {
+            log.error("更新地址内部转账交易数异常", e);
+            throw e;
+        }
+    }
+
     /**
      * 地址增加交易数
      *
@@ -369,6 +408,31 @@ public class AddressUpdateTask {
         return map;
     }
 
+    private Map<String, AddressQty> extractAddressTxTransferQty(List<TxTransferBak> transactionList) throws Exception {
+        Map<String, AddressQty> addressTransferTxIncreaseMap = new HashMap<>();
+        transactionList.stream().forEach(txTransferBak -> {
+            String from = txTransferBak.getFrom();
+            String to = txTransferBak.getTo();
+            // 如果转账自己到自己只能算1条
+            if(StringUtils.equals(from, to) &&  !AddressUtil.isAddrZero(from)){
+                updateAddressTxTransferQty(addressTransferTxIncreaseMap, from);
+                return;
+            }
+            if(!AddressUtil.isAddrZero(from)){
+                updateAddressTxTransferQty(addressTransferTxIncreaseMap, from);
+            }
+            if(!AddressUtil.isAddrZero(to)){
+                updateAddressTxTransferQty(addressTransferTxIncreaseMap, to);
+            }
+        });
+        return addressTransferTxIncreaseMap;
+    }
+
+    private void updateAddressTxTransferQty(Map<String, AddressQty> addressTransferTxIncreaseMap, String address){
+        AddressQty addressQty =  addressTransferTxIncreaseMap.computeIfAbsent(address, key -> AddressQty.builder().address(key).txTransferQty(0).build());
+        addressQty.setTxTransferQty(addressQty.getTxTransferQty() + 1);
+    }
+
     /**
      * 获取交易列表
      *
@@ -390,4 +454,20 @@ public class AddressUpdateTask {
         }
     }
 
+
+    /**
+     * 获取内部转账交易列表
+     */
+    private List<TxTransferBak> getTxTransferBakList(long maxId, int pageSize) throws Exception {
+        try {
+            TxTransferBakExample example = new TxTransferBakExample();
+            example.createCriteria().andIdGreaterThan(maxId);
+            example.setOrderByClause("id asc limit " + pageSize);
+            List<TxTransferBak> list = txTransferBakMapper.selectByExample(example);
+            return list;
+        } catch (Exception e) {
+            log.error("获取内部转账交易列表异常", e);
+            throw e;
+        }
+    }
 }

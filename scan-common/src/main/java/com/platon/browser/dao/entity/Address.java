@@ -58,6 +58,8 @@ public class Address {
 
     private Integer erc20TxQty;
 
+    private Integer transferTxQty;
+
     private String contractBin;
 
     public String getAddress() {
@@ -268,6 +270,14 @@ public class Address {
         this.erc20TxQty = erc20TxQty;
     }
 
+    public Integer getTransferTxQty() {
+        return transferTxQty;
+    }
+
+    public void setTransferTxQty(Integer transferTxQty) {
+        this.transferTxQty = transferTxQty;
+    }
+
     public String getContractBin() {
         return contractBin;
     }
@@ -310,6 +320,7 @@ public class Address {
         erc1155TxQty("erc1155_tx_qty", "erc1155TxQty", "INTEGER", false),
         erc721TxQty("erc721_tx_qty", "erc721TxQty", "INTEGER", false),
         erc20TxQty("erc20_tx_qty", "erc20TxQty", "INTEGER", false),
+        transferTxQty("transfer_tx_qty", "transferTxQty", "INTEGER", false),
         contractBin("contract_bin", "contractBin", "LONGVARCHAR", false);
 
         /**

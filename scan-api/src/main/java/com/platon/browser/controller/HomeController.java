@@ -14,10 +14,7 @@ import com.platon.browser.utils.I18nUtil;
 import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
@@ -118,7 +115,7 @@ public class HomeController {
     }
 
     /**
-     * 获取流通量(lat)
+     * 获取流通量(单位：lat)
      *
      * @return: reactor.core.publisher.Mono<java.lang.String>
      * @date: 2021/8/17
@@ -128,6 +125,20 @@ public class HomeController {
         return Mono.create(sink -> {
             BigDecimal circulationValue = commonService.getCirculationValue();
             circulationValue = Convert.fromVon(circulationValue, Convert.Unit.KPVON).setScale(8, RoundingMode.DOWN);
+            sink.success(circulationValue.toPlainString());
+        });
+    }
+    /**
+     * 根据块高，获取此块高的流通量(单位：wei)
+     * 如果块高为空，则获取链上最新流通量(wei)
+     * 返回单位是最小单位: wei
+     * @return: reactor.core.publisher.Mono<java.lang.String>
+     * @date: 2023/2/20
+     */
+    @GetMapping("home/circulationBalanceByBlockNumber")
+    public Mono<String> getBlockCirculationBalance(@RequestParam(value = "blockNumber", required = false)Long blockNumber) {
+        return Mono.create(sink -> {
+            BigDecimal circulationValue = commonService.getCirculationValue(blockNumber);
             sink.success(circulationValue.toPlainString());
         });
     }
