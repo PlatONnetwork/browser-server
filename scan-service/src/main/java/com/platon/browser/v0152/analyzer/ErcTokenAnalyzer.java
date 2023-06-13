@@ -11,7 +11,10 @@ import com.platon.browser.cache.AddressCache;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.entity.TokenTracker;
+import com.platon.browser.dao.entity.TokenTrackerExample;
 import com.platon.browser.dao.mapper.TokenMapper;
+import com.platon.browser.dao.mapper.TokenTrackerMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.enums.ErcTypeEnum;
@@ -30,10 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -43,6 +43,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ErcTokenAnalyzer {
+
+    public static Set<String> specificEventSet = new HashSet<>();
+    static {
+        specificEventSet.add("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"); // Transfer(address indexed from, address indexed to, uint256 value)  ERC20 & ERC721
+        specificEventSet.add("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"); // Approval(address indexed owner, address indexed spender, uint256 value)  ERC20 & ERC721
+        specificEventSet.add("0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"); // ApprovalForAll(address indexed owner, address indexed operator, bool approved)  ERC721
+        specificEventSet.add("0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62"); // TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)  ERC1155
+        specificEventSet.add("0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb"); // TransferBatch(address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] values)  ERC1155
+        specificEventSet.add("0x6bb7ff708619ba0610cba295a58592e0451dee2622938c8755667688daf3529b"); // URI(string value, uint256 indexed id)  ERC1155
+    }
 
     @Resource
     private ErcDetectService ercDetectService;
@@ -71,51 +81,30 @@ public class ErcTokenAnalyzer {
     @Resource
     private TokenMapper tokenMapper;
 
+    @Resource
+    private TokenTrackerMapper tokenTrackerMapper;
+
     /**
      * 解析Token,在合约创建时调用
      *
      * @param contractAddress
      */
-    public ErcToken resolveToken(String contractAddress, BigInteger blockNumber) {
+    public ErcToken resolveToken(String contractAddress, BigInteger blockNumber, boolean isTracker) {
         ErcToken token = new ErcToken();
         token.setTypeEnum(ErcTypeEnum.UNKNOWN);
         try {
             token.setAddress(contractAddress);
             ErcContractId contractId = ercDetectService.getContractId(contractAddress, blockNumber);
             BeanUtils.copyProperties(contractId, token);
-            token.setTotalSupply(CommonUtil.ofNullable(() -> contractId.getTotalSupply().toPlainString()).orElse("0"));
-            token.setTypeEnum(contractId.getTypeEnum());
             token.setType(contractId.getTypeEnum().name().toLowerCase());
             switch (contractId.getTypeEnum()) {
                 case ERC20:
-                    token.setIsSupportErc20(true);
-                    token.setIsSupportErc165(false);
-                    token.setIsSupportErc721(false);
-                    token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                    token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                    token.setIsSupportErc1155(false);
-                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc20AddressCache.add(contractAddress);
                     break;
                 case ERC721:
-                    token.setIsSupportErc20(false);
-                    token.setIsSupportErc165(true);
-                    token.setIsSupportErc721(true);
-                    token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
-                    token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
-                    token.setIsSupportErc1155(false);
-                    token.setIsSupportErc1155Metadata(token.getIsSupportErc1155());
                     ercCache.erc721AddressCache.add(contractAddress);
                     break;
                 case ERC1155:
-                    token.setIsSupportErc20(false);
-                    token.setIsSupportErc165(true);
-                    token.setIsSupportErc721(false);
-                    token.setIsSupportErc721Enumeration(token.getIsSupportErc721());
-                    token.setIsSupportErc721Metadata(token.getIsSupportErc721());
-                    //
-                    token.setIsSupportErc1155(true);
-                    token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
                     ercCache.erc1155AddressCache.add(contractAddress);
                     break;
                 default:
@@ -132,6 +121,18 @@ public class ErcTokenAnalyzer {
                 log.info("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
             } else {
                 log.warn("该合约地址[{}]无法识别该类型[{}]", token.getAddress(), token.getTypeEnum());
+                if(!isTracker){
+                    // 保存合约到token探测表，待下次存在类型事件时在检测
+                    TokenTracker tokenTracker = new TokenTracker();
+                    tokenTracker.setAddress(contractAddress);
+                    tokenTrackerMapper.insertSelective(tokenTracker);
+                }
+
+            }
+
+            // 完成Tracker
+            if(isTracker) {
+                tokenTrackerMapper.deleteByPrimaryKey(contractAddress);
             }
         } catch (Exception e) {
             log.error("合约创建,解析Token异常", e);
@@ -296,6 +297,7 @@ public class ErcTokenAnalyzer {
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void resolveTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
         try {
+            // TODO CD - 如果代理模式， 该方法可以存在优化空间
             // 过滤交易回执日志，地址不能为空且在token缓存里的
             List<Log> tokenLogs = receipt.getLogs()
                                          .stream()
@@ -383,4 +385,27 @@ public class ErcTokenAnalyzer {
         }
     }
 
+    public Set<String> listAddressOfSpecificEvent(Receipt receipt) {
+        Set<String> addressList = new HashSet<>();
+        for (Log receiptLog : receipt.getLogs()) {
+            if(CollUtil.isNotEmpty(receiptLog.getTopics()) && specificEventSet.contains(receiptLog.getTopics().get(0))) {
+                addressList.add(receiptLog.getAddress());
+            }
+        }
+        return addressList;
+    }
+
+    public boolean needTracker(String specificEventAddress) {
+        TokenTracker tokenTracker = tokenTrackerMapper.selectByPrimaryKey(specificEventAddress);
+        if(tokenTracker != null && tokenTracker.getTrigger() == 0){
+            return true;
+        }
+        return false;
+    }
+
+    public List<String> listNeedTrackerAddress() {
+        TokenTrackerExample example = new TokenTrackerExample();
+        example.createCriteria().andTriggerEqualTo(1);
+        return tokenTrackerMapper.selectByExample(example).stream().map(TokenTracker::getAddress).collect(Collectors.toList());
+    }
 }

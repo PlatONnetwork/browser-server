@@ -37,4 +37,10 @@ public class AddressQty {
      */
     private long proposalQty;
 
+
+    /**
+     * 内部转账交易总数
+     */
+    private long txTransferQty;
+
 }

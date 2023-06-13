@@ -294,6 +294,12 @@ public class TransactionService {
             resp.setBlockNumber(transaction.getNum());
             resp.setGasLimit(transaction.getGasLimit());
             resp.setGasUsed(transaction.getGasUsed());
+
+            // 内部转账记录
+            if(StringUtils.isNotEmpty(transaction.getTransferTxInfo())){
+                resp.setInternalTransferParams(JSON.parseArray(transaction.getTransferTxInfo(), InternalTransferParam.class));
+            }
+
             /**
              * wasm也是合约创建
              */

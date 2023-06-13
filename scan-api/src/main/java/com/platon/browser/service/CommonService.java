@@ -1,21 +1,31 @@
 package com.platon.browser.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.platon.browser.bean.CountBalance;
+import com.platon.browser.bean.EpochInfo;
+import com.platon.browser.bean.RestrictingBalance;
 import com.platon.browser.bean.StakingBO;
+import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomInternalAddressMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
 import com.platon.browser.dao.custommapper.CustomRpPlanMapper;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.service.account.AccountService;
 import com.platon.browser.utils.CommonUtil;
+import com.platon.browser.utils.EpochUtil;
 import com.platon.utils.Convert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 实现
@@ -44,6 +54,14 @@ public class CommonService {
     @Resource
     private StatisticCacheService statisticCacheService;
 
+    @Resource
+    private AccountService accountService;
+
+    @Resource
+    private SpecialApi specialApi;
+
+    @Resource
+    private PlatOnClient platOnClient;
     public String getNodeName(String nodeId, String nodeName) {
         /**
          * 当nodeId为空或者nodeName不为空则直接返回name
@@ -55,7 +73,7 @@ public class CommonService {
     }
 
     /**
-     * 获取总发行量(von)
+     * 获取总发行量（单位：von）
      * 总发行量=初始发行量*(1+增发比例)^第几年
      *
      * @param
@@ -74,7 +92,7 @@ public class CommonService {
     }
 
     /**
-     * 获取流通量
+     * 获取流通量（单位：von）
      * 流通量 = 本增发周期总发行量 - 锁仓未到期的金额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
      *
      * @param
@@ -86,6 +104,67 @@ public class CommonService {
         return CommonUtil.ofNullable(() -> turnValueSubInit(networkStat.getTurnValue(), networkStat)).orElse(BigDecimal.ZERO);
     }
 
+    /**
+     * 返回当前区块的总流通量（单位：von）
+     * 流通量 = 总发行量 - 总锁仓合约未释放余额 - 激励池合约余额 - 参与计算的基金会账户余额
+     * @param blockNumber
+     * @return
+     */
+    public BigDecimal getCirculationValue(Long blockNumber) {
+        if (blockNumber==null) {
+           return getCirculationValue();
+        }else{
+            BigDecimal issueValue = BigDecimal.ZERO;
+            BigDecimal restrictingValue = BigDecimal.ZERO;
+            BigDecimal inciteValue = BigDecimal.ZERO;
+            BigDecimal foundationValue = BigDecimal.ZERO;
+            BigDecimal remainingOfFoundationInRestricting = BigDecimal.ZERO;
+
+            int chainAge = 0;
+            try {
+                chainAge = this.getYearNum(blockNumber);
+            } catch (Exception e) {
+                log.error("根据块高计算链的年龄出错", e);
+                return BigDecimal.ZERO;
+            }
+            //计算流通量 = 总发行量 - 总锁仓 -  激励池余额 - 基金会账户余额 - 基金会在锁仓合约中的剩余金额
+            //总发行量
+            try {
+                issueValue = getCurrentBlockIssueValue(chainAge);
+            } catch (Exception e) {
+                log.error("获取取总发行量异常", e);
+                return BigDecimal.ZERO;
+            }
+
+            //总锁仓
+            BigDecimal rpNotExpiredValue = customRpPlanMapper.getRPNotExpiredValue(blockChainConfig.getSettlePeriodBlockCount().longValue(), blockNumber);
+            restrictingValue = Optional.ofNullable(rpNotExpiredValue).orElse(BigDecimal.ZERO);
+
+            //激励池余额
+            inciteValue = accountService.getInciteBalance(BigInteger.valueOf(blockNumber));
+
+            // 基金会账户余额
+            List<String> addressList = customInternalAddressMapper.listCalculableFoundationAddress();
+            if (!CollectionUtils.isEmpty(addressList)){
+                String addressParamStr = String.join(";", addressList);
+                try {
+                    List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper().getWeb3j(), addressParamStr, blockNumber);
+                    BigInteger value = balanceList.stream().map(RestrictingBalance::getDlFreeBalance).reduce(BigInteger.ZERO, BigInteger::add);
+                    foundationValue = new BigDecimal(value);
+                } catch (Exception e) {
+                    log.error("获取基金会余额异常", e);
+                    return BigDecimal.ZERO;
+                }
+            }
+
+            // 基金会在锁仓合约中的剩余金额
+            remainingOfFoundationInRestricting = this.getRemainingOfFoundationInRestricting(chainAge);
+
+            BigDecimal circulationValue = issueValue.subtract(restrictingValue).subtract(inciteValue).subtract(foundationValue).subtract(remainingOfFoundationInRestricting);
+            log.debug("区块：{}上的流通量(von)：{}", blockNumber, circulationValue.toPlainString());
+            return circulationValue;
+        }
+    }
     /**
      * 查询统计的余额
      *
@@ -137,12 +216,81 @@ public class CommonService {
 
     public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
         Integer yearNum = networkStat.getYearNum();
+        BigDecimal remain = getRemainingOfFoundationInRestricting(yearNum);
+        return turn.subtract(remain);
+    }
+
+    /**
+     * 按块高获取基金会锁仓在锁仓合约中的剩余基金。（单位：von）
+     * 基金会在创世块，会把一笔lat锁在锁仓合约中（注意，并非锁仓计划中），按年释放一部分，进入激励池
+     * @param chainAge
+     * @return
+     */
+    public BigDecimal getRemainingOfFoundationInRestricting(int chainAge){
         BigDecimal remain = BigDecimal.ZERO;
         for (Integer key: blockChainConfig.getFoundationSubsidies().keySet()){
-            if(key.compareTo(yearNum) > 0){
-                remain = remain.add(Convert.toVon(blockChainConfig.getFoundationSubsidies().get(key), Convert.Unit.KPVON));
+            if(key.compareTo(chainAge) > 0){
+                remain = remain.add(blockChainConfig.getFoundationSubsidies().get(key));
             }
         }
-        return turn.subtract(remain);
+        if (remain.compareTo(BigDecimal.ZERO) > 0 ){
+            remain = Convert.toVon(remain, Convert.Unit.KPVON);
+        }
+        return remain;
+    }
+    /**
+     * 返回当前链龄的总发行量：整数（单位：von）
+     * @param chainAge
+     * @return
+     * @throws Exception
+     */
+    public BigDecimal getCurrentBlockIssueValue(int chainAge) throws Exception {
+           // 算出总发行量
+        BigDecimal issueValue = getTotalIssueValue(chainAge);
+        log.debug("当前链龄的：{}的总发行量(von)：{}", chainAge, issueValue.toPlainString());
+
+        return issueValue;
+            }
+
+    /**
+     * 计算块高的增发年度值
+     *
+     * @param currentNumber: 当前块高
+     * @return: int
+     * @date: 2021/11/9
+     */
+    private int getYearNum(Long currentNumber) throws Exception {
+        // 上一结算周期最后一个块号
+        BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(BigInteger.valueOf(currentNumber), blockChainConfig.getSettlePeriodBlockCount());
+        // 从特殊接口获取
+        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
+        // 第几年
+        int yearNum = epochInfo.getYearNum().intValue();
+        if (yearNum < 1) {
+            throw new Exception(StrUtil.format("当前区块[{}],上一结算周期最后一个块号[{}]获取年份[{}]异常", currentNumber, preSettleEpochLastBlockNumber, yearNum));
+        }
+        return yearNum;
+        }
+
+    /**
+     * 返回总发行量：整数（单位：von）
+     * @param yearNum
+     * @return
+     * @throws Exception
+     */
+    private BigDecimal getTotalIssueValue(int yearNum) throws Exception {
+        // 获取初始发行金额(LAT/ATP)
+        BigDecimal initIssueAmount = blockChainConfig.getInitIssueAmount();
+        initIssueAmount = com.platon.utils.Convert.toVon(initIssueAmount, com.platon.utils.Convert.Unit.KPVON);
+        // 每年固定增发比例
+        BigDecimal addIssueRate = blockChainConfig.getAddIssueRate();
+        //BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
+        //取整
+        BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第[{}]年", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+        if (issueValue.compareTo(BigDecimal.ZERO) <= 0 || issueValue.compareTo(initIssueAmount) <= 0) {
+            throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能小于等于0或者小于等于初始发行量", issueValue.toPlainString()));
+        }
+        return issueValue;
     }
 }

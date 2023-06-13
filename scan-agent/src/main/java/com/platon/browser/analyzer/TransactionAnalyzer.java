@@ -2,15 +2,13 @@ package com.platon.browser.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.bean.ComplementInfo;
-import com.platon.browser.bean.ErcToken;
-import com.platon.browser.bean.Receipt;
+import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.AddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.entity.Address;
-import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.decoder.TxInputDecodeResult;
@@ -119,7 +117,7 @@ public class TransactionAnalyzer {
         if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
             receipt.getContractCreated().forEach(contract -> {
                 // solidity 类型 erc20 或 721 token检测及入口
-                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcToken ercToken = ercTokenAnalyzer.resolveToken(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), false);
                 // solidity or wasm
                 TxInputDecodeResult txInputDecodeResult = TxInputDecodeUtil.decode(result.getInput());
                 // 内存中更新地址类型
@@ -138,10 +136,23 @@ public class TransactionAnalyzer {
                 GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(contract.getAddress(), contractTypeEnum);
                 log.info("当前交易[{}]合约地址[{}]的合约类型为[{}]", result.getHash(), contract.getAddress(), contractTypeEnum);
                 if (!AddressUtil.isAddrZero(contract.getAddress())) {
+                    // TODO CD-如何合约类型变更可能存在问题，如第一次部署失败，但是地址已经采集。当成普通合约地址
                     // 补充address
                     addressCache.updateFirst(contract.getAddress(), contractTypeEnum);
                 } else {
                     log.error("该地址{}是0地址,不加载到地址缓存中", contract.getAddress());
+                }
+            });
+        }
+
+        // 普通EVM合约变成Token合约
+        Set<String> specificEventAddressList = ercTokenAnalyzer.listAddressOfSpecificEvent(receipt);
+        if (CollUtil.isNotEmpty(specificEventAddressList)) {
+            specificEventAddressList.forEach( specificEventAddress -> {
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM && ercTokenAnalyzer.needTracker(specificEventAddress)){
+                    log.info("当前交易[{}]日志中合约地址[{}]存在token事件并设置为需要探测", result.getHash(), specificEventAddress);
+                    ErcToken ercToken = tokenTracker(specificEventAddress,  collectionBlock.getNum());
+                    log.info("当前交易[{}]日志中合约地址[{}]探测结果[{}]", result.getHash(), specificEventAddress, ercToken.getTypeEnum());
                 }
             });
         }
@@ -176,6 +187,8 @@ public class TransactionAnalyzer {
                     TransactionUtil.resolveGeneralContractInvokeTxComplementInfo(result, platOnClient, ci, contractTypeEnum, log);
                     // 普通合约调用的交易是否成功只看回执的status,不用看log中的状态
                     result.setStatus(receipt.getStatus());
+
+                    // TODO CD - 如何部分成功，如何确认虚拟交易的成功性？
                     if (result.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
                         List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
@@ -233,6 +246,12 @@ public class TransactionAnalyzer {
               .setBin(ci.getBinCode())
               .setMethod(ci.getMethod());
         ercTokenAnalyzer.resolveTx(collectionBlock, result, receipt);
+
+        // 合约内部转账记录
+        if(CollUtil.isNotEmpty(receipt.getEmbedTransfer()) && status == Receipt.SUCCESS){
+            result.setTransferTxList(resolveContactTransferTx(collectionBlock, result, receipt));
+            result.setTransferTxInfo(JSON.toJSONString(result.getTransferTxList()));
+        }
 
         // 累加总交易数
         collectionBlock.setTxQty(collectionBlock.getTxQty() + 1);
@@ -294,51 +313,80 @@ public class TransactionAnalyzer {
         collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(result.decimalGasLimit()).toString());
-        proxyContract(result.getHash());
         return result;
     }
 
-    /**
-     * 针对特殊合约修改，仅对主网生效
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/2/9
-     */
-    private void proxyContract(String txHash) {
-        // 创建合约后的第一条交易，会设置合约的721属性
-        if ("0x908a9f487a1c9d39a17afe1a868705eec9b0ec899998eb7036412634388755ad".equalsIgnoreCase(txHash)) {
-            Address address = addressMapper.selectByPrimaryKey("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            if (ObjectUtil.isNotNull(address)) {
-                Address newAddress = new Address();
-                newAddress.setAddress(address.getAddress());
-                newAddress.setType(6);
-                addressMapper.updateByPrimaryKeySelective(newAddress);
-                Token token = new Token();
-                token.setAddress("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-                token.setType("erc721");
-                token.setName("QPassport");
-                token.setSymbol("QPT");
-                token.setTotalSupply("0");
-                token.setDecimal(0);
-                token.setIsSupportErc165(true);
-                token.setIsSupportErc20(false);
-                token.setIsSupportErc721(true);
-                token.setIsSupportErc721Enumeration(true);
-                token.setIsSupportErc721Metadata(true);
-                token.setTokenTxQty(0);
-                token.setHolder(0);
-                token.setContractDestroyBlock(0L);
-                token.setContractDestroyUpdate(false);
-                tokenMapper.insertSelective(token);
-                // 重置缓存
-                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.clear();
-                ercCache.init();
-                addressCache.getEvmContractAddressCache().remove("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            } else {
-                log.error("找不到该代理合约地址{}", "lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            }
+
+    @Transactional(rollbackFor = {Exception.class, Error.class})
+    public void instantlyTokenTracker(Block collectionBlock) {
+        // 使用地址缓存初始化普通合约缓存信息
+        initGeneralContractCache();
+        List<String> contractAddress = ercTokenAnalyzer.listNeedTrackerAddress();
+
+        if (CollUtil.isNotEmpty(contractAddress)) {
+            contractAddress.forEach( specificEventAddress -> {
+                if(GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.get(specificEventAddress) == ContractTypeEnum.EVM){
+                    log.info("当前区块[{}]中执行立即探测token类型的地址[{}]", collectionBlock.getNum(), specificEventAddress);
+                    ErcToken ercToken = tokenTracker(specificEventAddress,  collectionBlock.getNum());
+                    log.info("当前区块[{}]日志中合约地址[{}]探测结果[{}]", collectionBlock.getNum(), specificEventAddress, ercToken.getTypeEnum());
+                }
+            });
+        }
+
+    }
+
+    private ErcToken tokenTracker(String address, Long blockNumber){
+        ErcToken ercToken = ercTokenAnalyzer.resolveToken(address, BigInteger.valueOf(blockNumber), true);
+        switch(ercToken.getTypeEnum()){
+            case ERC20 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC20_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC20_EVM);
+                break;
+            case ERC721 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC721_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC721_EVM);
+                break; //可选
+            case ERC1155 :
+                GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(address, ContractTypeEnum.ERC1155_EVM);
+                changeEvmAddressType(address, ContractTypeEnum.ERC1155_EVM);
+                break;
+        }
+        return ercToken;
+    }
+
+    private void changeEvmAddressType(String specificEventAddress, ContractTypeEnum contractTypeEnum) {
+        // 更新缓存
+        GENERAL_CONTRACT_ADDRESS_2_TYPE_MAP.put(specificEventAddress, contractTypeEnum);
+        addressCache.changeEvmAddress2TokenAddress(specificEventAddress, contractTypeEnum);
+        // 更新db
+        Address address = addressMapper.selectByPrimaryKey(specificEventAddress);
+        if (ObjectUtil.isNotNull(address)) {
+            Address newAddress = new Address();
+            newAddress.setAddress(address.getAddress());
+            newAddress.setType(addressCache.convertContractTypeEnum2Type(contractTypeEnum));
+            addressMapper.updateByPrimaryKeySelective(newAddress);
         }
     }
 
+    private List<TxTransferBak> resolveContactTransferTx(Block collectionBlock, CollectionTransaction tx, Receipt receipt) {
+        List<TxTransferBak> transferBakList = new ArrayList<>();
+        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfer()) {
+            if(embedTransfer.getValue() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
+                log.warn("当前交易[{}]的合约内部转账记录不全, embedTransfer = [{}]", tx.getHash(), embedTransfer);
+                continue;
+            }
+            TxTransferBak transferBak =  new TxTransferBak();
+            transferBak.setSeq(collectionBlock.getSeq().incrementAndGet());
+            transferBak.setFrom(embedTransfer.getFrom());
+            transferBak.setFromType(addressCache.getTypeData(embedTransfer.getFrom()));
+            transferBak.setTo(embedTransfer.getTo());
+            transferBak.setToType(addressCache.getTypeData(embedTransfer.getTo()));
+            transferBak.setValue(embedTransfer.getValue().toBigInteger().toString());
+            transferBak.setHash(tx.getHash());
+            transferBak.setBn(collectionBlock.getNum());
+            transferBak.setbTime(tx.getTime());
+            transferBakList.add(transferBak);
+        }
+        return transferBakList;
+    }
 }

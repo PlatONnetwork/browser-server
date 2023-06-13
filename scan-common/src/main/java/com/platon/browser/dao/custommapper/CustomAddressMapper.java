@@ -8,6 +8,7 @@ import com.platon.browser.dao.entity.Address;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 public interface CustomAddressMapper {
@@ -65,4 +66,5 @@ public interface CustomAddressMapper {
      */
     int batchUpdateAddressInfo(@Param("list") List<Address> list);
 
+    void batchUpdateAddressTxTransferQty(@Param("list") Collection<AddressQty> list);
 }

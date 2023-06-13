@@ -25,6 +25,7 @@ public class Receipt {
     private String status;
     private String contractAddress;
     private List<ContractInfo> contractCreated;
+    private List<EmbedTransfer> embedTransfer;
     private List<String> topics;
 
     private int logStatus;
