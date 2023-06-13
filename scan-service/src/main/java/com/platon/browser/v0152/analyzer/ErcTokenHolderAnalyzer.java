@@ -79,10 +79,7 @@ public class ErcTokenHolderAnalyzer {
         });
         if (CollUtil.isNotEmpty(changeBalanceList)) {
             for(TokenHolder holder : changeBalanceList){
-                if (holder.getTokenAddress().equalsIgnoreCase("lat1mguk50rlca3xg0m93drj9rx4rhnvaymds2225r") &&
-                        holder.getAddress().equalsIgnoreCase("lat1w6zvpqwaw32rxxufef5h7l0wnr6slsn3d4xxdl")){
-                    log.info("checkpoint, token:{}, holder:{}, balanceIncrement:{}", holder.getTokenAddress(), holder.getAddress(), holder.getIncrement().toString() );
-                }
+                log.info("token balance checkpoint, token:{}, holder:{}, balanceIncrement:{}", holder.getTokenAddress(), holder.getAddress(), holder.getIncrement().toString());
             }
             //customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
             log.debug("区块中ERC20/ERC721交易数量：{}，需要更新的token持有者记录数量为：{}", txList.size(), changeBalanceList.size());
