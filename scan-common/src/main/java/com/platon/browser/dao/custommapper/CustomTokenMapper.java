@@ -3,7 +3,6 @@ package com.platon.browser.dao.custommapper;
 import com.github.pagehelper.Page;
 import com.platon.browser.bean.*;
 import com.platon.browser.dao.entity.Token;
-import com.platon.browser.elasticsearch.dto.ErcTx;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -44,4 +43,8 @@ public interface CustomTokenMapper {
     int batchUpdateTokenTotalSupply(@Param("list") List<ErcToken> list);
 
     int batchUpdateTokenHolder(@Param("list") List<Token> list);
+
+     int updateErc20TokenHolderCount();
+
+    int updateErc1155TokenHolderCount();
 }

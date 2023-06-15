@@ -29,6 +29,7 @@ import okhttp3.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -448,7 +449,6 @@ public class ErcTokenUpdateTask {
             updateParams.forEach(token -> token.setDirty(false));
         }
         XxlJobHelper.log("全量更新token的总供应量成功");
-        updateTokenHolderCount();
     }
 
     /**
@@ -1400,45 +1400,6 @@ public class ErcTokenUpdateTask {
         return res;
     }
 
-    /**
-     * 更新token对应的持有人的数量
-     *
-     * @param
-     * @return void
-     * @date 2021/3/17
-     */
-    private void updateTokenHolderCount() {
-        List<Token> updateTokenList = new ArrayList<>();
-        List<TokenHolderCount> list = customTokenHolderMapper.findTokenHolderCount();
-        List<Token> tokenList = tokenMapper.selectByExample(null);
-        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(tokenList)) {
-            list.forEach(tokenHolderCount -> {
-                tokenList.forEach(token -> {
-                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
-                        token.setHolder(tokenHolderCount.getTokenHolderCount());
-                        updateTokenList.add(token);
-                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
-                    }
-                });
-            });
-        }
-        List<TokenHolderCount> token1155List = customToken1155HolderMapper.findToken1155Holder();
-        if (CollUtil.isNotEmpty(token1155List) && CollUtil.isNotEmpty(tokenList)) {
-            token1155List.forEach(tokenHolderCount -> {
-                tokenList.forEach(token -> {
-                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
-                        token.setHolder(tokenHolderCount.getTokenHolderCount());
-                        updateTokenList.add(token);
-                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
-                    }
-                });
-            });
-        }
-        if (CollUtil.isNotEmpty(updateTokenList)) {
-            customTokenMapper.batchUpdateTokenHolder(updateTokenList);
-        }
-        XxlJobHelper.log("更新token对应的持有人的数量完成");
-    }
 
     private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
         HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
@@ -1490,6 +1451,29 @@ public class ErcTokenUpdateTask {
             }
         }
         return res;
+    }
+
+    /**
+     * 更新token对应的持有人的数量
+     * todo: 在涉及的表记录数量多时，这个统计效率并不高。最好的做法是在查看token的持有人数量时，再实时统计。就是说，这个数据没有必要持续统计并更新到表中。
+     * @param
+     * @return void
+     * @date 2021/3/17
+     */
+
+    @XxlJob("updateTokenHolderCountJobHandler")
+    public void updateTokenHolderCount() {
+        log.debug("开始执行:统计token的持有人数量任务");
+
+        StopWatch watch = new StopWatch();
+        watch.start("统计token的持有人数量");
+
+        customTokenMapper.updateErc20TokenHolderCount();
+        customTokenMapper.updateErc1155TokenHolderCount();
+
+        watch.stop();
+        log.debug("结束执行:统计token的持有人数量任务，耗时统计:{}ms", watch.getLastTaskTimeMillis());
+        XxlJobHelper.log("统计token的持有人数量完成");
     }
 
 }

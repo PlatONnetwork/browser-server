@@ -151,4 +151,27 @@
             update token set holder = #{item.holder} where address = #{item.address}
         </foreach>
     </update>
+
+    <update id="updateErc20TokenHolderCount">
+        update token t1
+            inner join (
+                SELECT token_address, count(1) as count
+                FROM `token_holder`
+                WHERE balance > 0
+                GROUP BY token_address
+            ) t2
+            on t1.address = t2.token_address
+        set t1.holder = t2.count
+    </update>
+    <update id="updateErc1155TokenHolderCount">
+        update token t1
+            inner join (
+                SELECT token_address, count(1) as count
+                FROM `token_1155_holder`
+                WHERE balance > 0
+                GROUP BY token_address
+            ) t2
+            on t1.address = t2.token_address
+        set t1.holder = t2.count
+    </update>
 </mapper>
