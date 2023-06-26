@@ -7,4 +7,4 @@ INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `
 INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`, `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`, `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`, `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`, `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`) VALUES (2, '统计token的持有人数量任务', '2021-11-29 14:38:46', '2021-11-30 10:48:55', 'admin', '', 'CRON', '0 */40 * * * ?', 'DO_NOTHING', 'FIRST', 'updateTokenHolderCountJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化', '2021-11-29 14:38:46', '', 0, 0, 0);
 
 delete from xxl_job_info where job_group = 2 and executor_handler = 'incrementUpdateTokenHolderBalanceJobHandler';
-delete from xxl_job_info where job_group = 2 and executor_handler = 'incrementUpdateTokenHolderBalanceJobHandler';
+delete from xxl_job_info where job_group = 2 and executor_handler = 'totalUpdateTokenHolderBalanceJobHandler';
