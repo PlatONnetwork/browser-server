@@ -148,7 +148,7 @@ public class ErcTokenUpdateTask {
      * @return void
      * @date 2021/2/1
      */
-    @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
+    //@XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
     public void incrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
@@ -167,7 +167,7 @@ public class ErcTokenUpdateTask {
      * 全量更新token持有者余额
      * 每天00:00:00执行一次
      */
-    @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
+    //@XxlJob("totalUpdateTokenHolderBalanceJobHandler")
     public void totalUpdateTokenHolder() {
         totalUpdateTokenHolderBalance();
         totalUpdateToken1155HolderBalance();
