@@ -1,17 +1,19 @@
 package com.platon.browser.client;
 
-import com.platon.contracts.ppos.*;
-import com.platon.contracts.ppos.dto.resp.GovernParam;
-import com.platon.contracts.ppos.dto.resp.Node;
-import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.contracts.ppos.*;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -116,6 +118,11 @@ public class PlatOnClient {
 
     public BigInteger getLatestBlockNumber() throws IOException {
         return retryableClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
+    }
+
+    @Cacheable("addressCodeFromChain")
+    public String getAddressCode(String address) throws IOException {
+        return retryableClient.getWeb3jWrapper().getWeb3j().platonGetCode(address, DefaultBlockParameterName.LATEST).send().getCode();
     }
 
     public List<Node> getLatestValidators() {
