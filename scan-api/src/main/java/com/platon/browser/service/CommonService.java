@@ -73,7 +73,7 @@ public class CommonService {
     }
 
     /**
-     * 获取总发行量（单位：von）
+     * 获取总发行量(von)
      * 总发行量=初始发行量*(1+增发比例)^第几年
      *
      * @param
@@ -92,7 +92,7 @@ public class CommonService {
     }
 
     /**
-     * 获取流通量（单位：von）
+     * 获取流通量
      * 流通量 = 本增发周期总发行量 - 锁仓未到期的金额 - 实时委托奖励池合约余额 - 实时激励池余额 - 实时所有基金会账户余额
      *
      * @param
@@ -105,7 +105,7 @@ public class CommonService {
     }
 
     /**
-     * 返回当前区块的总流通量（单位：von）
+     * 返回当前区块的总流通量(单位：wei)
      * 流通量 = 总发行量 - 总锁仓合约未释放余额 - 激励池合约余额 - 参与计算的基金会账户余额
      * @param blockNumber
      * @return
@@ -213,7 +213,6 @@ public class CommonService {
         return bo;
     }
 
-
     public BigDecimal turnValueSubInit(BigDecimal turn, NetworkStat networkStat){
         Integer yearNum = networkStat.getYearNum();
         BigDecimal remain = getRemainingOfFoundationInRestricting(yearNum);
@@ -221,7 +220,7 @@ public class CommonService {
     }
 
     /**
-     * 按块高获取基金会锁仓在锁仓合约中的剩余基金。（单位：von）
+     * 按块高获取基金会锁仓在锁仓合约中的剩余基金。
      * 基金会在创世块，会把一笔lat锁在锁仓合约中（注意，并非锁仓计划中），按年释放一部分，进入激励池
      * @param chainAge
      * @return
@@ -250,7 +249,7 @@ public class CommonService {
         log.debug("当前链龄的：{}的总发行量(von)：{}", chainAge, issueValue.toPlainString());
 
         return issueValue;
-            }
+    }
 
     /**
      * 计算块高的增发年度值
@@ -270,7 +269,7 @@ public class CommonService {
             throw new Exception(StrUtil.format("当前区块[{}],上一结算周期最后一个块号[{}]获取年份[{}]异常", currentNumber, preSettleEpochLastBlockNumber, yearNum));
         }
         return yearNum;
-        }
+    }
 
     /**
      * 返回总发行量：整数（单位：von）

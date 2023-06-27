@@ -71,7 +71,8 @@ public class BlockService {
 
     /**
      * 解析区块, 构造业务入库参数信息
-     *
+     * 2023/04/07 lvixaoyi
+     * 注意：此方法过程，没有影响输入参数的值
      * @return
      */
     public List<NodeOpt> analyze(CollectionEvent event) throws NoSuchBeanException {
@@ -87,26 +88,34 @@ public class BlockService {
         if ((block.getNum() + chainConfig.getElectionBackwardBlockCount().longValue()) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0
                 && event.getEpochMessage().getConsensusEpochRound().longValue() > 1) {
             // 共识轮数等于大于1的时候才进来
-            log.info("在块高[{}]选举验证人", block.getNum());
+            log.debug("在块高[{}]选举验证人", block.getNum());
+            //2023/04/07 lvixaoyi
+            //注意：此方法过程，没有影响输入参数的值
             List<NodeOpt> nodeOpt = onElectionAnalyzer.analyze(event, block);
             nodeOptList.addAll(nodeOpt);
         }
 
         // 新共识周期事件
         if ((block.getNum() - 1) % chainConfig.getConsensusPeriodBlockCount().longValue() == 0) {
-            log.info("在块高[{}]切换共识周期,当前所处共识周期轮数为[{}]", block.getNum(), event.getEpochMessage().getConsensusEpochRound());
+            log.debug("在块高[{}]切换共识周期,当前所处共识周期轮数为[{}]", block.getNum(), event.getEpochMessage().getConsensusEpochRound());
+            //2023/04/07 lvixaoyi
+            //注意：此方法过程，没有影响输入参数的值
             Optional<List<NodeOpt>> nodeOpt = onConsensusAnalyzer.analyze(event, block);
             nodeOpt.ifPresent(nodeOptList::addAll);
         }
 
         // 新结算周期事件
         if ((block.getNum() - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
-            log.info("在块高[{}]切换结算周期,当前所处结算周期轮数为[{}]", block.getNum(), event.getEpochMessage().getSettleEpochRound());
+            log.debug("在块高[{}]切换结算周期,当前所处结算周期轮数为[{}]", block.getNum(), event.getEpochMessage().getSettleEpochRound());
+            //2023/04/07 lvixaoyi
+            //注意：此方法过程，没有影响输入参数的值
             List<NodeOpt> nodeOpt = onSettleAnalyzer.analyze(event, block);
             nodeOptList.addAll(nodeOpt);
         }
 
         // 新区块事件
+        //2023/04/07 lvixaoyi
+        //注意：此方法过程，没有影响输入参数的值
         onNewBlockAnalyzer.analyze(event, block);
 
 

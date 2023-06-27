@@ -1,12 +1,10 @@
 package com.platon.browser.service.misc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.CustomProposalMapper;
+import com.platon.browser.dao.entity.Proposal;
+import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.ppos.StakeEpochService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +13,12 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.Proposal;
-import com.platon.browser.dao.custommapper.CustomProposalMapper;
-import com.platon.browser.service.govern.ParameterService;
-import com.platon.browser.service.ppos.StakeEpochService;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StakeEpochServiceTest {
@@ -55,6 +54,6 @@ public class StakeEpochServiceTest {
     	proposals.add(proposal);
     	when(customProposalMapper.selectVotingProposal(any())).thenReturn(proposals);
     	target.getUnStakeEndBlock("0x1", BigInteger.TEN, true);
-    	
+
     }
 }

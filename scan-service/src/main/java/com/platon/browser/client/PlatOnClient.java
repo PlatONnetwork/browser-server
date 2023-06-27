@@ -1,13 +1,13 @@
 package com.platon.browser.client;
 
-import com.platon.contracts.ppos.*;
-import com.platon.contracts.ppos.dto.resp.GovernParam;
-import com.platon.contracts.ppos.dto.resp.Node;
-import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
+import com.platon.contracts.ppos.*;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +101,7 @@ public class PlatOnClient {
         try {
             EconomicConfig ec = retryableClient.getWeb3jWrapper().getWeb3j().getEconomicConfig().send().getEconomicConfig();
             String msg = JSON.toJSONString(ec);
-            log.info("链上配置:{}", msg);
+            log.debug("链上配置:{}", msg);
             return ec;
         } catch (Exception e) {
             retryableClient.updateCurrentWeb3jWrapper();

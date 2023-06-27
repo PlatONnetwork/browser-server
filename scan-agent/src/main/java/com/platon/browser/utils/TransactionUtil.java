@@ -2,8 +2,11 @@ package com.platon.browser.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.bech32.Bech32;
-import com.platon.browser.bean.*;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.bean.ComplementInfo;
+import com.platon.browser.bean.PPosInvokeContractInput;
+import com.platon.browser.bean.Receipt;
+import com.platon.browser.bean.TransData;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.PPosInvokeContractInputCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
@@ -29,9 +32,9 @@ import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.rlp.solidity.RlpType;
 import com.platon.utils.Numeric;
-import org.slf4j.Logger;
-import org.springframework.beans.BeanUtils;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -42,6 +45,8 @@ import java.util.List;
 /**
  * 虚拟交易工具
  */
+
+@Slf4j
 public class TransactionUtil {
 
     /**
@@ -57,7 +62,7 @@ public class TransactionUtil {
      * @param invokeContractInput 合约内部调用PPOS操作的输入信息
      * @return
      */
-    public static List<Transaction> getVirtualTxList(Block block, Transaction parentTx, PPosInvokeContractInput invokeContractInput) {
+    public static List<Transaction> getVirtualTxList(Block block, Transaction parentTx, PPosInvokeContractInput invokeContractInput, NewAddressCache newAddressCache) {
         List<Transaction> transactionList = new ArrayList<>();
         if (invokeContractInput == null) {
             return transactionList;
@@ -73,24 +78,40 @@ public class TransactionUtil {
             if (result.getTypeEnum() == null) {
                 continue;
             }
-            Transaction tx = new Transaction();
-            BeanUtils.copyProperties(parentTx, tx);
-            tx.setStatus(parentTx.getStatus());
-            tx.setFrom(invokeContractInput.getFrom());
-            tx.setTo(invokeContractInput.getTo());
-            tx.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
-            tx.setHash(parentTx.getHash() + "-" + i);
-            tx.setType(result.getTypeEnum().getCode());
-            tx.setIndex(i);
-            tx.setInput(tran.getInput());
-            tx.setInfo(result.getParam().toJSONString());
-            tx.setSeq((long) i);
-            transactionList.add(tx);
+            Transaction virtualTx = new Transaction();
+            //todo
+            //BeanUtils.copyProperties(parentTx, virtualTx);
+            virtualTx.setTime(parentTx.getTime());
+            virtualTx.setContractType(ContractTypeEnum.INNER.getCode());
+            virtualTx.setNonce(parentTx.getNonce());
+            virtualTx.setContractAddress(parentTx.getContractAddress());
+            virtualTx.setCost(parentTx.getCost());
+            virtualTx.setGasLimit(parentTx.getGasLimit());
+            virtualTx.setGasPrice(parentTx.getGasPrice());
+            virtualTx.setGasUsed(parentTx.getGasUsed());
+            virtualTx.setCreTime(parentTx.getCreTime());
 
+            //2023/04/14 lvxiaoyi 如何用户合约发起内置合约调用时，是用其它私钥前面的话（按理不可能把私钥放到用户合约中）
+            //这里可以设置下以防万一
+            newAddressCache.addPendingAddressToBlockCtx(invokeContractInput.getFrom());
+
+            virtualTx.setFrom(invokeContractInput.getFrom());
+            virtualTx.setTo(invokeContractInput.getTo());
+            //2023/04/14 lvxiaoyi to地址肯定是内置合约地址，无需再加入地址缓存
+            virtualTx.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
+            virtualTx.setHash(parentTx.getHash() + "-" + i);
+            virtualTx.setType(result.getTypeEnum().getCode());
+            virtualTx.setIndex(i);
+            virtualTx.setInput(tran.getInput());
+            virtualTx.setInfo(result.getParam().toJSONString());
+            virtualTx.setSeq((long) i);
+
+            virtualTx.setStatus(parentTx.getStatus());
             if (Integer.parseInt(tran.getCode()) > 0) {
                 // 虚拟交易失败,交易状态码设置为失败
-                tx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
+                virtualTx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
             }
+            transactionList.add(virtualTx);
         }
         return transactionList;
     }
@@ -133,7 +154,7 @@ public class TransactionUtil {
     }
 
     /**
-     * 处理虚拟交易
+     * 处理用户合约调用PPOS合约的交易
      *
      * @param block
      * @param specialApi
@@ -145,14 +166,11 @@ public class TransactionUtil {
      * @throws ContractInvokeException
      * @throws BlankResponseException
      */
-    public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi, PlatOnClient platOnClient, CollectionTransaction contractInvokeTx, Receipt contractInvokeTxReceipt, Logger logger) throws ContractInvokeException, BlankResponseException {
-
-        // TODO CD-就取一个内部ppos交易为何如此复杂？
-
+    public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi, PlatOnClient platOnClient, com.platon.browser.elasticsearch.dto.Transaction contractInvokeTx, Receipt contractInvokeTxReceipt, NewAddressCache newAddressCache) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
-            logger.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs, true));
+            log.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs, true));
             List<PPosInvokeContractInput> ppremoveList = new ArrayList<>();
             for (PPosInvokeContractInput input : inputs) {
                 List<TransData> removeList = new ArrayList<>();
@@ -175,7 +193,7 @@ public class TransactionUtil {
         // 取出当前普通合约调用交易内部调用PPOS操作的输入参数
         PPosInvokeContractInput input = PPosInvokeContractInputCache.getPPosInvokeContractInput(contractInvokeTx.getHash());
         // 使用普通合约内部调用的输入数据构造虚拟PPOS交易列表(包括成功和失败的PPOS调用)
-        List<Transaction> virtualTxList = getVirtualTxList(block, contractInvokeTx, input);
+        List<Transaction> virtualTxList = getVirtualTxList(block, contractInvokeTx, input, newAddressCache);
         if (!virtualTxList.isEmpty()) {
             for (int i = 0; i < virtualTxList.size(); i++) {
                 Transaction vt = virtualTxList.get(i);
@@ -228,20 +246,15 @@ public class TransactionUtil {
     /**
      * 内置合约调用交易,解析补充信息
      */
-    public static void resolveInnerContractInvokeTxComplementInfo(CollectionTransaction tx, List<Log> logs, ComplementInfo ci) throws BeanCreateOrUpdateException {
-        PPOSTxDecodeResult decodedResult;
-        try {
-            // 解析交易的输入及交易回执log信息
-            decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
-            ci.setType(decodedResult.getTypeEnum().getCode());
-            ci.setInfo(decodedResult.getParam().toJSONString());
-            ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
-            ci.setContractType(ContractTypeEnum.INNER.getCode());
-            ci.setMethod(null);
-            ci.setBinCode(null);
-        } catch (Exception e) {
-            throw new BeanCreateOrUpdateException("交易[hash:" + tx.getHash() + "]的参数解析出错:" + e.getMessage());
-        }
+    public static void resolveInnerContractInvokeTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction tx, List<Log> logs, ComplementInfo ci) {
+        // 解析交易的输入及交易回执log信息
+        PPOSTxDecodeResult decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
+        ci.setType(decodedResult.getTypeEnum().getCode());
+        ci.setInfo(decodedResult.getParam().toJSONString());
+        ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
+        ci.setContractType(ContractTypeEnum.INNER.getCode());
+        ci.setMethod(null);
+        ci.setBinCode(null);
     }
 
     /**
@@ -252,14 +265,19 @@ public class TransactionUtil {
      * @return
      * @throws BeanCreateOrUpdateException
      */
-    public static String getContractBinCode(CollectionTransaction tx, PlatOnClient platOnClient, String contractAddress, Logger logger) throws BeanCreateOrUpdateException {
+    public static String getContractBinCode(com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, String contractAddress) throws IOException {
+        PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
+        return platonGetCode.getCode();
+    }
+
+    public static String getContractBinCode( PlatOnClient platOnClient, String contractAddress, Long blockNumber) throws BeanCreateOrUpdateException {
         try {
-            PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(tx.getNum()))).send();
+            PlatonGetCode platonGetCode = platOnClient.getWeb3jWrapper().getWeb3j().platonGetCode(contractAddress, DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber))).send();
             return platonGetCode.getCode();
         } catch (Exception e) {
             platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取合约代码出错[" + contractAddress + "]:" + e.getMessage();
-            logger.error("{}", error);
+            log.error("{}", error);
             throw new BeanCreateOrUpdateException(error);
         }
     }
@@ -271,14 +289,15 @@ public class TransactionUtil {
      * @param contractAddress
      * @param platOnClient
      * @param ci
-     * @param log
      * @param contractTypeEnum
      * @return void
      * @date 2021/4/20
      */
-    public static void resolveGeneralContractCreateTxComplementInfo(CollectionTransaction result, String contractAddress, PlatOnClient platOnClient, ComplementInfo ci, Logger log, ContractTypeEnum contractTypeEnum) throws BeanCreateOrUpdateException {
+    public static void resolveGeneralContractCreateTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction result, String contractAddress, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) {
         ci.setInfo("");
-        ci.setBinCode(TransactionUtil.getContractBinCode(result, platOnClient, result.getContractAddress(), log));
+        //String binCode = "0x00";
+        //ci.setBinCode(binCode);
+        //ci.setBinCode(TransactionUtil.getContractBinCode(result, platOnClient, result.getContractAddress()));
 
         if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
@@ -300,6 +319,48 @@ public class TransactionUtil {
 
     }
 
+    public static Transaction.TypeEnum convert2CreatingContractTxType(ContractTypeEnum contractTypeEnum){
+        if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_CREATE;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC1155_CONTRACT_CREATE;
+        } else if (contractTypeEnum == ContractTypeEnum.WASM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.WASM_CONTRACT_CREATE;
+        } else {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.EVM_CONTRACT_CREATE;
+        }
+    }
+
+    public static Transaction.ToTypeEnum convert2ToType(ContractTypeEnum contractTypeEnum){
+        if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC20_CONTRACT;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC721_CONTRACT;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC1155_CONTRACT;
+        } else if (contractTypeEnum == ContractTypeEnum.WASM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.WASM_CONTRACT;
+        } else {
+            return com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.EVM_CONTRACT;
+        }
+    }
+
+    public static Transaction.TypeEnum convert2InvokingContractTxType(ContractTypeEnum contractTypeEnum){
+        if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_EXEC;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC721_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC721_CONTRACT_EXEC;
+        } else if (contractTypeEnum == ContractTypeEnum.ERC1155_EVM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC1155_CONTRACT_EXEC;
+        } else if (contractTypeEnum == ContractTypeEnum.WASM) {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC;
+        } else {
+            return com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.CONTRACT_EXEC;
+        }
+    }
+
     /**
      * 调用普通合约,解析补充信息
      *
@@ -307,16 +368,13 @@ public class TransactionUtil {
      * @param platOnClient
      * @param ci
      * @param contractTypeEnum
-     * @param logger
      * @return void
      * @date 2021/4/20
      */
-    public static void resolveGeneralContractInvokeTxComplementInfo(CollectionTransaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum, Logger logger) throws BeanCreateOrUpdateException {
+    public static void resolveGeneralContractInvokeTxComplementInfo(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, PlatOnClient platOnClient, ComplementInfo ci, ContractTypeEnum contractTypeEnum) {
         ci.setInfo("");
-        String binCode = getContractBinCode(tx, platOnClient, tx.getTo(), logger);
+        // 2023/04/12 lvxiaoyi: 合约调用，不需要查询binCode，合约的bincCode只需要在合约创建时调用一次即可。如果合约销毁，则在receipt中有被销毁的地址列表
 
-        // TODO CD-重复调用存在
-        ci.setBinCode(binCode);
         // TODO: 解析出调用合约方法名
         String txInput = tx.getInput();
         // ci.method = getGeneralContractMethod();
@@ -324,11 +382,12 @@ public class TransactionUtil {
         ci.setContractType(contractTypeEnum.getCode());
         if (contractTypeEnum == ContractTypeEnum.EVM) {
             ci.setToType(Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
         }
         if (contractTypeEnum == ContractTypeEnum.WASM) {
             ci.setToType(Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
+            ci.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
         }
-        ci.setType(Transaction.TypeEnum.CONTRACT_EXEC.getCode());
         if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC20_CONTRACT_EXEC.getCode());
@@ -341,12 +400,6 @@ public class TransactionUtil {
             ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
             ci.setType(Transaction.TypeEnum.ERC1155_CONTRACT_EXEC.getCode());
         }
-
-        // TODO CD - 需要重构的点合约自杀
-        if ("0x".equals(binCode)) {
-            // 如果交易的binCode属性为0x,则表明掉用了合约自毁方法, 交易类型设置为 合约销毁
-            ci.setType(Transaction.TypeEnum.CONTRACT_EXEC_DESTROY.getCode());
-        }
     }
 
     /**
@@ -354,8 +407,9 @@ public class TransactionUtil {
      *
      * @param ci
      */
-    public static void resolveGeneralTransferTxComplementInfo(CollectionTransaction tx, ComplementInfo ci, AddressCache addressCache) {
+    public static void resolveGeneralTransferTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction tx, ComplementInfo ci, NewAddressCache newAddressCache) {
         ci.setType(Transaction.TypeEnum.TRANSFER.getCode());
+
         ci.setContractType(null);
         ci.setMethod(null);
         ci.setInfo("{}");
@@ -368,27 +422,27 @@ public class TransactionUtil {
             ci.setMethod(ContractDescEnum.getMap().get(toAddress).getContractName());
             return;
         }
-        if (addressCache.isEvmContractAddress(toAddress)) {
+        if (newAddressCache.isEvmContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.EVM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.EVM.getCode());
             return;
         }
-        if (addressCache.isWasmContractAddress(toAddress)) {
+        if (newAddressCache.isWasmContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.WASM_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.WASM.getCode());
             return;
         }
-        if (addressCache.isErc20ContractAddress(toAddress)) {
+        if (newAddressCache.isErc20ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.ERC20_EVM.getCode());
             return;
         }
-        if (addressCache.isErc721ContractAddress(toAddress)) {
+        if (newAddressCache.isErc721ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC721_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.ERC721_EVM.getCode());
             return;
         }
-        if (addressCache.isErc1155ContractAddress(toAddress)) {
+        if (newAddressCache.isErc1155ContractAddress(toAddress)) {
             ci.setToType(Transaction.ToTypeEnum.ERC1155_CONTRACT.getCode());
             ci.setContractType(ContractTypeEnum.ERC1155_EVM.getCode());
             return;

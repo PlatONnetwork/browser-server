@@ -1,22 +1,10 @@
 package com.platon.browser.service.ppos;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.platon.browser.analyzer.ppos.*;
-import org.springframework.stereotype.Service;
-
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.DelegateExitResult;
 import com.platon.browser.bean.TxAnalyseResult;
-import com.platon.browser.analyzer.ppos.RestrictingCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.ReportAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeCreateAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeExitAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeIncreaseAnalyzer;
-import com.platon.browser.analyzer.ppos.StakeModifyAnalyzer;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
@@ -24,10 +12,12 @@ import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.NoSuchBeanException;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: ppos服务
@@ -86,15 +76,12 @@ public class PPOSService {
     @Resource
     private NetworkStatCache networkStatCache;
 
-    @Resource
-    private AddressCache addressCache;
-
     // 前一个区块号
     private long preBlockNumber = 0L;
 
     /**
      * 解析交易, 构造业务入库参数信息
-     *
+     * 2023/04/07 lvixaoyi  入参event.transactions中的每个对象会被设置seq, txInfo值，并且会设置addressCache
      * @param event
      * @return
      */
@@ -103,7 +90,7 @@ public class PPOSService {
 
         TxAnalyseResult tar = TxAnalyseResult.builder().nodeOptList(new ArrayList<>()).delegationRewardList(new ArrayList<>()).build();
 
-        List<Transaction> transactions = event.getTransactions();
+        List<Transaction> transactions = event.getBlock().getDtoTransactions();
 
         if (event.getBlock().getNum() == 0) {
             return tar;
@@ -114,12 +101,14 @@ public class PPOSService {
         for (Transaction tx : transactions) {
             // 设置普通交易的交易序号
             tx.setSeq(event.getBlock().getNum() * 100000 + allTxCount);
-            this.addressCache.update(tx);
-            // 自增
+            // 2023/04/14 lvxiaoyi 区块内交易相关的地址，都已经在前面的分析中，加入了缓存，不再需要处理
+            //this.addressCache.update(tx);
+            // 自增·
             allTxCount++;
             // 分析真实交易
             this.analyzePPosTx(event, tx, tar);
             // 分析虚拟交易
+            // 2023/04/14 lvixoayi 区块内交易的虚拟交易，目前仅仅限于：用户合约调用platon的内置合约。所有，虚拟交易的from/to，已经在NewAddressCache中
             List<Transaction> virtualTxes = tx.getVirtualTransactions();
             for (Transaction vt : virtualTxes) {
                 // 设置合约调用ppos交易的交易序号
@@ -169,7 +158,7 @@ public class PPOSService {
      */
     private void analyzePPosTx(CollectionEvent event, Transaction tx, TxAnalyseResult tar) {
         try {
-            log.info("解析真实交易[{}]类型为enum:[{}] code:[{}] desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
+            log.debug("解析真实交易[{}]类型为enum:[{}] code:[{}] desc:[{}]", tx.getHash(), tx.getTypeEnum(), tx.getTypeEnum().getCode(), tx.getTypeEnum().getDesc());
             // 调用交易分析引擎分析交易，以补充相关数据
             NodeOpt nodeOpt = null;
             DelegationReward delegationReward = null;

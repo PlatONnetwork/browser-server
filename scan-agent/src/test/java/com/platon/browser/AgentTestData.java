@@ -1,21 +1,20 @@
 package com.platon.browser;
 
-import com.platon.contracts.ppos.dto.resp.Node;
-import com.platon.protocol.core.methods.response.PlatonBlock;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.v0150.bean.AdjustParam;
-import com.platon.browser.bean.CollectionBlock;
-import com.platon.browser.bean.CollectionTransaction;
-import com.platon.browser.bean.ComplementNodeOpt;
-import com.platon.browser.bean.ReceiptResult;
+import com.platon.browser.bean.*;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.entity.NetworkStat;
-import com.platon.browser.bean.*;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.NodeOpt;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.v0150.bean.AdjustParam;
+import com.platon.contracts.ppos.dto.resp.Node;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
 import java.io.File;
@@ -29,6 +28,7 @@ import java.util.concurrent.Executors;
  * @create: 2019-11-13 15:11:37
  **/
 @Slf4j
+@ExtendWith(MockitoExtension.class)
 public class AgentTestData {
 
     public static final String testDataDir = AgentTestData.class.getClassLoader().getResource("./").getPath() + "../../../../../testdata/";
@@ -59,11 +59,11 @@ public class AgentTestData {
 
     protected List<PlatonBlock.Block> rawBlockList = new ArrayList<>();
 
-    protected List<CollectionTransaction> transactionList = Collections.emptyList();
+    protected List<com.platon.browser.elasticsearch.dto.Transaction> transactionList = Collections.emptyList();
 
     protected List<ReceiptResult> receiptResultList = Collections.emptyList();
 
-    protected List<CustomStaking> stakingList = Collections.emptyList();
+    protected List<Staking> stakingList = Collections.emptyList();
 
     protected List<CustomDelegation> delegationList = Collections.emptyList();
 
@@ -89,7 +89,7 @@ public class AgentTestData {
 
     protected List<AdjustParam> adjustParamList = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void init() {
         Arrays.asList(dataFile).forEach(fileName -> {
             try {
@@ -128,7 +128,7 @@ public class AgentTestData {
                         networkStatList = JSON.parseArray(content, NetworkStat.class);
                         break;
                     case "transaction":
-                        transactionList = JSON.parseArray(content, CollectionTransaction.class);
+                        transactionList = JSON.parseArray(content, com.platon.browser.elasticsearch.dto.Transaction.class);
                         break;
                     case "receipts":
                         receiptResultList = JSON.parseArray(content, ReceiptResult.class);
@@ -142,7 +142,7 @@ public class AgentTestData {
                         });
                         break;
                     case "staking":
-                        stakingList = JSON.parseArray(content, CustomStaking.class);
+                        stakingList = JSON.parseArray(content, Staking.class);
                         break;
                     case "delegation":
                         delegationList = JSON.parseArray(content, CustomDelegation.class);

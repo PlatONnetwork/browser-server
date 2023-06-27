@@ -21,6 +21,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,12 +29,21 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import javax.annotation.Resource;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 重要说明：
+ * 如果单元测试需要加载spring context，不要用AgentApplication.class来加载，因为这个class加载运行后会进入一个for循环。
+ * 可以在test目录，写一个继承自ApplicationRunner的、run方法空的类。参考com.platon.AgentApplicationTest
+ * 并且，在执行这样的单元测试时，需要注释掉AgentApplication.class的@Configuration，@SpringBootApplication这两个注解才行（测试完成后，记得取消此注释）
+ *
+ */
 @Slf4j
 @EnableRetry
 @Configuration
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
+// @ServletComponentScan
+@ComponentScan(basePackages = {"com.platon.browser.**"})
 @MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper", "com.platon.browser.v0150.dao", "com.platon.browser.v0151.dao"})
 public class AgentApplication implements ApplicationRunner {
 

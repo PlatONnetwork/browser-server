@@ -1,6 +1,5 @@
 package com.platon.browser.bootstrap.bean;
 
-import lombok.Data;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

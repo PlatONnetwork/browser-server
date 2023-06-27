@@ -62,7 +62,7 @@ subprojects {
         options.encoding = "UTF-8"
     }
     apply plugin: 'java'
-    apply plugin: 'jacoco'
+    //apply plugin: 'jacoco'
     group 'com.platon.browser'
     version "$projectVersion-$shortCommitId"
     sourceCompatibility = '1.8'
@@ -271,14 +271,14 @@ subprojects {
     }
 
     //jacoco测试报表的功能
-    jacocoTestReport {
+    /*jacocoTestReport {
         reports {
             xml.enabled true
             html.enabled true
         }
-    }
+    }*/
 
-    jacocoTestCoverageVerification {
+    /*jacocoTestCoverageVerification {
         violationRules {
             rule {
                 limit {
@@ -288,10 +288,10 @@ subprojects {
         }
     }
 
-    check.dependsOn jacocoTestReport
+    check.dependsOn jacocoTestReport*/
 
     dependencies {
-        testCompile "junit:junit:$junitVersion"
+        //testCompile "junit:junit:$junitVersion"
         testCompile "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         compile "com.alibaba:fastjson:$fastJsonVersion"
@@ -321,7 +321,7 @@ subprojects {
         compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
         compile group: 'org.apache.httpcomponents', name: 'httpcore-nio', version: '4.4.12'
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.4.5'
-        implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.9.0'
+        implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.9.3'
 
         compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
         testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.5.0'

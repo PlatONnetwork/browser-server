@@ -1,12 +1,12 @@
 package com.platon.browser.dao.custommapper;
 
 import com.platon.browser.dao.entity.Slash;
-import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.param.BusinessParam;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -19,7 +19,7 @@ public interface SlashBusinessMapper {
      * 双签举报
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void slashNode(Slash param);
+    void slashNodeForDoubleSigned(Slash param);
 
     /**
      * 新选举周期更新节点提取质押需要经过的周期数
@@ -33,13 +33,14 @@ public interface SlashBusinessMapper {
      * @return
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void setException(@Param("nodeId") String nodeId, @Param("stakingBlockNum") long blockNum);
+    void slashByDoubleSigned(@Param("nodeId") String nodeId, @Param("stakingBlockNum") long blockNum);
 
     /**
-     * 查询标记为双签异常的节点
-     *
+     * 从staking表中过滤
+     * 标记为双签异常的节点id
+     * @param tobeSlashedNodeIdList, 将被处罚的节点（这些节点被处罚的原因，不一定都是因为双签，所以需要过滤下）
      * @return
      */
-    List<Staking> getException(@Param("list") List<String> list);
+    Set<String> filterNodeIdThoseDoubleSigned(List<String> tobeSlashedNodeIdList);
 
 }

@@ -19,7 +19,7 @@ public class ComplementNodeOptTest extends AgentTestBase {
 
     @Test
     public void Test() throws InvocationTargetException, IllegalAccessException {
-        List <CollectionTransaction> list = transactionList;
+        List <com.platon.browser.elasticsearch.dto.Transaction> list = transactionList;
         ComplementNodeOpt complementNodeOpt = ComplementNodeOpt.newInstance();
         complementNodeOpt.setBNum(list.get(0).getNum());
         complementNodeOpt.setCreTime(new Date());

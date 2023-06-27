@@ -1,15 +1,12 @@
 package com.platon.browser.bean;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.platon.browser.dao.entity.Address;
-
+import com.platon.browser.enums.AddressTypeEnum;
+import com.platon.browser.enums.ContractDescEnum;
+import com.platon.browser.enums.ContractTypeEnum;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * @Auther: Chendongming
@@ -19,73 +16,89 @@ import lombok.Data;
 @Data
 public class CustomAddress extends Address {
 
-    public CustomAddress() {
-        super();
-        Date date = new Date();
-        this.setUpdateTime(date);
-        this.setCreateTime(date);
-        /* 初始化默认值 */
-        this.setBalance(BigDecimal.ZERO);
-        this.setRestrictingBalance(BigDecimal.ZERO);
-        this.setStakingValue(BigDecimal.ZERO);
-        this.setDelegateValue(BigDecimal.ZERO);
-        this.setRedeemedValue(BigDecimal.ZERO);
-        this.setTxQty(BigInteger.ZERO.intValue());
-        this.setTransferQty(BigInteger.ZERO.intValue());
-        this.setStakingQty(BigInteger.ZERO.intValue());
-        this.setDelegateQty(BigInteger.ZERO.intValue());
-        this.setProposalQty(BigInteger.ZERO.intValue());
-        this.setCandidateCount(BigInteger.ZERO.intValue());
-        this.setDelegateHes(BigDecimal.ZERO);
-        this.setDelegateLocked(BigDecimal.ZERO);
-        this.setContractName("");
-        this.setContractCreate("");
-        this.setContractCreatehash("");
+    private ContractTypeEnum contractType;
+    private int option;
+
+    private CustomAddress() {
+    }
+
+    private static CustomAddress initDefaultAccountAddress(String addr){
+        CustomAddress address = new CustomAddress();
+        address.setAddress(addr);
+        // 先默认置为账户地址，具体是什么类型，由调用此方法的后续逻辑决定并设置
+        address.setType(AddressTypeEnum.ACCOUNT.getCode());
+        ContractDescEnum cde = ContractDescEnum.getMap().get(addr);
+        if (cde != null) {
+            address.setContractName(cde.getContractName());
+            address.setContractCreate(cde.getCreator());
+            address.setContractCreatehash(cde.getContractHash());
+        } else {
+            address.setContractName("");
+            address.setContractCreate("");
+            address.setContractCreatehash("");
+        }
+
+        address.setTxQty(0);
+        address.setErc20TxQty(0);
+        address.setErc721TxQty(0);
+        address.setErc1155TxQty(0);
+        address.setTransferQty(0);
+        address.setStakingQty(0);
+        address.setDelegateQty(0);
+        address.setProposalQty(0);
+        address.setHaveReward(BigDecimal.ZERO);
+        return address;
+    }
+    public static CustomAddress createNewAccountAddress(String addr){
+        CustomAddress address = initDefaultAccountAddress(addr);
+        address.setOption(Option.NEW);
+        return address;
     }
 
     /**
-     * 地址类型 :1账号,2内置合约 ,3EVM合约,4WASM合约
+     * 对于db中已经存在的，也可以用此创建，一般和其它option配合使用
+     * @param addr
+     * @return
      */
-    public enum TypeEnum {
-        ACCOUNT(1, "账号"),
-        INNER_CONTRACT(2, "内置合约"),
-        EVM(3, "3EVM合约"),
-        WASM(4, "WASM合约"),
-        ERC20_EVM(5, "ERC20合约"),
-        ERC721_EVM(6, "ERC721合约"),
-        ERC1155_EVM(7, "ERC1155合约");
+    public static CustomAddress createPendingAccountAddress(String addr){
+        CustomAddress address = initDefaultAccountAddress(addr);
+        address.setOption(Option.PENDING);
+        return address;
+    }
 
-        private int code;
-        private String desc;
+    /*public enum Option {
+        NEW, SUICIDED, REWARD_CLAIM, PENDING
+    }*/
 
-        TypeEnum(int code, String desc) {
-            this.code = code;
-            this.desc = desc;
+    public enum Option {
+        PENDING(0),
+        NEW(1),
+        REWARD_CLAIM(2),
+        SUICIDED(4),
+
+        RESET_TYPE(8);
+
+        private int mask;
+
+        private Option(int mask) {
+            this.mask = mask;
         }
+    }
 
-        public int getCode() {
-            return this.code;
+    private int setting=0x0;
+    public void setOption(Option ...flags) {
+        for(Option flag:flags){
+            setting|=flag.mask;
         }
+    }
 
-        public String getDesc() {
-            return this.desc;
+    public void unsetOption(Option ...flags) {
+        for(Option flag:flags){
+            setting &=~flag.mask;
         }
+    }
 
-        private static final Map<Integer, TypeEnum> ENUMS = new HashMap<>();
-        static {
-            Arrays.asList(TypeEnum.values()).forEach(en -> ENUMS.put(en.code, en));
-        }
-
-        public static TypeEnum getEnum(Integer code) {
-            return ENUMS.get(code);
-        }
-
-        public static boolean contains(int code) {
-            return ENUMS.containsKey(code);
-        }
-
-        public static boolean contains(CustomStaking.StatusEnum en) {
-            return ENUMS.containsValue(en);
-        }
+    public boolean hasOption(Option flag) {
+        return (setting & flag.mask)==flag.mask;
     }
 }

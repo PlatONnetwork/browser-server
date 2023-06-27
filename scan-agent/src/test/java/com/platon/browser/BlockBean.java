@@ -1,8 +1,8 @@
 package com.platon.browser;
 
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import java.util.List;
 

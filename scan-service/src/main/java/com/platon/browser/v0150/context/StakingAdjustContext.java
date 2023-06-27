@@ -1,6 +1,6 @@
 package com.platon.browser.v0150.context;
 
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
 import lombok.Data;
@@ -26,8 +26,8 @@ public class StakingAdjustContext extends AbstractAdjustContext {
         // 验证金额是否正确前，检查各项必须的数据是否存在
         if (!errors.isEmpty()) return;
         if(
-            adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
-            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
+            adjustParam.getStatus()== Staking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==Staking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点，判断stakingReduction金额是否够扣
             if(adjustParam.getStakingReduction().compareTo(adjustParam.getHes().add(adjustParam.getLock()))<0){
@@ -47,8 +47,8 @@ public class StakingAdjustContext extends AbstractAdjustContext {
     @Override
     void calculateAmountAndStatus() throws BlockNumberException {
         if(
-            adjustParam.getStatus()==CustomStaking.StatusEnum.EXITING.getCode()
-            ||adjustParam.getStatus()==CustomStaking.StatusEnum.EXITED.getCode()
+            adjustParam.getStatus()==Staking.StatusEnum.EXITING.getCode()
+            ||adjustParam.getStatus()==Staking.StatusEnum.EXITED.getCode()
         ){
             // 退出中或已退出的节点，从stakingReduction中减掉hes和lock
             adjustParam.setStakingReduction(
@@ -71,9 +71,9 @@ public class StakingAdjustContext extends AbstractAdjustContext {
             BigDecimal stakingHes = adjustParam.getStakingHes();
             BigDecimal stakingLocked = adjustParam.getStakingLocked();
             if(stakingHes.add(stakingLocked).compareTo(chainConfig.getStakeThreshold())<0){
-                adjustParam.setStatus(CustomStaking.StatusEnum.EXITING.getCode());
-                adjustParam.setIsConsensus(CustomStaking.YesNoEnum.NO.getCode());
-                adjustParam.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
+                adjustParam.setStatus(Staking.StatusEnum.EXITING.getCode());
+                adjustParam.setIsConsensus(Staking.YesNoEnum.NO.getCode());
+                adjustParam.setIsSettle(Staking.YesNoEnum.NO.getCode());
                 // 把锁定期金额移至退回中字段
                 adjustParam.setStakingReduction(adjustParam.getStakingReduction().add(stakingLocked));
                 // 把犹豫期和锁定期金额置0

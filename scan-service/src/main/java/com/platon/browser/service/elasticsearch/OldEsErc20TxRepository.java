@@ -143,7 +143,7 @@
 //                    ParsedValueCount valueCount = innerGroup.getAggregations().get("tx_count");
 //                    double txCount = valueCount.value();
 //                    ttc.getTokenTxCountMap().put(address,(long)txCount);
-//                    log.info("name , count {} {}", address, txCount);
+//                    log.debug("name , count {} {}", address, txCount);
 //                });
 //            });
 //        } catch (IOException e) {

@@ -1,17 +1,17 @@
 package com.platon.browser.utils;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.math.BigInteger;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  *  @file VerUtilTest.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年9月9日
  */
@@ -34,7 +34,7 @@ public class ChainVersionUtilTest {
         String version = ChainVersionUtil.toStringVersion(BigInteger.valueOf(65792));
         assertEquals("1.1.0", version);
     }
-    
+
     @Test
     public void TestTransferBigVersion() {
     	BigInteger version = ChainVersionUtil.toBigVersion(BigInteger.valueOf(65792));

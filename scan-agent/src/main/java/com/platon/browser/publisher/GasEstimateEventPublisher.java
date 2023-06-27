@@ -15,7 +15,13 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ *
  * Gas price 估算事件发布者
+ *
+ * lvxioayi：
+ * @deprecated
+ * 下面的方法中，会保证Gas_Estimate表写成功，也不会再写Gas_Estimate_log表，因此和GasEstimateEvent相关的代码都可以去掉
+ * com.platon.browser.analyzer.epoch.OnSettleAnalyzer#analyze(com.platon.browser.bean.CollectionEvent, com.platon.browser.elasticsearch.dto.Block)
  */
 @Slf4j
 @Component

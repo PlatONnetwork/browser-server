@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.ProposalBusinessMapper">
-    <update id="proposalSlashUpdate" >
+	<update id="discardOptionForVotingProposal">
+		update proposal
+		inner join (
+			select proposal_hash, `option`
+			from vote
+			where node_id in (<foreach collection="list" item="item" separator=",">#{item,jdbcType=VARCHAR}</foreach>)
+		) t2  on proposal.hash = t2.proposal_hash and proposal.status = 1
+		set
+			proposal.yeas = case when t2.`option` = 1 and proposal.yeas > 1 then proposal.yeas - 1 else proposal.yeas end,
+			proposal.nays = case when t2.`option` = 2 and proposal.nays > 1 then proposal.nays - 1 else proposal.nays end,
+			proposal.abstentions = case when t2.`option` = 3 and proposal.abstentions > 1 then proposal.abstentions - 1 else proposal.abstentions end;
+	</update>
+
+    <!--<update id="proposalSlashUpdate" >
         <foreach collection="proposalSlashs" item="ps">
         	/*1、更新提案*/
-			update proposal set 
+			update proposal set
 			<choose>
             	<when test='ps.voteOption == "1"'>
          			`yeas` = `yeas`- 1
@@ -18,18 +31,18 @@
          	</choose>
 			 where `hash` = #{ps.hash};
             /*2、更新投票*/
-		    update vote set 
+		    update vote set
 		    <choose>
             	<when test='ps.voteOption == "1"'>
 		    	`option` = 11
-		    	</when> 
+		    	</when>
 		    	<when test='ps.voteOption == "2"'>
 		    	`option` = 12
-		    	</when> 
+		    	</when>
 		    	<when test='ps.voteOption == "3"'>
 		    	`option` = 13
 		    	</when>
 		    </choose> where `hash` = #{ps.voteHash} ;
         </foreach>
-</update>
+</update>-->
 </mapper>

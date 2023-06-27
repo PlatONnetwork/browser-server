@@ -1,13 +1,11 @@
 package com.platon.browser.task.bean;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试

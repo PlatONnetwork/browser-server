@@ -5,11 +5,11 @@ import com.platon.contracts.ppos.dto.common.FunctionType;
 import com.platon.contracts.ppos.dto.enums.StakingAmountType;
 import com.platon.contracts.ppos.dto.req.StakingParam;
 import com.platon.contracts.ppos.utils.EncoderUtils;
-import org.bouncycastle.util.encoders.Hex;
-import org.junit.Test;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.http.HttpService;
 import com.platon.utils.Convert;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

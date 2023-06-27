@@ -1,15 +1,13 @@
 package com.platon.browser.decoder.ppos;
 
+import com.platon.browser.param.StakeModifyParam;
+import com.platon.browser.param.TxParam;
 import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.utils.Numeric;
-import com.platon.browser.param.StakeModifyParam;
-import com.platon.browser.param.TxParam;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-
-import static com.platon.browser.decoder.ppos.AbstractPPOSDecoder.*;
 
 /**
  * @description: 创建验证人交易输入参数解码器

@@ -1,11 +1,11 @@
 package com.platon.browser.service.statistic;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.cache.AddressCache;
-import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer;
 import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.elasticsearch.dto.Block;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StatisticServiceTest extends AgentTestBase {
     @Mock
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
     @Mock
     private StatisticsNetworkAnalyzer statisticsNetworkAnalyzer;
     @Mock
@@ -39,7 +39,7 @@ public class StatisticServiceTest extends AgentTestBase {
 
     @Before
     public void setup() throws Exception {
-        when(addressCache.getAll()).thenReturn(new ArrayList<>(addressList));
+        when(newAddressCache.listNewAddressInBlockCtx()).thenReturn(new ArrayList<>(addressList));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class StatisticServiceTest extends AgentTestBase {
         CollectionEvent event = new CollectionEvent();
         event.setBlock(blockList.get(0));
         event.setEpochMessage(EpochMessage.newInstance());
-        event.setTransactions(new ArrayList <>(transactionList));
+        event.getBlock().setDtoTransactions(new ArrayList <>(transactionList));
         target.analyze(event);
         verify(target, times(1)).analyze(any());
     }

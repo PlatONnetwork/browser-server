@@ -10,7 +10,6 @@ import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -45,7 +44,6 @@ public class ErcTokenHolderAnalyzer {
      * 然后这个minter转账后给其它人后，这个minter的balance会变成负数
      * 这个是因为这样的合约不是标准合约。所以如果实时维护就不能支持这样的非标准合约了。
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
     public void analyze(List<ErcTx> txList) {
         List<TokenHolder> changeBalanceList = new ArrayList<>();
         txList.forEach(tx -> {
@@ -80,6 +78,9 @@ public class ErcTokenHolderAnalyzer {
             }
         });
         if (CollUtil.isNotEmpty(changeBalanceList)) {
+            /*for(TokenHolder holder : changeBalanceList){
+                log.info("token balance checkpoint, token:{}, holder:{}, balanceIncrement:{}", holder.getTokenAddress(), holder.getAddress(), holder.getIncrement().toString());
+            }*/
             //customTokenHolderMapper.batchInsertOrUpdateSelective(insertOrUpdate, TokenHolder.Column.values());
             log.debug("区块中ERC20/ERC721交易数量：{}，需要更新的token持有者记录数量为：{}", txList.size(), changeBalanceList.size());
             customTokenHolderMapper.batchChange(changeBalanceList);
@@ -104,7 +105,7 @@ public class ErcTokenHolderAnalyzer {
             tokenHolder.setTokenTxQty(tokenHolder.getTokenTxQty() + 1);
         }
         //TokenTxQty： 用户对该erc20的交易总数，或者是用户对该erc721, erc1155所有tokenId的交易总数
-        log.info("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
+        log.debug("该合约地址[{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getAddress(), tokenHolder.getTokenTxQty());
         insertOrUpdate.add(tokenHolder);
     }*/
 

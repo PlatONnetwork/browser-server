@@ -46,7 +46,7 @@
     <result column="total_dele_reward" jdbcType="DECIMAL" property="totalDeleReward" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.StakingHistory">
-    <result column="annualized_rate_info" jdbcType="LONGVARCHAR" property="annualizedRateInfo" />
+    <result column="annualized_rate_info" jdbcType="VARCHAR" property="annualizedRateInfo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -107,13 +107,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction, 
-    staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr, 
-    benefit_addr, annualized_rate, program_version, big_version, web_site, details, join_time, 
-    leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked, 
-    stat_delegate_released, block_reward_value, fee_reward_value, staking_reward_value, 
-    predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time, 
-    reward_per, next_reward_per, next_reward_per_mod_epoch, have_dele_reward, pre_dele_annualized_rate, 
+    node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction,
+    staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr,
+    benefit_addr, annualized_rate, program_version, big_version, web_site, details, join_time,
+    leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, stat_delegate_locked,
+    stat_delegate_released, block_reward_value, fee_reward_value, staking_reward_value,
+    predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, create_time, update_time,
+    reward_per, next_reward_per, next_reward_per_mod_epoch, have_dele_reward, pre_dele_annualized_rate,
     dele_annualized_rate, total_dele_reward
   </sql>
   <sql id="Blob_Column_List">
@@ -150,7 +150,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="com.platon.browser.dao.entity.StakingHistoryKey" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -170,37 +170,37 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.StakingHistory">
-    insert into staking_history (node_id, staking_block_num, staking_tx_index, 
-      staking_hes, staking_locked, staking_reduction, 
-      staking_reduction_epoch, node_name, node_icon, 
-      external_id, external_name, staking_addr, 
-      benefit_addr, annualized_rate, program_version, 
-      big_version, web_site, details, 
-      join_time, leave_time, `status`, 
-      is_consensus, is_settle, is_init, 
-      stat_delegate_hes, stat_delegate_locked, stat_delegate_released, 
-      block_reward_value, fee_reward_value, staking_reward_value, 
-      predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, 
-      create_time, update_time, reward_per, 
-      next_reward_per, next_reward_per_mod_epoch, have_dele_reward, 
-      pre_dele_annualized_rate, dele_annualized_rate, 
+    insert into staking_history (node_id, staking_block_num, staking_tx_index,
+      staking_hes, staking_locked, staking_reduction,
+      staking_reduction_epoch, node_name, node_icon,
+      external_id, external_name, staking_addr,
+      benefit_addr, annualized_rate, program_version,
+      big_version, web_site, details,
+      join_time, leave_time, `status`,
+      is_consensus, is_settle, is_init,
+      stat_delegate_hes, stat_delegate_locked, stat_delegate_released,
+      block_reward_value, fee_reward_value, staking_reward_value,
+      predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty,
+      create_time, update_time, reward_per,
+      next_reward_per, next_reward_per_mod_epoch, have_dele_reward,
+      pre_dele_annualized_rate, dele_annualized_rate,
       total_dele_reward, annualized_rate_info
       )
-    values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER}, 
-      #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL}, 
-      #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR}, 
-      #{externalId,jdbcType=VARCHAR}, #{externalName,jdbcType=VARCHAR}, #{stakingAddr,jdbcType=VARCHAR}, 
-      #{benefitAddr,jdbcType=VARCHAR}, #{annualizedRate,jdbcType=DOUBLE}, #{programVersion,jdbcType=VARCHAR}, 
-      #{bigVersion,jdbcType=VARCHAR}, #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR}, 
-      #{joinTime,jdbcType=TIMESTAMP}, #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, 
-      #{isConsensus,jdbcType=INTEGER}, #{isSettle,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER}, 
-      #{statDelegateHes,jdbcType=DECIMAL}, #{statDelegateLocked,jdbcType=DECIMAL}, #{statDelegateReleased,jdbcType=DECIMAL}, 
-      #{blockRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{stakingRewardValue,jdbcType=DECIMAL}, 
-      #{predictStakingReward,jdbcType=DECIMAL}, #{curConsBlockQty,jdbcType=BIGINT}, #{preConsBlockQty,jdbcType=BIGINT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardPer,jdbcType=INTEGER}, 
-      #{nextRewardPer,jdbcType=INTEGER}, #{nextRewardPerModEpoch,jdbcType=INTEGER}, #{haveDeleReward,jdbcType=DECIMAL}, 
-      #{preDeleAnnualizedRate,jdbcType=DOUBLE}, #{deleAnnualizedRate,jdbcType=DOUBLE}, 
-      #{totalDeleReward,jdbcType=DECIMAL}, #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+    values (#{nodeId,jdbcType=VARCHAR}, #{stakingBlockNum,jdbcType=BIGINT}, #{stakingTxIndex,jdbcType=INTEGER},
+      #{stakingHes,jdbcType=DECIMAL}, #{stakingLocked,jdbcType=DECIMAL}, #{stakingReduction,jdbcType=DECIMAL},
+      #{stakingReductionEpoch,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, #{nodeIcon,jdbcType=VARCHAR},
+      #{externalId,jdbcType=VARCHAR}, #{externalName,jdbcType=VARCHAR}, #{stakingAddr,jdbcType=VARCHAR},
+      #{benefitAddr,jdbcType=VARCHAR}, #{annualizedRate,jdbcType=DOUBLE}, #{programVersion,jdbcType=VARCHAR},
+      #{bigVersion,jdbcType=VARCHAR}, #{webSite,jdbcType=VARCHAR}, #{details,jdbcType=VARCHAR},
+      #{joinTime,jdbcType=TIMESTAMP}, #{leaveTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER},
+      #{isConsensus,jdbcType=INTEGER}, #{isSettle,jdbcType=INTEGER}, #{isInit,jdbcType=INTEGER},
+      #{statDelegateHes,jdbcType=DECIMAL}, #{statDelegateLocked,jdbcType=DECIMAL}, #{statDelegateReleased,jdbcType=DECIMAL},
+      #{blockRewardValue,jdbcType=DECIMAL}, #{feeRewardValue,jdbcType=DECIMAL}, #{stakingRewardValue,jdbcType=DECIMAL},
+      #{predictStakingReward,jdbcType=DECIMAL}, #{curConsBlockQty,jdbcType=BIGINT}, #{preConsBlockQty,jdbcType=BIGINT},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rewardPer,jdbcType=INTEGER},
+      #{nextRewardPer,jdbcType=INTEGER}, #{nextRewardPerModEpoch,jdbcType=INTEGER}, #{haveDeleReward,jdbcType=DECIMAL},
+      #{preDeleAnnualizedRate,jdbcType=DOUBLE}, #{deleAnnualizedRate,jdbcType=DOUBLE},
+      #{totalDeleReward,jdbcType=DECIMAL}, #{annualizedRateInfo,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.StakingHistory">
@@ -464,7 +464,7 @@
         #{totalDeleReward,jdbcType=DECIMAL},
       </if>
       <if test="annualizedRateInfo != null">
-        #{annualizedRateInfo,jdbcType=LONGVARCHAR},
+        #{annualizedRateInfo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -604,7 +604,7 @@
         total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL},
       </if>
       <if test="record.annualizedRateInfo != null">
-        annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR},
+        annualized_rate_info = #{record.annualizedRateInfo,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -655,7 +655,7 @@
       pre_dele_annualized_rate = #{record.preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{record.deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{record.totalDeleReward,jdbcType=DECIMAL},
-      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=LONGVARCHAR}
+      annualized_rate_info = #{record.annualizedRateInfo,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -832,7 +832,7 @@
         total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL},
       </if>
       <if test="annualizedRateInfo != null">
-        annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR},
+        annualized_rate_info = #{annualizedRateInfo,jdbcType=VARCHAR},
       </if>
     </set>
     where node_id = #{nodeId,jdbcType=VARCHAR}
@@ -880,7 +880,7 @@
       pre_dele_annualized_rate = #{preDeleAnnualizedRate,jdbcType=DOUBLE},
       dele_annualized_rate = #{deleAnnualizedRate,jdbcType=DOUBLE},
       total_dele_reward = #{totalDeleReward,jdbcType=DECIMAL},
-      annualized_rate_info = #{annualizedRateInfo,jdbcType=LONGVARCHAR}
+      annualized_rate_info = #{annualizedRateInfo,jdbcType=VARCHAR}
     where node_id = #{nodeId,jdbcType=VARCHAR}
       and staking_block_num = #{stakingBlockNum,jdbcType=BIGINT}
   </update>
@@ -936,34 +936,34 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into staking_history
-    (node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction, 
-      staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr, 
-      benefit_addr, annualized_rate, program_version, big_version, web_site, details, 
-      join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes, 
-      stat_delegate_locked, stat_delegate_released, block_reward_value, fee_reward_value, 
-      staking_reward_value, predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty, 
-      create_time, update_time, reward_per, next_reward_per, next_reward_per_mod_epoch, 
-      have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward, 
+    (node_id, staking_block_num, staking_tx_index, staking_hes, staking_locked, staking_reduction,
+      staking_reduction_epoch, node_name, node_icon, external_id, external_name, staking_addr,
+      benefit_addr, annualized_rate, program_version, big_version, web_site, details,
+      join_time, leave_time, `status`, is_consensus, is_settle, is_init, stat_delegate_hes,
+      stat_delegate_locked, stat_delegate_released, block_reward_value, fee_reward_value,
+      staking_reward_value, predict_staking_reward, cur_cons_block_qty, pre_cons_block_qty,
+      create_time, update_time, reward_per, next_reward_per, next_reward_per_mod_epoch,
+      have_dele_reward, pre_dele_annualized_rate, dele_annualized_rate, total_dele_reward,
       annualized_rate_info)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER}, 
-        #{item.stakingHes,jdbcType=DECIMAL}, #{item.stakingLocked,jdbcType=DECIMAL}, #{item.stakingReduction,jdbcType=DECIMAL}, 
-        #{item.stakingReductionEpoch,jdbcType=INTEGER}, #{item.nodeName,jdbcType=VARCHAR}, 
-        #{item.nodeIcon,jdbcType=VARCHAR}, #{item.externalId,jdbcType=VARCHAR}, #{item.externalName,jdbcType=VARCHAR}, 
-        #{item.stakingAddr,jdbcType=VARCHAR}, #{item.benefitAddr,jdbcType=VARCHAR}, #{item.annualizedRate,jdbcType=DOUBLE}, 
-        #{item.programVersion,jdbcType=VARCHAR}, #{item.bigVersion,jdbcType=VARCHAR}, #{item.webSite,jdbcType=VARCHAR}, 
-        #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, #{item.leaveTime,jdbcType=TIMESTAMP}, 
-        #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, #{item.isSettle,jdbcType=INTEGER}, 
-        #{item.isInit,jdbcType=INTEGER}, #{item.statDelegateHes,jdbcType=DECIMAL}, #{item.statDelegateLocked,jdbcType=DECIMAL}, 
-        #{item.statDelegateReleased,jdbcType=DECIMAL}, #{item.blockRewardValue,jdbcType=DECIMAL}, 
-        #{item.feeRewardValue,jdbcType=DECIMAL}, #{item.stakingRewardValue,jdbcType=DECIMAL}, 
-        #{item.predictStakingReward,jdbcType=DECIMAL}, #{item.curConsBlockQty,jdbcType=BIGINT}, 
-        #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP}, 
-        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardPer,jdbcType=INTEGER}, #{item.nextRewardPer,jdbcType=INTEGER}, 
-        #{item.nextRewardPerModEpoch,jdbcType=INTEGER}, #{item.haveDeleReward,jdbcType=DECIMAL}, 
-        #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}, #{item.deleAnnualizedRate,jdbcType=DOUBLE}, 
-        #{item.totalDeleReward,jdbcType=DECIMAL}, #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+      (#{item.nodeId,jdbcType=VARCHAR}, #{item.stakingBlockNum,jdbcType=BIGINT}, #{item.stakingTxIndex,jdbcType=INTEGER},
+        #{item.stakingHes,jdbcType=DECIMAL}, #{item.stakingLocked,jdbcType=DECIMAL}, #{item.stakingReduction,jdbcType=DECIMAL},
+        #{item.stakingReductionEpoch,jdbcType=INTEGER}, #{item.nodeName,jdbcType=VARCHAR},
+        #{item.nodeIcon,jdbcType=VARCHAR}, #{item.externalId,jdbcType=VARCHAR}, #{item.externalName,jdbcType=VARCHAR},
+        #{item.stakingAddr,jdbcType=VARCHAR}, #{item.benefitAddr,jdbcType=VARCHAR}, #{item.annualizedRate,jdbcType=DOUBLE},
+        #{item.programVersion,jdbcType=VARCHAR}, #{item.bigVersion,jdbcType=VARCHAR}, #{item.webSite,jdbcType=VARCHAR},
+        #{item.details,jdbcType=VARCHAR}, #{item.joinTime,jdbcType=TIMESTAMP}, #{item.leaveTime,jdbcType=TIMESTAMP},
+        #{item.status,jdbcType=INTEGER}, #{item.isConsensus,jdbcType=INTEGER}, #{item.isSettle,jdbcType=INTEGER},
+        #{item.isInit,jdbcType=INTEGER}, #{item.statDelegateHes,jdbcType=DECIMAL}, #{item.statDelegateLocked,jdbcType=DECIMAL},
+        #{item.statDelegateReleased,jdbcType=DECIMAL}, #{item.blockRewardValue,jdbcType=DECIMAL},
+        #{item.feeRewardValue,jdbcType=DECIMAL}, #{item.stakingRewardValue,jdbcType=DECIMAL},
+        #{item.predictStakingReward,jdbcType=DECIMAL}, #{item.curConsBlockQty,jdbcType=BIGINT},
+        #{item.preConsBlockQty,jdbcType=BIGINT}, #{item.createTime,jdbcType=TIMESTAMP},
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.rewardPer,jdbcType=INTEGER}, #{item.nextRewardPer,jdbcType=INTEGER},
+        #{item.nextRewardPerModEpoch,jdbcType=INTEGER}, #{item.haveDeleReward,jdbcType=DECIMAL},
+        #{item.preDeleAnnualizedRate,jdbcType=DOUBLE}, #{item.deleAnnualizedRate,jdbcType=DOUBLE},
+        #{item.totalDeleReward,jdbcType=DECIMAL}, #{item.annualizedRateInfo,jdbcType=VARCHAR}
         )
     </foreach>
   </insert>
@@ -1109,7 +1109,7 @@
           #{item.totalDeleReward,jdbcType=DECIMAL}
         </if>
         <if test="'annualized_rate_info'.toString() == column.value">
-          #{item.annualizedRateInfo,jdbcType=LONGVARCHAR}
+          #{item.annualizedRateInfo,jdbcType=VARCHAR}
         </if>
       </foreach>
       )

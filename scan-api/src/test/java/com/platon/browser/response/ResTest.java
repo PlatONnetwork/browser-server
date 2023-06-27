@@ -1,8 +1,6 @@
 package com.platon.browser.response;
 
-import com.github.pagehelper.Page;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.response.token.*;
 import com.platon.browser.utils.ClassUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,13 +11,10 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -30,7 +25,7 @@ public class ResTest {
 
     /**
      * 测试开始前，设置相关行为属性
-     * 
+     *
      * @throws IOException
      * @throws BeanCreateOrUpdateException
      */

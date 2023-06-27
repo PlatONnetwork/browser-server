@@ -68,7 +68,7 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
         CommonUtil.putTraceId(event.getTraceId());
         long startTime = System.currentTimeMillis();
         exec(event, sequence, endOfBatch);
-        log.info("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
         CommonUtil.removeTraceId();
     }
 
@@ -80,8 +80,8 @@ public class BootstrapEventHandler implements EventHandler<BootstrapEvent> {
 
             this.clear();
             this.blocks.add(block);
-            this.transactions.addAll(block.getTransactions());
-            block.setTransactions(null);
+            this.transactions.addAll(block.getDtoTransactions());
+            block.setDtoTransactions(null);
 
             Long txMaxId = 0L;
             if (!this.transactions.isEmpty()) {

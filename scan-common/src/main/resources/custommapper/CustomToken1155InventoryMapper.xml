@@ -150,4 +150,34 @@
         SELECT MAX(id) AS maxId
         FROM token_1155_inventory
     </select>
+
+    <update id="batchUpdateTokenUrl">
+        <foreach collection="list" item="item" separator=";">
+            update token_1155_inventory set token_url =  #{item.tokenUrl,jdbcType=VARCHAR} where id = #{item.tokenInventoryId,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateTokenInfo">
+        <foreach collection="list" item="item" separator=";">
+            update token_1155_inventory
+            <set>
+                <if test="item.name != null">
+                    `name` = #{item.name,jdbcType=VARCHAR},
+                </if>
+                <if test="item.image != null">
+                    image = #{item.image,jdbcType=VARCHAR},
+                </if>
+                <if test="item.retryNum != null">
+                    retry_num = #{item.retryNum,jdbcType=INTEGER},
+                </if>
+                <if test="item.description != null">
+                    description = #{item.description,jdbcType=VARCHAR},
+                </if>
+                <if test="item.decimal != null">
+                    decimal = #{item.decimal,jdbcType=INTEGER},
+                </if>
+            </set>
+            where  id = #{item.tokenInventoryId,jdbcType=BIGINT}
+        </foreach>
+    </update>
 </mapper>

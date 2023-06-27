@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Block {
 
     @JSONField(serialize = false)
-    protected List<Transaction> transactions = new ArrayList<>();
+    protected List<com.platon.browser.elasticsearch.dto.Transaction> dtoTransactions = new ArrayList<>();
 
     @JSONField(serialize = false)
     private Integer erc20TxQty = 0;

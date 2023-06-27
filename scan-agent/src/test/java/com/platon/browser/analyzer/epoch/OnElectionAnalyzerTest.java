@@ -1,22 +1,21 @@
 package com.platon.browser.analyzer.epoch;
 
-import com.platon.protocol.Web3j;
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.bean.HistoryLowRateSlash;
+import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.bean.EpochMessage;
-import com.platon.browser.cache.NetworkStatCache;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.StakingMapper;
-import com.platon.browser.bean.CustomStaking.StatusEnum;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.service.ppos.StakeEpochService;
+import com.platon.protocol.Web3j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,11 +68,11 @@ public class OnElectionAnalyzerTest extends AgentTestBase {
             staking.setStatDelegateReleased(BigDecimal.ONE);
             staking.setStakingLocked(BigDecimal.ONE);
             staking.setStakingReduction(BigDecimal.ONE);
-            staking.setStatus(StatusEnum.EXITING.getCode());
+            staking.setStatus(Staking.StatusEnum.EXITING.getCode());
             staking.setUnStakeFreezeDuration(1);
             staking.setUnStakeEndBlock(1l);
             if (i == 1) {
-                staking.setStatus(StatusEnum.CANDIDATE.getCode());
+                staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
             } else {
                 staking.setStakingReduction(new BigDecimal("-1"));
             }

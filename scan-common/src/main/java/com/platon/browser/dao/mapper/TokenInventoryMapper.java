@@ -4,8 +4,9 @@ import com.github.pagehelper.Page;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
 import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface TokenInventoryMapper {
     long countByExample(TokenInventoryExample example);
@@ -53,4 +54,21 @@ public interface TokenInventoryMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int batchInsertSelective(@Param("list") List<TokenInventoryWithBLOBs> list, @Param("selective") TokenInventoryWithBLOBs.Column ... selective);
+    /**
+     * 查询需要更新的NFT资产列表，（合约是有效的，没有被销毁）
+     * 条件是：token_url is not null and image is null and retry_num < 3
+     * @param offset
+     * @param pageSize
+     * @return
+     */
+    List<com.platon.browser.dao.entity.NftObject> listValidTokenInventoryWithEmptyImage(@Param("offset")int offset, @Param("pageSize")int pageSize);
+
+    /**
+     * 查询需要补齐URLNFT资产列表（合约是有效的，没有被销毁）
+     * 条件是：token_url is not null and image is null and retry_num < 3
+     * @param offset
+     * @param pageSize
+     * @return
+     */
+    List<com.platon.browser.dao.entity.NftObject> listValidTokenInventoryWithEmptyUrl(int offset, int pageSize);
 }

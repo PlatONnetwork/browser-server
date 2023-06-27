@@ -5,7 +5,7 @@
 <select id="getNetworkStatisticsFromNode"  resultType="com.platon.browser.task.bean.NetworkStatistics">
 	select sum(total_value) as totalValue,
 	    sum(staking_hes + staking_locked) as stakingValue
-	 from node 
+	 from node
 	 where status = 1
 </select>
 
@@ -22,70 +22,8 @@
     </select>
 
 <update id="networkChange" parameterType="com.platon.browser.dao.entity.NetworkStat">
-    insert into `network_stat`
-    (
-        `id`,
-        `cur_number`,
-        `node_id`,
-        `node_name`,
-        `tx_qty`,
-        `cur_tps`,
-        `max_tps`,
-        `issue_value`,
-        `turn_value`,
-        `proposal_qty`,
-        `block_reward`,
-        `staking_reward`,
-        `add_issue_begin`,
-        `add_issue_end`,
-        `next_settle`,
-        `node_opt_seq`,
-        `cur_block_hash`,
-        `staking_delegation_value`,
-        `staking_value`,
-        `doing_proposal_qty`,
-        `address_qty`,
-        `settle_staking_reward`,
-        `avg_pack_time`,
-        `issue_rates`,
-        `erc20_tx_qty`,
-        `erc721_tx_qty`,
-        `erc1155_tx_qty`,
-        `year_num`
-    )
-    values
-    (
-        #{id},
-        #{curNumber},
-        #{nodeId},
-        #{nodeName},
-        #{txQty},
-        #{curTps},
-        #{maxTps},
-        #{issueValue},
-        #{turnValue},
-        #{proposalQty},
-        #{blockReward},
-        #{stakingReward},
-        #{addIssueBegin},
-        #{addIssueEnd},
-        #{nextSettle},
-        #{nodeOptSeq},
-        #{curBlockHash},
-        #{stakingDelegationValue},
-        #{stakingValue},
-        #{doingProposalQty},
-        #{addressQty},
-        #{settleStakingReward},
-        #{avgPackTime},
-        #{issueRates},
-        #{erc20TxQty},
-        #{erc721TxQty},
-        #{erc1155TxQty},
-        #{yearNum}
-    )
-    on duplicate
-    key update
+    update `network_stat`
+    set
         `cur_number` = #{curNumber},
         `node_id` = #{nodeId},
         `node_name` = #{nodeName},
@@ -113,6 +51,6 @@
         `erc721_tx_qty` = #{erc721TxQty},
         `erc1155_tx_qty` = #{erc1155TxQty},
         `year_num` = #{yearNum}
-        ;
+    where id = 1;
 </update>
 </mapper>

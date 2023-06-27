@@ -1,9 +1,9 @@
 package com.platon.browser.client;
 
-import lombok.Builder;
-import lombok.experimental.Accessors;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.Web3jService;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 
 /**
  * @description:
@@ -34,5 +34,19 @@ public class Web3jWrapper {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-    
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Web3jWrapper that = (Web3jWrapper) o;
+
+		return address.equals(that.address);
+	}
+
+	@Override
+	public int hashCode() {
+		return address.hashCode();
+	}
 }

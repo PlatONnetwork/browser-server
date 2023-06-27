@@ -1,16 +1,23 @@
 package com.platon.browser.bootstrap.service;
 
-import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.*;
+import com.platon.browser.bean.AnnualizedRateInfo;
+import com.platon.browser.bean.CollectionNetworkStat;
+import com.platon.browser.bean.CustomNode;
+import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.bootstrap.bean.InitializationResult;
-import com.platon.browser.cache.AddressCache;
 import com.platon.browser.cache.NetworkStatCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
-import com.platon.browser.dao.mapper.*;
-import com.platon.browser.enums.AddressTypeEnum;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
+import com.platon.browser.dao.entity.GasEstimate;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Staking;
+import com.platon.browser.dao.mapper.AddressMapper;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
+import com.platon.browser.dao.mapper.NodeMapper;
+import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.publisher.GasEstimateEventPublisher;
@@ -19,12 +26,12 @@ import com.platon.browser.service.epoch.EpochRetryService;
 import com.platon.browser.service.govern.ParameterService;
 import com.platon.browser.service.ppos.StakeEpochService;
 import com.platon.browser.utils.EpochUtil;
-import com.platon.browser.v0152.analyzer.ErcCache;
 import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -67,7 +74,7 @@ public class InitializationService {
     private NetworkStatCache networkStatCache;
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private ParameterService parameterService;
@@ -76,7 +83,7 @@ public class InitializationService {
     private ProposalCache proposalCache;
 
     @Resource
-    private GasEstimateLogMapper gasEstimateLogMapper;
+    private CustomGasEstimateMapper customGasEstimateMapper;
 
     @Resource
     private GasEstimateEventPublisher gasEstimateEventPublisher;
@@ -108,9 +115,6 @@ public class InitializationService {
     @Resource
     private EsTransferTxRepository esTransferTxRepository;
 
-    @Resource
-    private ErcCache ercCache;
-
     /**
      * 进入应用初始化子流程
      *
@@ -120,9 +124,8 @@ public class InitializationService {
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public InitializationResult init(String traceId) throws BlockNumberException {
-        log.info("进入应用初始化子流程");
+        log.debug("进入应用初始化子流程");
         proposalCache.init();
-        ercCache.init();
         // 初始化ES
         initEs();
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
@@ -150,7 +153,7 @@ public class InitializationService {
             nodeMapper.deleteByExample(null);
             stakingMapper.deleteByExample(null);
             addressMapper.deleteByExample(null);
-            log.info("删除节点表、质押表、地址表数据");
+            log.debug("删除节点表、质押表、地址表数据");
             // 初始化内置节点
             List<com.platon.browser.dao.entity.Node> nodeList = initInnerStake();
             // 初始化节点缓存
@@ -158,7 +161,7 @@ public class InitializationService {
             // 初始化网络缓存
             networkStatCache.init(networkStat);
             // 初始化内置地址
-            addressCache.initOnFirstStart();
+            newAddressCache.initForBlock0();
             return initialResult;
         }
 
@@ -171,7 +174,8 @@ public class InitializationService {
         List<com.platon.browser.dao.entity.Node> nodeList = nodeMapper.selectByExample(null);
         nodeCache.init(nodeList);
 
-        // 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
+        //交易类型的判断，只需要知道合约类型。利用持续加载的方式，加载到缓存中。
+        /*// 初始化EVM合约地址缓存，用于后续交易的类型判断（调用EVM合约）
         AddressExample addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.EVM_CONTRACT.getCode());
         List<Address> addressList = addressMapper.selectByExample(addressExample);
@@ -181,7 +185,7 @@ public class InitializationService {
         addressExample = new AddressExample();
         addressExample.createCriteria().andTypeEqualTo(AddressTypeEnum.WASM_CONTRACT.getCode());
         addressList = addressMapper.selectByExample(addressExample);
-        addressCache.initWasmContractAddressCache(addressList);
+        addressCache.initWasmContractAddressCache(addressList);*/
 
         // 初始化网络缓存
         networkStatCache.init(networkStat);
@@ -192,15 +196,26 @@ public class InitializationService {
         epochRetryService.consensusChange(BigInteger.valueOf(networkStat.getCurNumber()));
 
         // 检查gas price估算数据表
-        GasEstimateLogExample condition = new GasEstimateLogExample();
+        // lvxiaoyi: 这个是为了升级算出每个node_id的hashCode。这个hashCode在更新gas_estimate是作为where条件代替node_id，可以节省大量数据传输
+        List<GasEstimate> gasEstimateList = customGasEstimateMapper.listHashCodeEmpty();
+        if(!CollectionUtils.isEmpty(gasEstimateList)){
+            gasEstimateList.forEach( e->{
+                e.setNodeIdHashCode(e.getNodeId().hashCode());
+            });
+            customGasEstimateMapper.updateHashCodeEmpty(gasEstimateList);
+        }
+        /*GasEstimateLogExample condition = new GasEstimateLogExample();
         condition.setOrderByClause("seq asc");
         List<GasEstimateLog> gasEstimateLogs = gasEstimateLogMapper.selectByExample(condition);
         gasEstimateLogs.forEach(e -> {
             List<GasEstimate> estimates = JSON.parseArray(e.getJson(), GasEstimate.class);
             if (estimates != null && !estimates.isEmpty()) {
+                estimates.forEach( e2->{
+                    e2.setNodeIdHashCode(e2.getNodeId().hashCode());
+                });
                 gasEstimateEventPublisher.publish(e.getSeq(), estimates, traceId);
             }
-        });
+        });*/
 
         return initialResult;
     }
@@ -217,31 +232,33 @@ public class InitializationService {
         epochRetryService.consensusChange(BigInteger.ZERO);
 
         List<CustomNode> nodes = new ArrayList<>();
-        List<CustomStaking> stakingList = new ArrayList<>();
+        List<Staking> stakingList = new ArrayList<>();
 
         List<Node> validators = epochRetryService.getPreValidators();
         Set<String> validatorSet = new HashSet<>();
         validators.forEach(v -> validatorSet.add(v.getNodeId()));
 
         // 配置中的默认内置节点信息
-        Map<String, CustomStaking> defaultStakingMap = new HashMap<>();
+        Map<String, Staking> defaultStakingMap = new HashMap<>();
         chainConfig.getDefaultStakingList().forEach(staking -> defaultStakingMap.put(staking.getNodeId(), staking));
 
         List<Node> nodeList = epochRetryService.getPreVerifiers();
         for (int index = 0; index < nodeList.size(); index++) {
             Node v = nodeList.get(index);
-            CustomStaking staking = new CustomStaking();
+            Staking staking = new Staking();
+            staking.init();
+
             staking.updateWithVerifier(v);
             staking.setStakingTxIndex(index);
             // 提前设置验证轮数
             staking.setStakingReductionEpoch(BigInteger.ONE.intValue());
-            staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
-            staking.setIsInit(CustomStaking.YesNoEnum.YES.getCode());
-            staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
+            staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
+            staking.setIsInit(Staking.YesNoEnum.YES.getCode());
+            staking.setIsSettle(Staking.YesNoEnum.YES.getCode());
             staking.setStakingLocked(chainConfig.getDefaultStakingLockedAmount());
             // 如果当前候选节点在共识周期验证人列表，则标识其为共识周期节点
             if (validatorSet.contains(v.getNodeId())) {
-                staking.setIsConsensus(CustomStaking.YesNoEnum.YES.getCode());
+                staking.setIsConsensus(Staking.YesNoEnum.YES.getCode());
             }
 
             if (StringUtils.isBlank(staking.getNodeName())) {
@@ -292,7 +309,7 @@ public class InitializationService {
 
             // 使用当前质押信息生成节点信息
             CustomNode node = new CustomNode();
-            node.updateWithCustomStaking(staking);
+            node.updateWithStaking(staking);
             node.setStakingTxIndex(index);
             node.setTotalValue(staking.getStakingLocked());
             node.setIsRecommend(CustomNode.YesNoEnum.NO.getCode());

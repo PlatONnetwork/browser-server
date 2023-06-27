@@ -8,7 +8,6 @@ import com.platon.browser.dao.entity.Address;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 
 public interface CustomAddressMapper {
@@ -66,5 +65,8 @@ public interface CustomAddressMapper {
      */
     int batchUpdateAddressInfo(@Param("list") List<Address> list);
 
-    void batchUpdateAddressTxTransferQty(@Param("list") Collection<AddressQty> list);
+    /**
+     * 统计账户地址的质押金额信息、委托金额、委托节点数量等信息
+     */
+    void updateStakingDelegationStats();
 }

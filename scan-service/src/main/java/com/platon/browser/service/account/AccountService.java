@@ -38,7 +38,7 @@ public class AccountService {
     private PlatOnClient platOnClient;
 
     /**
-     * 带有重试功能的根据区块号获取激励池余额
+     * 带有重试功能的根据区块号获取激励池余额（单位：von）
      *
      * @param blockNumber
      */
@@ -51,9 +51,9 @@ public class AccountService {
             BigInteger balance = platOnClient.getWeb3jWrapper().getWeb3j().platonGetBalance(INCITE_ACCOUNT_ADDR, DefaultBlockParameter.valueOf(blockNumber)).send().getBalance();
             return new BigDecimal(balance);
         } catch (Exception e) {
-            platOnClient.updateCurrentWeb3jWrapper();
             String error = "获取激励池[" + INCITE_ACCOUNT_ADDR + BLOCK_TIP + blockNumber + BALANCE_TIP + e.getMessage();
-            log.error("{}", error);
+            log.error(error, e);
+            platOnClient.updateCurrentWeb3jWrapper();
             throw new BusinessException(error);
         }
     }

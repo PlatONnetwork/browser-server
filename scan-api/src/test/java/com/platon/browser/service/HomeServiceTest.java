@@ -11,7 +11,6 @@ import com.platon.browser.response.home.BlockStatisticNewResp;
 import com.platon.browser.response.home.ChainStatisticNewResp;
 import com.platon.browser.response.home.QueryNavigationResp;
 import com.platon.browser.response.home.StakingListNewResp;
-import com.platon.browser.utils.NetworkParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,15 +19,14 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class HomeServiceTest extends ApiTestMockBase {

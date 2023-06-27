@@ -1,6 +1,5 @@
 package com.platon.browser.bean.govern;
 
-import com.platon.browser.bean.govern.*;
 import com.platon.browser.dao.entity.Config;
 import lombok.Data;
 import org.junit.Test;

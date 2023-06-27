@@ -3,8 +3,8 @@ package com.platon.browser.config.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.apache.commons.lang3.StringUtils;
 import com.platon.utils.Convert;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.math.RoundingMode;

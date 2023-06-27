@@ -1,22 +1,14 @@
 package com.platon.browser.task;
 
 import com.platon.browser.dao.custommapper.CustomStakingHistoryMapper;
-import com.platon.browser.dao.entity.Staking;
-import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.entity.StakingHistory;
-import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.utils.AppStatusUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @Auther: dongqile
@@ -26,9 +18,6 @@ import java.util.Set;
 @Component
 @Slf4j
 public class StakingMigrateTask {
-
-    @Resource
-    private StakingMapper stakingMapper;
 
     @Resource
     private CustomStakingHistoryMapper customStakingHistoryMapper;
@@ -50,19 +39,11 @@ public class StakingMigrateTask {
 
     protected void start() {
         try {
-            StakingExample stakingExample = new StakingExample();
-            stakingExample.createCriteria().andStatusEqualTo(3);
-            List<Staking> stakingList = stakingMapper.selectByExample(stakingExample);
-            Set<StakingHistory> stakingHistoryList = new HashSet<>();
-            if (!stakingList.isEmpty()) {
-                stakingList.forEach(staking -> {
-                    StakingHistory stakingHistory = new StakingHistory();
-                    BeanUtils.copyProperties(staking, stakingHistory);
-                    stakingHistoryList.add(stakingHistory);
-                });
-                customStakingHistoryMapper.batchInsertOrUpdateSelective(stakingHistoryList, StakingHistory.Column.values());
-            }
-            XxlJobHelper.handleSuccess("质押表中的历史数据迁移至数据库任务成功");
+            /**
+             *  把staking表中，已经退出的质押（status=3)的记录，备份到staking_history表中，然后从staking表中删除
+             */
+            customStakingHistoryMapper.backupQuitedStaking();
+            XxlJobHelper.handleSuccess("已经退出的质押记录迁移至历史表成功");
         } catch (Exception e) {
             log.error("质押表中的历史数据迁移至数据库任务异常", e);
             throw e;

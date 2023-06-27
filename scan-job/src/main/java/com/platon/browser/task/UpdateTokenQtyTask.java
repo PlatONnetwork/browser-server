@@ -16,9 +16,7 @@ import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -27,8 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * 用trigger来更新address表和token
+ */
 @Slf4j
-@Component
+//@Component
+@Deprecated
 public class UpdateTokenQtyTask {
 
     @Resource
@@ -50,19 +53,34 @@ public class UpdateTokenQtyTask {
     private TxErc1155BakMapper txErc1155BakMapper;
 
     /**
-     * 更新erc交易数
+     * 根据：
+     * 表tx_erc_20_bak / tx_erc_721_bak / tx_erc_1155_bak 中的合约交易记录，
+     * 增量统计：（统计过的每类交易记录ID，将被记录到print_log表中）
+     * 1. 每个erc token的交易记录总数（记录到：token.token_tx_qty）
+     * 2. 每个账户地址涉及的各类erc token交易记录数（记录到：address.erc20_tx_qty / address.erc721_tx_qty / address.erc1155_tx_qty）
+     *
      * 每5分钟执行一次
      *
      * @param :
      * @return: void
      * @date: 2021/12/6
+     *
+     * 2023/04/06, lvxiaoyi: 用trigger来更新address表和token
+     * @deprecated
      */
-    @XxlJob("updateTokenQtyJobHandler")
+    //@XxlJob("updateTokenQtyJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateTokenQty() throws Exception {
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            //
+            // 重要：
+            // 合约上交易数量的缓存key：合约地址; value:TokenQty，合约交易数量。
             Map<String, TokenQty> tokenMap = new HashMap<>();
+
+            //
+            // 重要：
+            // 钱包地址上，ERC交易数量map，key:钱包地址；value:token交易数量
             Map<String, AddressErcQty> addressMap = new HashMap<>();
             PointLog erc20PointLog = pointLogMapper.selectByPrimaryKey(3);
             long oldErc20Position = Convert.toLong(erc20PointLog.getPosition());
@@ -73,14 +91,19 @@ public class UpdateTokenQtyTask {
             List<TxErc20Bak> erc20List = txErc20BakMapper.selectByExample(txErc20BakExample);
             if (CollUtil.isNotEmpty(erc20List)) {
                 TaskUtil.console("找到erc20交易[{}]条", erc20List.size());
+                //按合约地址分组，map<合约地址，List<合约交易>>
                 Map<String, List<ErcTx>> erc20Map = erc20List.stream().collect(Collectors.groupingBy(ErcTx::getContract));
-                //累计token的erc20交易数
+                //累计token的erc20交易次数
                 for (Map.Entry<String, List<ErcTx>> entry : erc20Map.entrySet()) {
+                    //ERC20合约交易数量的缓存
                     TokenQty tokenQty = getTokenQty(tokenMap, entry.getKey());
+                    //设置合约ERC20的交易次数
                     tokenQty.setErc20TxQty(entry.getValue().size());
                 }
-                //累计地址的erc20交易数
+                //统计某地址上的erc20交易次数
                 for (ErcTx ercTx : erc20List) {
+                    //统计每个账户地址上的erc20交易次数
+                    //每笔交易都有from/to，则from/to地址上的合约交易数量都要+1（特殊情况：0地址，from/to相同）
                     AddressErcQty fromAddressErcQty = getAddressErcQty(addressMap, ercTx.getFrom());
                     AddressErcQty toAddressErcQty = getAddressErcQty(addressMap, ercTx.getTo());
                     if (ercTx.getFrom().equalsIgnoreCase(ercTx.getTo()) && !AddressUtil.isAddrZero(ercTx.getFrom())) {

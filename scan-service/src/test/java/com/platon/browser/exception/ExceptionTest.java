@@ -1,8 +1,8 @@
 package com.platon.browser.exception;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionTest {
 
@@ -27,5 +27,5 @@ public class ExceptionTest {
 			assertTrue(e instanceof NetworkException);;
 		}
 	}
-	
+
 }

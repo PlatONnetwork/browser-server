@@ -81,7 +81,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
+    address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20,
     is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata, is_support_erc1155,is_support_erc1155_metadata, create_time,
     update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
   </sql>
@@ -100,7 +100,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from token
     where address = #{address,jdbcType=VARCHAR}
@@ -116,21 +116,21 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.Token">
-    insert into token (address, `type`, `name`, 
-      symbol, total_supply, `decimal`, 
-      is_support_erc165, is_support_erc20, is_support_erc721, 
+    insert into token (address, `type`, `name`,
+      symbol, total_supply, `decimal`,
+      is_support_erc165, is_support_erc20, is_support_erc721,
       is_support_erc721_enumeration, is_support_erc721_metadata,
       is_support_erc1155, is_support_erc1155_metadata,
-      create_time, update_time, token_tx_qty, 
-      holder, contract_destroy_block, contract_destroy_update
+      create_time, update_time, token_tx_qty,
+      holder, contract_destroy_block, contract_destroy_update, created_block_number
       )
-    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER}, 
-      #{isSupportErc165,jdbcType=BIT}, #{isSupportErc20,jdbcType=BIT}, #{isSupportErc721,jdbcType=BIT}, 
+    values (#{address,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{symbol,jdbcType=VARCHAR}, #{totalSupply,jdbcType=VARCHAR}, #{decimal,jdbcType=INTEGER},
+      #{isSupportErc165,jdbcType=BIT}, #{isSupportErc20,jdbcType=BIT}, #{isSupportErc721,jdbcType=BIT},
       #{isSupportErc721Enumeration,jdbcType=BIT}, #{isSupportErc721Metadata,jdbcType=BIT},
       #{isSupportErc1155,jdbcType=BIT}, #{isSupportErc1155Metadata,jdbcType=BIT},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER}, 
-      #{holder,jdbcType=INTEGER}, #{contractDestroyBlock,jdbcType=BIGINT}, #{contractDestroyUpdate,jdbcType=BIT}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{tokenTxQty,jdbcType=INTEGER},
+      #{holder,jdbcType=INTEGER}, #{contractDestroyBlock,jdbcType=BIGINT}, #{contractDestroyUpdate,jdbcType=BIT}, #{createdBlockNumber,jdbcType=BIGINT}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.platon.browser.dao.entity.Token">
@@ -439,20 +439,20 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into token
-    (address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20, 
+    (address, `type`, `name`, symbol, total_supply, `decimal`, is_support_erc165, is_support_erc20,
       is_support_erc721, is_support_erc721_enumeration, is_support_erc721_metadata,
       is_support_erc1155,is_support_erc1155_metadata, create_time,
       update_time, token_tx_qty, holder, contract_destroy_block, contract_destroy_update
       )
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, 
-        #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER}, 
-        #{item.isSupportErc165,jdbcType=BIT}, #{item.isSupportErc20,jdbcType=BIT}, #{item.isSupportErc721,jdbcType=BIT}, 
+      (#{item.address,jdbcType=VARCHAR}, #{item.type,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR},
+        #{item.symbol,jdbcType=VARCHAR}, #{item.totalSupply,jdbcType=VARCHAR}, #{item.decimal,jdbcType=INTEGER},
+        #{item.isSupportErc165,jdbcType=BIT}, #{item.isSupportErc20,jdbcType=BIT}, #{item.isSupportErc721,jdbcType=BIT},
         #{item.isSupportErc721Enumeration,jdbcType=BIT}, #{item.isSupportErc721Metadata,jdbcType=BIT},
         #{item.isSupportErc1155,jdbcType=BIT}, #{item.isSupportErc1155Metadata,jdbcType=BIT},
-        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER}, 
-        #{item.holder,jdbcType=INTEGER}, #{item.contractDestroyBlock,jdbcType=BIGINT}, 
+        #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.tokenTxQty,jdbcType=INTEGER},
+        #{item.holder,jdbcType=INTEGER}, #{item.contractDestroyBlock,jdbcType=BIGINT},
         #{item.contractDestroyUpdate,jdbcType=BIT})
     </foreach>
   </insert>

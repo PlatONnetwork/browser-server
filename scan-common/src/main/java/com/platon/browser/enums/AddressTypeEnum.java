@@ -9,9 +9,9 @@ public enum AddressTypeEnum {
     INNER_CONTRACT(2, "内置合约"),
     EVM_CONTRACT(3, "EVM合约"),
     WASM_CONTRACT(4, "WASM合约"),
-    ERC20_EVM_CONTRACT(5, "ERC合约"),
-    ERC721_EVM_CONTRACT(6, "ERC合约"),
-    ERC1155_EVM_CONTRACT(7, "ERC合约");
+    ERC20_EVM_CONTRACT(5, "ERC20合约"),
+    ERC721_EVM_CONTRACT(6, "ERC721合约"),
+    ERC1155_EVM_CONTRACT(7, "ERC1155合约");
 
     private int code;
     private String desc;
@@ -44,5 +44,22 @@ public enum AddressTypeEnum {
 
     public static boolean contains(AddressTypeEnum en) {
         return ENUMS.containsValue(en);
+    }
+
+    public ContractTypeEnum convertToContractType(){
+        switch (this) {
+            case EVM_CONTRACT:
+                return ContractTypeEnum.EVM;
+            case WASM_CONTRACT:
+                return ContractTypeEnum.WASM;
+            case ERC20_EVM_CONTRACT:
+                return ContractTypeEnum.ERC20_EVM;
+            case ERC721_EVM_CONTRACT:
+                return ContractTypeEnum.ERC721_EVM;
+            case ERC1155_EVM_CONTRACT:
+                return ContractTypeEnum.ERC1155_EVM;
+            default:
+                return null;
+        }
     }
 }

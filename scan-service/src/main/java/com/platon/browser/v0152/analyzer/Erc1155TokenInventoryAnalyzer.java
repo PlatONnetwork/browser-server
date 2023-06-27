@@ -68,12 +68,13 @@ public class Erc1155TokenInventoryAnalyzer {
                         toTokenInventory.setTokenId(tokenId);
                         toTokenInventory.setTokenTxQty(1);
                         toTokenInventory.setRetryNum(0);
-                        String tokenURI = ercServiceImpl.getToken1155URI(tokenAddress, new BigInteger(tokenId), blockNumber);
+                        //todo: 非常耗时，想办法多线程异步获取；或者有scan-job来补齐（采用此方案）
+                        /*String tokenURI = ercServiceImpl.getToken1155URI(tokenAddress, new BigInteger(tokenId), blockNumber);
                         if (StrUtil.isNotBlank(tokenURI)) {
                             toTokenInventory.setTokenUrl(tokenURI);
                         } else {
                             log.warn("当前块高[{}]获取合约[{}]tokenId[{}]的tokenUrl为空，请联系管理员处理", blockNumber, tokenAddress, tokenId);
-                        }
+                        }*/
                     }
 
                     insertOrUpdate.add(toTokenInventory);
@@ -89,11 +90,11 @@ public class Erc1155TokenInventoryAnalyzer {
 
             if (CollUtil.isNotEmpty(insertOrUpdate)) {
                 customToken1155InventoryMapper.batchInsertOrUpdateSelective(insertOrUpdate, Token1155Inventory.Column.values());
-                log.info("当前交易[{}]添加erc1155库存[{}]笔成功", txHash, insertOrUpdate.size());
+                log.debug("当前交易[{}]添加erc1155库存[{}]笔成功", txHash, insertOrUpdate.size());
             }
             if (CollUtil.isNotEmpty(delToken1155InventoryKey)) {
                 customToken1155InventoryMapper.burnAndDelTokenInventory(delToken1155InventoryKey);
-                log.info("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delToken1155InventoryKey.size());
+                log.debug("当前交易[{}]删除erc721库存[{}]笔成功", txHash, delToken1155InventoryKey.size());
             }
         }
     }

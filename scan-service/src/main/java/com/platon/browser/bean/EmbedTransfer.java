@@ -8,6 +8,5 @@ import java.math.BigDecimal;
 public class EmbedTransfer {
     private String from;
     private String to;
-    private BigDecimal value;
-
+    private BigDecimal amount;
 }

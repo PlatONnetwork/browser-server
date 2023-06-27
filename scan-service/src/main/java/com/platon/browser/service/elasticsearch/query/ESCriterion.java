@@ -1,12 +1,13 @@
 package com.platon.browser.service.elasticsearch.query;
 
 import org.elasticsearch.index.query.QueryBuilder;
+
 import java.util.List;
 
 /**
  * es查询接口
  *  @file ESCriterion.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年10月31日
  */

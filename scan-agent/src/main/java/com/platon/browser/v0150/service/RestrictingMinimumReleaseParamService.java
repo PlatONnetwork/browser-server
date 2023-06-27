@@ -1,6 +1,5 @@
 package com.platon.browser.v0150.service;
 
-import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.entity.Config;
 import com.platon.browser.dao.entity.ConfigExample;
@@ -8,6 +7,7 @@ import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.v0150.V0150Config;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

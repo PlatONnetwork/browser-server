@@ -62,7 +62,7 @@ public class NodeCache {
      * @date 2021/4/19
      */
     public void init(List<Node> nodeList) {
-        log.info("初始化节点缓存");
+        log.debug("初始化节点缓存");
         if (nodeList.isEmpty()) return;
         nodeList.forEach(s -> {
             NodeItem node = NodeItem.builder()

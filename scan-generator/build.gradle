@@ -26,7 +26,7 @@ mybatisGenerator {
         mybatisGenerator project(':scan-generator')
         mybatisGenerator itfswMybatisGeneratorPlugin
         mybatisGenerator mybatisGeneratorCore
-        runtimeOnly 'mysql:mysql-connector-java:5.1.47'
+        runtimeOnly 'mysql:mysql-connector-java:8.0.33'
     }
 }
 
@@ -37,7 +37,7 @@ repositories {
 dependencies {
     compile mybatisGeneratorCore
     compile itfswMybatisGeneratorPlugin
-    testCompile 'junit:junit:4.12'
+    //testCompile 'junit:junit:4.12'
 }
 
 def defaultEncoding = 'UTF-8'

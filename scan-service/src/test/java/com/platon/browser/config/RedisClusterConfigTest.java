@@ -1,6 +1,5 @@
 package com.platon.browser.config;
 
-import com.platon.browser.config.RedisClusterConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;

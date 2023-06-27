@@ -35,6 +35,7 @@
                t.symbol,
                t.name,
                t.total_supply   as totalSupply,
+               th.token_id      as tokenId,
                th.balance,
                t.decimal,
                th.token_tx_qty  as txCount
@@ -42,27 +43,6 @@
                  left join token t on th.token_address = t.address
         where th.token_address = #{tokenAddress}
           AND t.type = 'erc721'
-        order by balance desc
-    </select>
-
-    <select id="selectERC1155Holder" parameterType="java.lang.String"
-            resultType="com.platon.browser.bean.CustomTokenHolder">
-        select
-        th.token_address as tokenAddress,
-        th.address,
-        t.type,
-        t.symbol,
-        t.name,
-        t.total_supply as totalSupply,
-        th.balance,
-        th.token_id as tokenId,
-        t.decimal,
-        th.token_tx_qty as txCount
-        from token_holder th left join token t on th.token_address = t.address
-        where t.type = 'erc1155'
-        <if test="tokenAddress != null">
-            AND th.token_address = #{tokenAddress}
-        </if>
         order by balance desc
     </select>
 
@@ -151,6 +131,8 @@
         </foreach>
         ;
     </update>
+
+
 
     <select id="findTokenHolderCount" resultType="com.platon.browser.bean.TokenHolderCount">
         select t.token_address as tokenAddress, count(1) as tokenHolderCount

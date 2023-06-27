@@ -46,7 +46,7 @@ remotes {
         user = "$deployServerUser"
         port = Integer.parseInt("$deployServerPort")
         password = "$deployServerPassword"
-    }
+}
 }
 
 task deployToTestEnv(dependsOn: ['build'], group: 'deploy') {
@@ -76,10 +76,15 @@ task deployToTestEnv(dependsOn: ['build'], group: 'deploy') {
 
 dependencies {
     compile project(":scan-service")
+    compile "org.springframework.boot:spring-boot-starter-web:$springbootVersion"
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
-    compile "com.alibaba:druid:$druidVersion"
+    compile "com.alibaba:druid-spring-boot-starter:$druidVersion"
     runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
     compile "com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2"
     compile "org.jsoup:jsoup:$jsoupVersion"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

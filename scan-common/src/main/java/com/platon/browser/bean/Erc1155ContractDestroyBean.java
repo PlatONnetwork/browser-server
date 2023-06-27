@@ -16,7 +16,7 @@ public class Erc1155ContractDestroyBean {
     private String tokenId;
 
     /**
-     * 合约地址
+     * 钱包地址（持有tokenId的用户钱包地址）
      */
     private String address;
 

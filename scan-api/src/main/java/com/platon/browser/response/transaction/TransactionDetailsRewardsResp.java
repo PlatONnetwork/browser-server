@@ -1,14 +1,14 @@
 package com.platon.browser.response.transaction;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.json.CustomLatSerializer;
+
+import java.math.BigDecimal;
 
 /**
  * 交易详情领取奖励子结构体返回对象
  *  @file TransactionDetailsRewardsResp.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -36,5 +36,5 @@ public class TransactionDetailsRewardsResp {
 	public void setReward(BigDecimal reward) {
 		this.reward = reward;
 	}
-	
+
 }

@@ -13,12 +13,12 @@ import com.platon.browser.client.SpecialApi;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.utils.CalculateUtils;
 import com.platon.browser.utils.EpochUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -41,6 +41,9 @@ public class StatisticsNetworkAnalyzer {
     private StatisticBusinessMapper statisticBusinessMapper;
 
     @Resource
+    private NetworkStatMapper networkStatMapper;
+
+    @Resource
     private SpecialApi specialApi;
 
     @Resource
@@ -56,22 +59,24 @@ public class StatisticsNetworkAnalyzer {
      */
     private volatile BigDecimal totalIssueValue = BigDecimal.ZERO;
 
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+
     public void analyze(CollectionEvent event, Block block, EpochMessage epochMessage) throws Exception {
         long startTime = System.currentTimeMillis();
         log.debug("区块入库统计：区块[{}],交易数[{}],共识周期轮数[{}],结算周期轮数[{}],增发周期轮数[{}]",
                   block.getNum(),
-                  event.getTransactions().size(),
+                  event.getBlock().getDtoTransactions().size(),
                   epochMessage.getConsensusEpochRound(),
                   epochMessage.getSettleEpochRound(),
                   epochMessage.getIssueEpochRound());
         // 网络统计
         NetworkStat networkStat = networkStatCache.getNetworkStat();
+        //NetworkStat networkStat = new NetworkStat();
+        networkStat.setId(1);
         networkStat.setNodeId(block.getNodeId());
         networkStat.setNodeName(nodeCache.getNode(block.getNodeId()).getNodeName());
         networkStat.setNextSettle(CalculateUtils.calculateNextSetting(chainConfig.getSettlePeriodBlockCount(), epochMessage.getSettleEpochRound(), epochMessage.getCurrentBlockNumber()));
         setTotalIssueValue(block.getNum(), event.getEpochMessage().getSettleEpochRound(), networkStat);
-        statisticBusinessMapper.networkChange(networkStat);
+        networkStatMapper.updateByPrimaryKey(networkStat);
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
     }
 
@@ -88,8 +93,11 @@ public class StatisticsNetworkAnalyzer {
         try {
             // 结算周期的区块获取总发行量
             if ((curBlockNum - 1) % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
-                log.info("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
+                log.debug("当前块高[{}]在第[{}]结算周期获取总发行量", curBlockNum, settleEpochRound);
+                //  根据块高算出year
                 yearNum = getYearNum(curBlockNum);
+                // todo: lvxiaoyi: 2023/02/14 增加一个接口，根据块高查询总发行量
+                // 算出总发行量
                 totalIssueValue = getTotalIssueValue(yearNum);
                 networkStat.setYearNum(yearNum);
                 networkStat.setIssueValue(totalIssueValue);
@@ -97,13 +105,13 @@ public class StatisticsNetworkAnalyzer {
                 // 非结算周期的区块则取本地内存中的值，如果值校验不对则重新获取
                 if (yearNum < 1 || ObjectUtil.isNull(totalIssueValue) || totalIssueValue.compareTo(BigDecimal.ZERO) <= 0) {
                     // agent重启，并未追到结算周期时，本地内存失效则重新获取
-                    log.info("本地内存中的年份小于1或者总发行量为空或者总发行量小于等于0，将重新获取年份和总发行量");
+                    log.debug("本地内存中的年份小于1或者总发行量为空或者总发行量小于等于0，将重新获取年份和总发行量");
                     yearNum = getYearNum(curBlockNum);
                     totalIssueValue = getTotalIssueValue(yearNum);
                 }
                 networkStat.setYearNum(yearNum);
                 networkStat.setIssueValue(totalIssueValue);
-                log.info("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
+                log.debug("当前块高[{}]在第[{}]结算周期获取本地内存的年份[{}]和总发行量[{}]成功", curBlockNum, settleEpochRound, yearNum, totalIssueValue.toPlainString());
             }
         } catch (Exception e) {
             log.error(StrUtil.format("当前块高[{}]在第[{}]结算周期获取总发行量异常，即将重试", curBlockNum, settleEpochRound), e);
@@ -135,7 +143,7 @@ public class StatisticsNetworkAnalyzer {
     }
 
     /**
-     * 获取总发行量
+     * 获取总发行量（单位：LAT）
      *
      * @param yearNum: 第几年
      * @return: java.math.BigDecimal
@@ -148,7 +156,7 @@ public class StatisticsNetworkAnalyzer {
         // 每年固定增发比例
         BigDecimal addIssueRate = chainConfig.getAddIssueRate();
         BigDecimal issueValue = initIssueAmount.multiply(addIssueRate.add(new BigDecimal(1L)).pow(yearNum)).setScale(4, BigDecimal.ROUND_HALF_UP);
-        log.info("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第[{}]年", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
+        log.debug("总发行量[{}]=初始发行量[{}]*(1+增发比例[{}])^第[{}]年", issueValue.toPlainString(), initIssueAmount.toPlainString(), addIssueRate.toPlainString(), yearNum);
         if (issueValue.compareTo(BigDecimal.ZERO) <= 0 || issueValue.compareTo(initIssueAmount) <= 0) {
             throw new Exception(StrUtil.format("获取总发行量[{}]错误,不能小于等于0或者小于等于初始发行量", issueValue.toPlainString()));
         }

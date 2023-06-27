@@ -1,13 +1,13 @@
 package com.platon.browser.service.epoch;
 
-import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.browser.bean.EpochMessage;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.custommapper.CustomBlockNodeMapper;
+import com.platon.browser.dao.entity.BlockNode;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.exception.BlockNumberException;
 import com.platon.browser.utils.EpochUtil;
+import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class EpochService {
 
     /**
      * 使用区块号更新服务内部状态
-     * 
+     *
      * @param blockNumber
      */
     public EpochMessage getEpochMessage(Long blockNumber) throws BlockNumberException {

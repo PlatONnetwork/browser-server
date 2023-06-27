@@ -1,7 +1,7 @@
 package com.platon.browser.config;
 
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.ConfigLoadingException;
@@ -61,7 +61,7 @@ public class BlockChainConfig {
             }
             salt = salt.trim();
             System.setProperty("JASYPT_ENCRYPTOR_PASSWORD", salt);
-            log.info("salt:{}", salt);
+            log.debug("salt:{}", salt);
         } catch (IOException | ConfigLoadingException e) {
             log.error("加载解密文件出错", e);
             System.exit(1);
@@ -363,7 +363,7 @@ public class BlockChainConfig {
     /**
      * 初始内置节点信息
      */
-    private List<CustomStaking> defaultStakingList = new ArrayList<>();
+    private List<Staking> defaultStakingList = new ArrayList<>();
 
     /**
      * 代币定义事件

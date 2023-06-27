@@ -1,11 +1,11 @@
 package com.platon.browser.enums;
 
-import com.platon.browser.bean.CustomStaking;
+import com.platon.browser.dao.entity.Staking;
 
 /**
  *  返回前端验证人状态枚举
  *  @file StakingStatusEnum.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -20,9 +20,9 @@ public enum StakingStatusEnum {
 	LOCKED("locked",7);//锁定中
 
 	private String name;
-	
+
 	private Integer code;
-	
+
 	StakingStatusEnum(String name, Integer code) {
 		this.code = code;
 		this.name = name;
@@ -34,38 +34,38 @@ public enum StakingStatusEnum {
 	public Integer getCode() {
 		return code;
 	}
-	
+
 	/**
 	 * 根据数据状态转换成对应的前端状态
 	 * @method getCodeByStatus
 	 */
 	public static Integer getCodeByStatus(Integer status, Integer isConsensus, Integer isSetting) {
-		if(CustomStaking.StatusEnum.CANDIDATE.getCode() == status) {
-			if(CustomStaking.YesNoEnum.YES.getCode() == isConsensus) {
+		if(Staking.StatusEnum.CANDIDATE.getCode() == status) {
+			if(Staking.YesNoEnum.YES.getCode() == isConsensus) {
 				/** 当状态既为候选中且在共识周期则认为节点为共识中*/
 				return StakingStatusEnum.VERIFYING.getCode();
 			}
-			if(CustomStaking.YesNoEnum.YES.getCode() == isSetting) {
+			if(Staking.YesNoEnum.YES.getCode() == isSetting) {
 				/** 当状态既为候选中且在结算周期则认为节点为活跃中*/
 				return StakingStatusEnum.ACTIVE.getCode();
 			}
 			return StakingStatusEnum.CANDIDATE.getCode();
 		}
-		if(CustomStaking.StatusEnum.EXITING.getCode() == status) {
-			if(CustomStaking.YesNoEnum.YES.getCode() == isSetting) {
+		if(Staking.StatusEnum.EXITING.getCode() == status) {
+			if(Staking.YesNoEnum.YES.getCode() == isSetting) {
 				/** 当状态退出中且在结算周期则认为节点为活跃中*/
 				return StakingStatusEnum.ACTIVE.getCode();
 			}
 			return StakingStatusEnum.EXITING.getCode();
 		}
-		if(CustomStaking.StatusEnum.EXITED.getCode() == status) {
+		if(Staking.StatusEnum.EXITED.getCode() == status) {
 			return StakingStatusEnum.EXITED.getCode();
 		}
 		/**锁定状态*/
-		if(CustomStaking.StatusEnum.LOCKED.getCode() == status) {
+		if(Staking.StatusEnum.LOCKED.getCode() == status) {
 			return StakingStatusEnum.LOCKED.getCode();
 		}
 		return null;
 	}
-	
+
 }

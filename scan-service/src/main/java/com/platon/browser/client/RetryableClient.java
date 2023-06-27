@@ -10,14 +10,17 @@ import com.platon.protocol.websocket.WebSocketService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 /**
  * 链参数统一配置项
@@ -103,7 +106,14 @@ public class RetryableClient {
         return rewardContract;
     }
 
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    /**
+     * @Backoff注解中的参数说明：
+     * value：隔多少毫秒后重试，默认为1000L，我们设置为3000L；
+     * delay：和value一样，但是默认为0；
+     * multiplier（指定延迟倍数）默认为0，表示固定暂停1秒后进行重试，如果把multiplier设置为1.5，则第一次重试为2秒，第二次为3秒，第三次为4.5秒。
+     * @throws ConfigLoadingException
+     */
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 2000L, multiplier = 1))
     public void init() throws ConfigLoadingException {
         WEB3J_CONFIG_LOCK.writeLock().lock();
         try {
@@ -113,7 +123,25 @@ public class RetryableClient {
                 if (protocol == Web3jProtocolEnum.WS) {
                     WebSocketService wss = new WebSocketService(protocol.getHead() + address, true);
                     try {
-                        wss.connect();
+                        wss.connect(new Consumer<String>() {
+                                        @Override
+                                        public void accept(String s) {
+                                            log.debug("[websocket收到消息{}", s);
+                                        }
+                                    },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable e) {
+                                        log.debug("[websocket连接异常", e);
+                                    }
+                                },
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //ws连接关闭，则移除web3jwrapper
+                                        removeWeb3jWrapper(protocol.getHead() + address);
+                                    }
+                                });
                         service = wss;
                     } catch (ConnectException e) {
                         log.error("Websocket地址({})无法连通:", protocol.getHead() + address, e);
@@ -135,6 +163,24 @@ public class RetryableClient {
         } finally {
             WEB3J_CONFIG_LOCK.writeLock().unlock();
         }
+    }
+
+
+    private void removeWeb3jWrapper(String formalAddress){
+        if(web3jWrappers.isEmpty()){
+            return;
+        }
+        WEB3J_CONFIG_LOCK.writeLock().lock();
+        Iterator<Web3jWrapper> it = web3jWrappers.iterator();
+        while (it.hasNext()) {
+            Web3jWrapper wrapper = it.next();
+            if (wrapper.getAddress().equals(formalAddress)) {
+                it.remove();//使用迭代器的删除方法删除
+            }
+        }
+        //更新当前所用web3jWrapper
+        updateCurrentWeb3jWrapper();
+        WEB3J_CONFIG_LOCK.writeLock().unlock();
     }
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
@@ -161,6 +207,9 @@ public class RetryableClient {
         stakingContract = StakingContract.load(currentWeb3jWrapper.getWeb3j());
     }
 
+    /**
+     * 如果有多个web3j连接，则取块高最高的一个连接
+     */
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
     public void updateCurrentWeb3jWrapper() {
         WEB3J_CONFIG_LOCK.writeLock().lock();
@@ -176,7 +225,7 @@ public class RetryableClient {
                         currentWeb3jWrapper = wrapper;
                     }
                 } catch (Exception e2) {
-                    log.info("候选Web3j实例({})无效！", wrapper.getAddress());
+                    log.debug("候选Web3j实例({})无效！", wrapper.getAddress());
                 }
             }
             if (preWeb3j == null || preWeb3j != currentWeb3jWrapper) {
@@ -184,9 +233,9 @@ public class RetryableClient {
                 updateContract();
             }
             if (maxBlockNumber == -1) {
-                log.info("当前所有候选Web3j实例均无法连通!");
+                log.debug("当前所有候选Web3j实例均无法连通!");
                 if (protocol == Web3jProtocolEnum.WS) {
-                    log.info("重新初始化websocket连接!");
+                    log.debug("重新初始化websocket连接!");
                     try {
                         init();
                     } catch (ConfigLoadingException e) {

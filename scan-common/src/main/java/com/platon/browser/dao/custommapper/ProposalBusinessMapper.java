@@ -2,8 +2,6 @@ package com.platon.browser.dao.custommapper;
 
 import com.platon.browser.dao.param.BusinessParam;
 import com.platon.browser.dao.param.ppos.ProposalParameter;
-import com.platon.browser.dao.param.ppos.ProposalSlash;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -46,9 +44,16 @@ public interface ProposalBusinessMapper {
     void parameter(ProposalParameter businessParam);
 
     /**
+     * 作废双签节点对处于投票阶段的提案的投票操作
+     *
+     * @param doubleSignedNodeIdList
+     */
+    void discardOptionForVotingProposal(List<String> doubleSignedNodeIdList);
+
+    /**
      * 提案数据更新
      */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
-    void proposalSlashUpdate(@Param("proposalSlashs") List<ProposalSlash> proposalSlashs);
+   /* @Transactional(rollbackFor = {Exception.class, Error.class})
+    void proposalSlashUpdate(@Param("proposalSlashs") List<ProposalSlash> proposalSlashs);*/
 
 }

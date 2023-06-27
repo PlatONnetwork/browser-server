@@ -6,6 +6,7 @@ import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.config.DisruptorConfig;
 import com.platon.browser.utils.CommonUtil;
+import com.platon.protocol.core.methods.response.PlatonBlock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import com.platon.protocol.core.methods.response.PlatonBlock;
 
 import java.util.ArrayList;
 import java.util.List;

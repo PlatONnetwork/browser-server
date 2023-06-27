@@ -1,7 +1,5 @@
 package com.platon.browser.bean;
 
-import com.platon.browser.bean.Receipt;
-import com.platon.browser.bean.ReceiptResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

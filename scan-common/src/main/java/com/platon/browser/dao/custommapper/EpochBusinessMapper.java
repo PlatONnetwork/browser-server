@@ -1,6 +1,5 @@
 package com.platon.browser.dao.custommapper;
 
-import com.platon.browser.dao.entity.GasEstimate;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.param.BusinessParam;
 import org.apache.ibatis.annotations.Param;
@@ -32,16 +31,10 @@ public interface EpochBusinessMapper {
     void settleForStakingValue(@Param("list") List<Staking> updateStakingList);
 
     /**
-     * 更新Gas估算周期数
-     */
-    @Transactional(rollbackFor = {Exception.class, Error.class})
-    void updateGasEstimate(@Param("list") List<GasEstimate> estimateList);
-
-    /**
      * 新选举周期数据变更（结算&共识周期往前推20个块）
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    void slashNode(BusinessParam param);
+    void slashNodeForZeroProduce(BusinessParam param);
 
     /**
      * 新共识周期数据变更

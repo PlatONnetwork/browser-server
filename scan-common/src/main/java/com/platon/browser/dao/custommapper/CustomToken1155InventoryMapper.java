@@ -2,6 +2,7 @@ package com.platon.browser.dao.custommapper;
 
 import com.platon.browser.bean.CustomToken1155Inventory;
 import com.platon.browser.bean.Erc1155ContractDestroyBalanceVO;
+import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.dao.entity.Token1155Inventory;
 import com.platon.browser.dao.entity.Token1155InventoryKey;
 import com.platon.browser.dao.entity.Token1155InventoryWithBLOBs;
@@ -35,4 +36,7 @@ public interface CustomToken1155InventoryMapper {
 
     long findMaxId();
 
+    void batchUpdateTokenUrl(List<NftObject> nftList);
+
+    void batchUpdateTokenInfo(List<NftObject> finalNftList);
 }

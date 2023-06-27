@@ -1,8 +1,8 @@
 package com.platon.browser.analyzer.ppos;
 
-import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
 import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.NodeItem;
+import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.param.BusinessParam;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -11,7 +11,6 @@ import com.platon.browser.exception.NoSuchBeanException;
 import com.platon.browser.param.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;

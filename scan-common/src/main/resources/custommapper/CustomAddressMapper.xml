@@ -149,4 +149,30 @@
         </foreach>
     </update>
 
+
+    <update id="updateStakingDelegationStats">
+        update address addr
+        inner join (
+            select t1.*, t2.candidateCount
+            from (
+                 select delegate_addr, sum(delegate_hes) as delegateHes, sum(delegate_locked) as delegateLocked, sum(delegate_released) as delegateReleased
+                 from delegation
+                 where is_history = 2
+                 group by delegate_addr
+            ) t1
+            INNER join(
+                select delegate_addr, count(distinct node_id) as candidateCount
+                from delegation
+                where is_history = 2
+                group by delegate_addr
+            ) t2 on t1.delegate_addr = t2.delegate_addr
+        ) delegate_stat on addr.address = delegate_stat.delegate_addr
+        inner join (
+            select staking_addr, sum(staking_hes + staking_locked) as stakingValue, sum(staking_reduction) as redeemedValue
+            from staking
+            where status in (1,2)
+            group by staking_addr
+        ) staking_stat on addr.address = staking_stat.staking_addr
+        set addr.delegate_hes = delegate_stat.delegateHes, addr.delegate_locked = delegate_stat.delegateLocked, addr.delegate_released = delegate_stat.delegateReleased, addr.delegate_value = delegate_stat.delegateHes + delegate_stat.delegateLocked, addr.candidate_count = delegate_stat.candidateCount, addr.staking_value = staking_stat.stakingValue, addr.redeemed_value = staking_stat.redeemedValue
+    </update>
 </mapper>

@@ -2,9 +2,11 @@ package com.platon.browser;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CustomDelegation;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.entity.*;
+import com.platon.browser.dao.entity.Address;
+import com.platon.browser.dao.entity.NetworkStat;
+import com.platon.browser.dao.entity.Node;
+import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.v0150.bean.AdjustParam;
@@ -48,7 +50,7 @@ public class TestData {
 
     protected List<Address> addressList = Collections.emptyList();
 
-    protected List<CustomStaking> stakingList = Collections.emptyList();
+    protected List<Staking> stakingList = Collections.emptyList();
 
     protected List<CustomDelegation> delegationList = Collections.emptyList();
 
@@ -78,7 +80,7 @@ public class TestData {
                         this.addressList = JSON.parseArray(content, Address.class);
                         break;
                     case "staking":
-                        stakingList = JSON.parseArray(content, CustomStaking.class);
+                        stakingList = JSON.parseArray(content, Staking.class);
                         break;
                     case "delegation":
                         delegationList = JSON.parseArray(content, CustomDelegation.class);

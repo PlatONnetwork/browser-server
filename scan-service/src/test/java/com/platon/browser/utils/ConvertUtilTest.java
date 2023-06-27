@@ -1,14 +1,13 @@
 package com.platon.browser.utils;
 
-import static org.junit.Assert.assertTrue;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import com.platon.rlp.wasm.datatypes.Int;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class ConvertUtilTest {

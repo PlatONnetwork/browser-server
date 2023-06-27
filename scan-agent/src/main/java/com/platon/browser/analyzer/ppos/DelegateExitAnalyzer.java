@@ -1,11 +1,9 @@
 package com.platon.browser.analyzer.ppos;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.bean.CustomStaking;
 import com.platon.browser.bean.DelegateExitResult;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.config.BlockChainConfig;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
 import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
@@ -54,7 +52,7 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
     private DelegationMapper delegationMapper;
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private CustomGasEstimateMapper customGasEstimateMapper;
@@ -132,7 +130,7 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
          */
         boolean isCandidate = true; // 对应节点是否候选中
 
-        if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() || staking.getStatus() == CustomStaking.StatusEnum.EXITED.getCode()) {
+        if (staking.getStatus() == Staking.StatusEnum.EXITING.getCode() || staking.getStatus() == Staking.StatusEnum.EXITED.getCode()) {
             // 节点是[退出中|已退出]
             businessParam.setCodeNodeIsLeave(true);
             isCandidate = false;
@@ -258,11 +256,17 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
             List<GasEstimate> estimates = new ArrayList<>();
             GasEstimate estimate = new GasEstimate();
             estimate.setNodeId(txParam.getNodeId());
+            estimate.setNodeIdHashCode(txParam.getNodeId().hashCode());
             estimate.setSbn(txParam.getStakingBlockNum().longValue());
             estimate.setAddr(tx.getFrom());
+            // lvxiaoyi, 用户在委托后，如果有任何其它操作入追加委托，撤回部分委托等，底层将会把此用户之前的未结算奖励做结算汇总并记录，然后重新开始计算未领取奖励和epoch。
+            // 并且，在计算用户的这些后续操作的手续费时，会把未领取奖励的epoch数量*100作为额外的手续费。这样，就避免了重新计算epoch后，用户领取奖励时手续费少算的问题。
+            // 也就是说，把用户最后领取奖励的部分手续费，提前在中间操作时扣除了。
+            // 如果用户在委托后，用户没有后续操作，底层就不会产生此用户的奖励结算汇总。
+            // 所有，这里要重置为0（这个逻辑也体现在com.platon.browser.dao.custommapper.CustomGasEstimateMapper.batchInsertOrResetEpoch对应的sql语句上）
             estimate.setEpoch(0L);
             estimates.add(estimate);
-            customGasEstimateMapper.batchInsertOrUpdateSelective(estimates, GasEstimate.Column.values());
+            customGasEstimateMapper.batchInsertOrResetEpoch(estimates);
         }
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
@@ -277,7 +281,8 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
      * @date: 2021/12/2
      */
     private void updateAddressHaveReward(DelegateExit businessParam) {
-        Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getTxFrom());
+        // 2023/04/14 lvxiaoyi 所有交易（包括PPOS虚拟交易）的相关地址，都已经在缓存中
+        /*Address addressInfo = addressMapper.selectByPrimaryKey(businessParam.getTxFrom());
         if (ObjectUtil.isNull(addressInfo)) {
             // db不存在则在缓存中创建一个新的地址，并更新已领取委托奖励
             Address address = addressCache.createDefaultAddress(businessParam.getTxFrom());
@@ -286,6 +291,11 @@ public class DelegateExitAnalyzer extends PPOSAnalyzer<DelegateExitResult> {
         } else {
             customAddressMapper.updateAddressHaveReward(businessParam.getTxFrom(), businessParam.getDelegateReward());
         }
+         customAddressMapper.updateAddressHaveReward(businessParam.getTxFrom(), businessParam.getDelegateReward());
+        */
+        //2023/04/14 lvxiaoyi, 最后统一处理，参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer
+        newAddressCache.addRewardClaimAddressToBlockCtx(businessParam.getTxFrom(), businessParam.getDelegateReward());
+
     }
 
 }

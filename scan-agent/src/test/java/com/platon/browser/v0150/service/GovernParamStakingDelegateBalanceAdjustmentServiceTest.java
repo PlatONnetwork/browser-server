@@ -1,17 +1,17 @@
 package com.platon.browser.v0150.service;
 
-import com.platon.contracts.ppos.ProposalContract;
-import com.platon.contracts.ppos.dto.CallResponse;
-import com.platon.contracts.ppos.dto.resp.GovernParam;
-import com.platon.contracts.ppos.dto.resp.ParamItem;
-import com.platon.contracts.ppos.dto.resp.ParamValue;
-import com.platon.protocol.core.RemoteCall;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.mapper.ConfigMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.ModifiableGovernParamEnum;
 import com.platon.browser.v0150.V0150Config;
+import com.platon.contracts.ppos.ProposalContract;
+import com.platon.contracts.ppos.dto.CallResponse;
+import com.platon.contracts.ppos.dto.resp.GovernParam;
+import com.platon.contracts.ppos.dto.resp.ParamItem;
+import com.platon.contracts.ppos.dto.resp.ParamValue;
+import com.platon.protocol.core.RemoteCall;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

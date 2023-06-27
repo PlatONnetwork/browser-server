@@ -6,28 +6,23 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.platon.browser.bean.AddressQty;
 import com.platon.browser.dao.custommapper.CustomAddressMapper;
-import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.PointLogMapper;
 import com.platon.browser.dao.mapper.TxBakMapper;
-import com.platon.browser.dao.mapper.TxTransferBakMapper;
 import com.platon.browser.elasticsearch.dto.Transaction;
-import com.platon.browser.task.bean.AddressStatistics;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 
@@ -53,9 +48,6 @@ import java.util.stream.Collectors;
 public class AddressUpdateTask {
 
     @Resource
-    private StatisticBusinessMapper statisticBusinessMapper;
-
-    @Resource
     private AddressMapper addressMapper;
 
     @Resource
@@ -67,17 +59,15 @@ public class AddressUpdateTask {
     @Resource
     private TxBakMapper txBakMapper;
 
-    @Resource
-    private TxTransferBakMapper txTransferBakMapper;
-
     /**
      * 用于地址表更新
      */
-    private AtomicLong addressStart = new AtomicLong(0L);
+    //private AtomicLong addressStart = new AtomicLong(0L);
 
     /**
      * 地址表信息补充
      * 每5秒执行一次
+     * 2023/03/29, lvxiaoyi, 改成用SQL来统计并更新地址的质押情况，委托情况
      *
      * @param :
      * @return: void
@@ -85,7 +75,24 @@ public class AddressUpdateTask {
      */
     @XxlJob("addressUpdateJobHandler")
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void addressUpdate() {
+    public void updateStakingDelegationStats() {
+        // 只有程序正常运行才执行任务
+        if (!AppStatusUtil.isRunning()) {
+            return;
+        }
+
+        log.debug(">>>>开始执行:统计账户的质押/委托信息");
+        StopWatch watch = new StopWatch();
+        watch.start();
+
+
+        customAddressMapper.updateStakingDelegationStats();
+        watch.stop();
+        log.debug("结束执行:统计账户的质押/委托信息，耗时统计：{}ms", watch.getLastTaskTimeMillis());
+    }
+
+
+    /*public void addressUpdate() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -98,7 +105,7 @@ public class AddressUpdateTask {
             log.error("地址表信息补充异常", e);
             throw e;
         }
-    }
+    }*/
 
     /**
      * 执行任务
@@ -107,7 +114,7 @@ public class AddressUpdateTask {
      * @param size  执行的批次
      * @return
      */
-    protected void batchUpdate(int start, int size) {
+    /*protected void batchUpdate(int start, int size) {
         //查询待补充的地址
         AddressExample addressExample = new AddressExample();
         addressExample.setOrderByClause("create_time limit " + start + "," + size);
@@ -195,7 +202,7 @@ public class AddressUpdateTask {
         if (!updateAddressList.isEmpty()) {
             statisticBusinessMapper.batchUpdateFromTask(updateAddressList);
         }
-    }
+    }*/
 
     /**
      * 更新地址交易数
@@ -204,10 +211,14 @@ public class AddressUpdateTask {
      * @param :
      * @return: void
      * @date: 2021/12/6
+     *
+     * 2023/04/06, lvxiaoyi: 改成用trigger来更新地址的交易数
+     * @deprecated
      */
-    @XxlJob("updateAddressQtyJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void updateQty() throws Exception {
+    //@XxlJob("updateAddressQtyJobHandler")
+    //@Transactional(rollbackFor = {Exception.class, Error.class})
+    @Deprecated
+    public void updateTxQty() throws Exception {
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(2);
@@ -245,40 +256,6 @@ public class AddressUpdateTask {
             }
         } catch (Exception e) {
             log.error("更新地址交易数异常", e);
-            throw e;
-        }
-    }
-
-
-    /**
-     * 更新地址合约内部转账交易数
-     * 每30秒执行一次
-     *
-     */
-    @XxlJob("updateAddressTransferTxQtyJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void updateTransferTxQty() throws Exception {
-        try {
-            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
-            PointLog pointLog = pointLogMapper.selectByPrimaryKey(11);
-            long oldPosition = Convert.toLong(pointLog.getPosition());
-            TaskUtil.console("当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
-            List<TxTransferBak> transactionList = getTxTransferBakList(oldPosition, pageSize);
-            if (CollUtil.isNotEmpty(transactionList)) {
-                String minId = CollUtil.getFirst(transactionList).getId().toString();
-                String maxId = CollUtil.getLast(transactionList).getId().toString();
-                pointLog.setPosition(maxId);
-                TaskUtil.console("查找到[{}]条内部转账交易,交易id为[{}-{}]", transactionList.size(), minId, maxId);
-                Map<String, AddressQty> map = extractAddressTxTransferQty(transactionList);
-                TaskUtil.console("更新的数据为{}", JSONUtil.toJsonStr(map.values()));
-                customAddressMapper.batchUpdateAddressTxTransferQty(map.values());
-                pointLogMapper.updateByPrimaryKeySelective(pointLog);
-                TaskUtil.console("更新地址内部转账交易数，断点(交易id)为[{}]->[{}]，更新[{}]个地址", oldPosition, pointLog.getPosition(), map.size());
-            } else {
-                XxlJobHelper.handleSuccess(StrUtil.format("最新断点[{}]未找到交易列表，更新地址交易数完成", oldPosition));
-            }
-        } catch (Exception e) {
-            log.error("更新地址内部转账交易数异常", e);
             throw e;
         }
     }
@@ -408,31 +385,6 @@ public class AddressUpdateTask {
         return map;
     }
 
-    private Map<String, AddressQty> extractAddressTxTransferQty(List<TxTransferBak> transactionList) throws Exception {
-        Map<String, AddressQty> addressTransferTxIncreaseMap = new HashMap<>();
-        transactionList.stream().forEach(txTransferBak -> {
-            String from = txTransferBak.getFrom();
-            String to = txTransferBak.getTo();
-            // 如果转账自己到自己只能算1条
-            if(StringUtils.equals(from, to) &&  !AddressUtil.isAddrZero(from)){
-                updateAddressTxTransferQty(addressTransferTxIncreaseMap, from);
-                return;
-            }
-            if(!AddressUtil.isAddrZero(from)){
-                updateAddressTxTransferQty(addressTransferTxIncreaseMap, from);
-            }
-            if(!AddressUtil.isAddrZero(to)){
-                updateAddressTxTransferQty(addressTransferTxIncreaseMap, to);
-            }
-        });
-        return addressTransferTxIncreaseMap;
-    }
-
-    private void updateAddressTxTransferQty(Map<String, AddressQty> addressTransferTxIncreaseMap, String address){
-        AddressQty addressQty =  addressTransferTxIncreaseMap.computeIfAbsent(address, key -> AddressQty.builder().address(key).txTransferQty(0).build());
-        addressQty.setTxTransferQty(addressQty.getTxTransferQty() + 1);
-    }
-
     /**
      * 获取交易列表
      *
@@ -454,20 +406,4 @@ public class AddressUpdateTask {
         }
     }
 
-
-    /**
-     * 获取内部转账交易列表
-     */
-    private List<TxTransferBak> getTxTransferBakList(long maxId, int pageSize) throws Exception {
-        try {
-            TxTransferBakExample example = new TxTransferBakExample();
-            example.createCriteria().andIdGreaterThan(maxId);
-            example.setOrderByClause("id asc limit " + pageSize);
-            List<TxTransferBak> list = txTransferBakMapper.selectByExample(example);
-            return list;
-        } catch (Exception e) {
-            log.error("获取内部转账交易列表异常", e);
-            throw e;
-        }
-    }
 }

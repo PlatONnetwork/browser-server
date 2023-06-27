@@ -1,17 +1,17 @@
 package com.platon.browser.analyzer.statistic;
 
 import com.platon.browser.AgentTestBase;
+import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochInfo;
 import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.bean.NodeItem;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
-import com.platon.browser.bean.NodeItem;
-import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
-import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.config.BlockChainConfig;
+import com.platon.browser.dao.custommapper.StatisticBusinessMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.protocol.Web3j;
@@ -22,8 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.mockito.ArgumentMatchers.any;
-import javax.annotation.Resource;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
-	
+
 	@Mock
 	private NetworkStatCache networkStatCache;
     @Mock
@@ -96,7 +95,7 @@ public class StatisticsNetworkAnalyzerTest extends AgentTestBase {
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setBlock(block);
         collectionEvent.setEpochMessage(epochMessage);
-        collectionEvent.setTransactions(new ArrayList <>(transactionList));
+        collectionEvent.getBlock().setDtoTransactions(new ArrayList <>(transactionList));
         target.analyze(collectionEvent,block,epochMessage);
     }
 }

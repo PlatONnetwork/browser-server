@@ -1,8 +1,8 @@
 package com.platon.browser.service.receipt;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.bean.ReceiptResult;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.exception.NetworkException;
 import org.junit.Before;
 import org.junit.Test;

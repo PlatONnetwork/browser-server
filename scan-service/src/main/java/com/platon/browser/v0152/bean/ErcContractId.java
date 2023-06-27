@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class ErcContractId {
 
-    private ErcTypeEnum typeEnum = ErcTypeEnum.UNKNOWN;
+    private ErcTypeEnum typeEnum;
 
     /**
      * 合约名称

@@ -1,10 +1,10 @@
 package com.platon.browser.response.home;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.platon.browser.config.json.CustomLatSerializer;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 首页统计返回对象

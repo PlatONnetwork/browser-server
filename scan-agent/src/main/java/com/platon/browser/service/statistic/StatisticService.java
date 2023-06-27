@@ -7,19 +7,18 @@ import cn.hutool.json.JSONUtil;
 import com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer;
 import com.platon.browser.analyzer.statistic.StatisticsNetworkAnalyzer;
 import com.platon.browser.bean.*;
-import com.platon.browser.cache.AddressCache;
+import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Node;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 public class StatisticService {
 
     @Resource
-    private AddressCache addressCache;
+    private NewAddressCache newAddressCache;
 
     @Resource
     private StatisticsNetworkAnalyzer statisticsNetworkAnalyzer;
@@ -56,24 +55,24 @@ public class StatisticService {
      * @return
      */
     public void analyze(CollectionEvent event) throws Exception {
-        long startTime = System.currentTimeMillis();
+        log.debug("开始统计业务参数，块高：{}", event.getBlock().getNum());
+        StopWatch watch = new StopWatch("统计业务参数");
         Block block = event.getBlock();
         EpochMessage epochMessage = event.getEpochMessage();
-        // 地址统计
-        Collection<Address> addressList = this.addressCache.getAll();
+        // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行区块内交易涉及的相关地址入库操作
+        if (this.newAddressCache.hasRelatedAddressInBlockCtx()) {
+            watch.start("Address统计分析");
+            this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
+            watch.stop();
+        }
         if (block.getNum() == 0) {
-            if (CollUtil.isNotEmpty(addressList)) {
-                // 初始化内置地址，比如内置合约等
-                this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
-            }
             return;
         }
-        // 程序逻辑运行至此处，所有ppos相关业务逻辑已经分析完成，进行地址入库操作
-        if (CollUtil.isNotEmpty(addressList)) {
-            this.statisticsAddressAnalyzer.analyze(event, block, epochMessage);
-        }
+        watch.start("NetworkStatus统计分析");
         this.statisticsNetworkAnalyzer.analyze(event, block, epochMessage);
-        log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
+        watch.stop();
+
+        log.debug("结束统计业务参数，块高：{}，耗时统计：{}", event.getBlock().getNum(), watch.prettyPrint());
     }
 
     /**
@@ -94,7 +93,7 @@ public class StatisticService {
                     NodeSettleStatis nodeSettleStatis;
                     if (StrUtil.isEmpty(info)) {
                         nodeSettleStatis = new NodeSettleStatis();
-                        nodeSettleStatis.setNodeId(node.getNodeId());
+                        //nodeSettleStatis.setNodeId(node.getNodeId());
                         nodeSettleStatis.setBlockNum(0L);
                         NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                         nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());
@@ -120,7 +119,7 @@ public class StatisticService {
                 if (CollUtil.isNotEmpty(updateNodeList)) {
                     int res = customNodeMapper.updateNodeSettleStatis(updateNodeList);
                     if (res > 0) {
-                        log.info("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
+                        log.debug("节点列表({})在共识轮数[{}]块高[{}]当选出块节点,更新数据成功",
                                  updateNodeList.stream().map(Node::getNodeId).collect(Collectors.toList()),
                                  event.getEpochMessage().getConsensusEpochRound(),
                                  event.getEpochMessage().getCurrentBlockNumber());
@@ -211,7 +210,7 @@ public class StatisticService {
             NodeSettleStatis nodeSettleStatis;
             if (StrUtil.isEmpty(info)) {
                 nodeSettleStatis = new NodeSettleStatis();
-                nodeSettleStatis.setNodeId(nodeItem.getNodeId());
+                //nodeSettleStatis.setNodeId(nodeItem.getNodeId());
                 nodeSettleStatis.setBlockNum(event.getEpochMessage().getCurrentBlockNumber().longValue());
                 NodeSettleStatisBase nodeSettleStatisBase = new NodeSettleStatisBase();
                 nodeSettleStatisBase.setSettleEpochRound(event.getEpochMessage().getSettleEpochRound());

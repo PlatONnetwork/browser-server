@@ -14,9 +14,9 @@ public class RestrictingBalance {
 
     private String account;
 
-    private BigInteger freeBalance;
+    private BigInteger freeBalance; //EOA帐号余额
 
-    private BigInteger lockBalance;
+    private BigInteger lockBalance; //EOA的锁仓未释放余额
 
     private BigInteger pledgeBalance;
 

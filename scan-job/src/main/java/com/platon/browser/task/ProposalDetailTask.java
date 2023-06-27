@@ -12,10 +12,7 @@ import com.platon.browser.exception.HttpRequestException;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.MarkDownParserUtil;
 import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -27,7 +24,8 @@ import java.util.List;
  * @Description: 提案信息更新任务
  */
 @Slf4j
-@Component
+//@Component
+@Deprecated
 public class ProposalDetailTask {
 
     @Resource
@@ -42,8 +40,8 @@ public class ProposalDetailTask {
      * 3.查询到的信息更新并修改数据库
      * 每15秒执行一次
      */
-    @XxlJob("proposalDetailUpdateJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+    //@XxlJob("proposalDetailUpdateJobHandler")
+    //@Transactional(rollbackFor = {Exception.class, Error.class})
     public void proposalDetail() {
         // 只有程序正常运行才执行任务
         if (AppStatusUtil.isRunning()) start();
@@ -75,7 +73,7 @@ public class ProposalDetailTask {
                 //将同步完成的proposal信息修改状态已完成
                 proposal.setCompletionFlag(CustomProposal.FlagEnum.COMPLETE.getCode());
             }
-            customProposalMapper.updateProposalDetailList(proposals);
+            //customProposalMapper.updateProposalDetailList(proposals);
             XxlJobHelper.handleSuccess("更新提案详情定时任务完成");
         } catch (Exception e) {
             log.error("更新提案详情定时任务异常", e);

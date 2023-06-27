@@ -1,31 +1,32 @@
 package com.platon.browser.utils;
 
-import cn.hutool.core.collection.BoundedPriorityQueue;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.bean.NodeSettleStatis;
 import com.platon.browser.bean.NodeSettleStatisBase;
+import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.elasticsearch.dto.Transaction;
+import com.platon.browser.enums.ErcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RunWith(MockitoJUnitRunner.Silent.class)
 public class CommonUtilTest {
-
     @Test
     public void test() {
         long time = DateUtil.parse("2021-03-27 18:30:00", "yyyy-MM-dd HH:mm:ss").getTime();
@@ -71,7 +72,7 @@ public class CommonUtilTest {
     @Test
     public void Test1() {
         NodeSettleStatis nodeSettleStatis = new NodeSettleStatis();
-        nodeSettleStatis.setNodeId("aaaaaaaa");
+        //nodeSettleStatis.setNodeId("aaaaaaaa");
 
         NodeSettleStatisBase nodeSettleStatisBase1 = new NodeSettleStatisBase();
         nodeSettleStatisBase1.setSettleEpochRound(new BigInteger("1"));
@@ -123,7 +124,7 @@ public class CommonUtilTest {
         nodeSettleStatis.getNodeSettleStatisQueue().offer(nodeSettleStatisBase7);
         nodeSettleStatis.getNodeSettleStatisQueue().offer(nodeSettleStatisBase8);
 
-        log.error("============{}", nodeSettleStatis.computeGenBlocksRate(BigInteger.valueOf(8)));
+        log.error("============{}", nodeSettleStatis.computeGenBlocksRate("testNodeId", BigInteger.valueOf(8)));
     }
 
     @Test
@@ -137,4 +138,100 @@ public class CommonUtilTest {
         log.info("============{}", percent.toPlainString());
     }
 
+
+    @Test
+    public void testScanAgentSpeedCalculate() {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime date1 = LocalDateTime.parse("2023-03-22 06:49:50", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-03-22 08:19:56", inputFormatter);
+        long seconds = Duration.between(date1, date2).getSeconds();
+
+        long total = 426651;
+
+        System.out.println("aaaa::::::" + (total / seconds));
+    }
+
+    @Test
+    public void testFmisSpeedCalculate() {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime date1 = LocalDateTime.parse("2023-04-18 09:29:37", inputFormatter);
+        LocalDateTime date2 = LocalDateTime.parse("2023-04-18 10:15:56", inputFormatter);
+        long seconds = Duration.between(date1, date2).getSeconds();
+
+        long total = 58297818-58051589;
+
+        System.out.println(total / seconds);
+    }
+
+
+    @Test
+    public void testParallelStream() {
+
+        NftObject obj1 = new NftObject();
+        obj1.setTokenAddress("0x01");
+        obj1.setTokenId(1L);
+        NftObject obj2 = new NftObject();
+        obj1.setTokenAddress("0x02");
+        obj1.setTokenId(2L);
+        List<NftObject> nftList = new ArrayList<>();
+        nftList.add(obj1);
+        nftList.add(obj2);
+
+        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+
+        CountDownLatch countDownLatch = new CountDownLatch(nftList.size());
+        forkJoinPool.submit(() -> {
+            nftList.parallelStream().forEach(nft -> {
+                // 重试次数+1
+                nft.setRetryNum(nft.getRetryNum() + 1);
+                nft.setImage("nft01_image");
+                nft.setDescription("nft01_desc");
+                nft.setName("nfg01_name");
+                nft.setDecimal(18);
+                countDownLatch.countDown();
+            });
+        });
+
+    }
+
+    @Test
+    public void testBit(){
+        CustomAddress address =  CustomAddress.createNewAccountAddress("abcd");
+
+        address.setOption(CustomAddress.Option.NEW);
+        address.setOption(CustomAddress.Option.REWARD_CLAIM);
+        address.setOption(CustomAddress.Option.SUICIDED);
+        address.setOption(CustomAddress.Option.REWARD_CLAIM);
+
+        System.out.println("isNew: " + address.hasOption(CustomAddress.Option.NEW));
+        System.out.println("isReward: " + address.hasOption(CustomAddress.Option.REWARD_CLAIM));
+        System.out.println("isSuicided: " + address.hasOption(CustomAddress.Option.SUICIDED));
+    }
+
+
+
+    @Test
+    public void testHashNodeId(){
+        String nodeId = "0xd2d670c64375d958ae15030d2e7979a369a1142a8981f41cb6aa31727c90a6af79ea7b8d07284736eec4c690e501d5e638a7dc87a646b0245631afc84f1d0c1f";
+        log.debug("hashCode：{}" , nodeId.hashCode());
+        String hash = DigestUtils.md5Hex(nodeId);
+        log.info("md5：{}", hash);
+
+        nodeId = "0xd2d670c64375d958ae15030d2e7979a369a1142a8981f41cb6aa31727c90a6af79ea7b8d07284736eec4c690e501d5e638a7dc87a646b0245631afc84f1d1c1f";
+        log.debug("hashCode：{}" , nodeId.hashCode());
+        hash = DigestUtils.sha256Hex(nodeId);
+        log.info("sha256Hex：{}", hash);
+
+        hash = DigestUtils.md5Hex(nodeId);
+        log.info("md5Hex：{}", hash);
+    }
+
+    @Test
+    public void testErcTypeEnum() {
+        System.out.println("AAA:"+ ErcTypeEnum.getErcTypeEnum("erc20"));
+
+        System.out.println("BBBB:"+ErcTypeEnum.valueOf("erc20"));
+    }
 }

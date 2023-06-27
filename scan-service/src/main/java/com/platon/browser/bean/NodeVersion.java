@@ -1,8 +1,8 @@
 package com.platon.browser.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.platon.browser.utils.HexUtil;
 import com.platon.browser.utils.ChainVersionUtil;
+import com.platon.browser.utils.HexUtil;
 
 import java.math.BigInteger;
 

@@ -1,14 +1,8 @@
 package com.platon.browser.dao.custommapper;
 
-import com.platon.browser.dao.entity.StakingHistory;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.Set;
-
 public interface CustomStakingHistoryMapper {
-
-	int batchInsertOrUpdateSelective ( @Param("list") Set <StakingHistory> list, @Param("selective") StakingHistory.Column... selective );
-
-
-
+    /**
+     * 把staking表中，已经退出的质押（status=3)的记录，备份到staking_history表中，然后从staking表中删除
+     */
+    void backupQuitedStaking();
 }

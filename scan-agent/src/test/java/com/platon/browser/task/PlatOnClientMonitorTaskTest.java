@@ -1,6 +1,5 @@
 package com.platon.browser.task;
 
-import com.platon.browser.AgentTestBase;
 import com.platon.browser.AgentTestData;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.AppStatus;
@@ -13,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**

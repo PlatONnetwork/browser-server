@@ -1,12 +1,9 @@
 package com.platon.browser;
 
-import org.junit.runner.RunWith;
+import com.platon.browser.client.PlatOnClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import com.platon.browser.client.PlatOnClient;
-import org.springframework.test.context.junit4.SpringRunner;
 
 //@RunWith(SpringRunner.class)
 @SpringBootTest(classes= BrowserServiceApplication.class, value = "spring.profiles.active=dev",webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

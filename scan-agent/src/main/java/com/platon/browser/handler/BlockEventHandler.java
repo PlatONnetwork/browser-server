@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -69,17 +70,32 @@ public class BlockEventHandler implements EventHandler<BlockEvent> {
 
     private void exec(BlockEvent event, long sequence, boolean endOfBatch) throws InterruptedException, ExecutionException, BlankResponseException, BeanCreateOrUpdateException, ContractInvokeException {
         try {
+            log.debug("开始分析BlockEvent");
+
+            StopWatch watch = new StopWatch("分析BlockEvent");
+
+            watch.start("获取区块");
             PlatonBlock.Block rawBlock = event.getBlockCF().get().getBlock();
             if (retryCount.incrementAndGet() > 1) {
                 log.error("重试次数[{}],该区块[{}]重复处理，可能会引起数据重复统计", retryCount.get(), rawBlock.getNumber());
             }
+            watch.stop();
+            watch.start("获取区块的交易回执");
             ReceiptResult receiptResult = event.getReceiptCF().get();
-            log.info("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
+            log.debug("当前区块[{}]有[{}]笔交易", rawBlock.getNumber(), CommonUtil.ofNullable(() -> rawBlock.getTransactions().size()).orElse(0));
             // 分析区块
+            watch.stop();
+            watch.start("分析区块和回执");
             CollectionBlock block = blockAnalyzer.analyze(rawBlock, receiptResult);
             block.setReward(event.getEpochMessage().getBlockReward().toString());
+
+            watch.stop();
+            watch.start("发布collectionEven");
+
             // TODO 此分割线以上代码异常重试属于正常逻辑，如果是以下代码发生异常，可能区块已经发送到CollectionEventHandler进行处理，则该区块会被重复处理多次
-            collectionEventPublisher.publish(block, block.getTransactions(), event.getEpochMessage(), event.getTraceId());
+            collectionEventPublisher.publish(block, event.getEpochMessage(), event.getTraceId());
+            watch.stop();
+            log.debug("结束分析BlockEvent，区块：{}, 耗时统计：{}", rawBlock.getNumber(), watch.prettyPrint());
             // 释放对象引用
             event.releaseRef();
             retryCount.set(0);

@@ -2,15 +2,16 @@ package com.platon.browser.analyzer.epoch;
 
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
-import com.platon.browser.bean.*;
+import com.platon.browser.bean.AnnualizedRateInfo;
+import com.platon.browser.bean.CollectionEvent;
+import com.platon.browser.bean.ComplementNodeOpt;
+import com.platon.browser.bean.PeriodValueElement;
 import com.platon.browser.config.BlockChainConfig;
-import com.platon.browser.dao.custommapper.CustomGasEstimateLogMapper;
+import com.platon.browser.dao.custommapper.CustomGasEstimateMapper;
 import com.platon.browser.dao.custommapper.EpochBusinessMapper;
 import com.platon.browser.dao.entity.GasEstimate;
-import com.platon.browser.dao.entity.GasEstimateLog;
 import com.platon.browser.dao.entity.Staking;
 import com.platon.browser.dao.entity.StakingExample;
-import com.platon.browser.dao.mapper.GasEstimateLogMapper;
 import com.platon.browser.dao.mapper.StakingMapper;
 import com.platon.browser.dao.param.epoch.Settle;
 import com.platon.browser.elasticsearch.dto.Block;
@@ -22,7 +23,6 @@ import com.platon.contracts.ppos.dto.resp.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -43,15 +43,18 @@ public class OnSettleAnalyzer {
     private StakingMapper stakingMapper;
 
     @Resource
-    private CustomGasEstimateLogMapper customGasEstimateLogMapper;
-
-    @Resource
-    private GasEstimateLogMapper gasEstimateLogMapper;
+    private CustomGasEstimateMapper customGasEstimateMapper;
 
     @Resource
     private RestrictingMinimumReleaseParamService restrictingMinimumReleaseParamService;
 
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+
+    /**
+     * 输入参数没有被修改
+     * @param event
+     * @param block
+     * @return
+     */
     public List<NodeOpt> analyze(CollectionEvent event, Block block) {
         long startTime = System.currentTimeMillis();
         // 操作日志列表
@@ -80,9 +83,9 @@ public class OnSettleAnalyzer {
                               .build();
 
         List<Integer> statusList = new ArrayList<>();
-        statusList.add(CustomStaking.StatusEnum.CANDIDATE.getCode());
-        statusList.add(CustomStaking.StatusEnum.EXITING.getCode());
-        statusList.add(CustomStaking.StatusEnum.LOCKED.getCode());
+        statusList.add(Staking.StatusEnum.CANDIDATE.getCode());
+        statusList.add(Staking.StatusEnum.EXITING.getCode());
+        statusList.add(Staking.StatusEnum.LOCKED.getCode());
         StakingExample stakingExample = new StakingExample();
         stakingExample.createCriteria().andStatusIn(statusList);
         List<Staking> stakingList = stakingMapper.selectByExampleWithBLOBs(stakingExample);
@@ -94,26 +97,26 @@ public class OnSettleAnalyzer {
             staking.setStakingHes(BigDecimal.ZERO);
 
             //退出中记录状态设置（状态为退出中且已经经过指定的结算周期数，则把状态置为已退出）
-            if (staking.getStatus() == CustomStaking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
+            if (staking.getStatus() == Staking.StatusEnum.EXITING.getCode() && // 节点状态为退出中
                     event.getBlock().getNum() >= staking.getUnStakeEndBlock() // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 staking.setStakingReduction(BigDecimal.ZERO);
-                staking.setStatus(CustomStaking.StatusEnum.EXITED.getCode());
+                staking.setStatus(Staking.StatusEnum.EXITED.getCode());
                 staking.setLowRateSlashCount(0);
                 exitedNodeIds.add(staking.getNodeId());
             }
 
             //锁定中记录状态设置（状态为已锁定中且已经经过指定的结算周期数，则把状态置为候选中）
-            if (staking.getStatus() == CustomStaking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
+            if (staking.getStatus() == Staking.StatusEnum.LOCKED.getCode() && // 节点状态为已锁定
                     (staking.getZeroProduceFreezeEpoch() + staking.getZeroProduceFreezeDuration()) < settle.getSettingEpoch()
                 // 且当前区块号大于等于质押预计的实际退出区块号
             ) {
                 // 低出块处罚次数置0
                 staking.setLowRateSlashCount(0);
                 // 异常状态
-                staking.setExceptionStatus(CustomStaking.ExceptionStatusEnum.NORMAL.getCode());
+                staking.setExceptionStatus(Staking.ExceptionStatusEnum.NORMAL.getCode());
                 // 从已锁定状态恢复到候选中状态
-                staking.setStatus(CustomStaking.StatusEnum.CANDIDATE.getCode());
+                staking.setStatus(Staking.StatusEnum.CANDIDATE.getCode());
                 recoverLog(staking, settle.getSettingEpoch(), block, nodeOpts);
             }
 
@@ -125,9 +128,9 @@ public class OnSettleAnalyzer {
 
             //当前质押是下轮结算周期验证人
             if (settle.getCurVerifierSet().contains(staking.getNodeId())) {
-                staking.setIsSettle(CustomStaking.YesNoEnum.YES.getCode());
+                staking.setIsSettle(Staking.YesNoEnum.YES.getCode());
             } else {
-                staking.setIsSettle(CustomStaking.YesNoEnum.NO.getCode());
+                staking.setIsSettle(Staking.YesNoEnum.NO.getCode());
             }
 
             // 设置当前质押的总委托奖励，从节点上取出来的委托总奖励就是当前质押获取的总委托奖励
@@ -166,24 +169,25 @@ public class OnSettleAnalyzer {
         List<GasEstimate> gasEstimates = new ArrayList<>();
         preVerifierMap.forEach((k, v) -> {
             GasEstimate ge = new GasEstimate();
-            ge.setNodeId(v.getNodeId());
+            //ge.setNodeId(v.getNodeId());
+            ge.setNodeIdHashCode(v.getNodeId().hashCode());
             ge.setSbn(v.getStakingBlockNum().longValue());
             gasEstimates.add(ge);
         });
 
         // 1、把周期数需要自增1的节点质押先入mysql数据库
-        Long seq = block.getNum() * 10000;
+        /*Long seq = block.getNum() * 10000;
         List<GasEstimateLog> gasEstimateLogs = new ArrayList<>();
         GasEstimateLog gasEstimateLog = new GasEstimateLog();
         gasEstimateLog.setSeq(seq);
         gasEstimateLog.setJson(JSON.toJSONString(gasEstimates));
-        gasEstimateLogs.add(gasEstimateLog);
-        customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
+        gasEstimateLogs.add(gasEstimateLog);*/
+        //customGasEstimateLogMapper.batchInsertOrUpdateSelective(gasEstimateLogs, GasEstimateLog.Column.values());
 
         if (CollUtil.isNotEmpty(gasEstimates)) {
-            epochBusinessMapper.updateGasEstimate(gasEstimates);
+            customGasEstimateMapper.increaseEpoch(gasEstimates);
         }
-        gasEstimateLogMapper.deleteByPrimaryKey(seq);
+        //gasEstimateLogMapper.deleteByPrimaryKey(seq);
 
         log.debug("处理耗时:{} ms", System.currentTimeMillis() - startTime);
 
@@ -217,7 +221,7 @@ public class OnSettleAnalyzer {
                 updateStaking.setStakingRewardValue(stakingRewardValue);
                 updateStakingList.add(updateStaking);
                 // MySQL数据库会四舍五入取整
-                log.info("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
+                log.debug("块高[{}]对应的结算周期为[{}]--节点[{}]的质押奖励为累计[{}]=基础[{}]+增量[{}]",
                          blockNum,
                          epoch,
                          staking.getNodeId(),

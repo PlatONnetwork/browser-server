@@ -5,7 +5,6 @@ import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.request.token.QueryTokenHolderListReq;
-import com.platon.browser.response.BaseResp;
 import com.platon.browser.response.RespPage;
 import com.platon.browser.response.account.AccountDownload;
 import com.platon.browser.response.token.QueryTokenHolderListResp;

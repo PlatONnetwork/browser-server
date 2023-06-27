@@ -1,8 +1,9 @@
 package com.platon.browser.enums;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class RetEnumTest {
 
@@ -12,12 +13,12 @@ public class RetEnumTest {
 		assertTrue(retEnum.getCode()==-1);
 		assertTrue(retEnum.getName().equals("请求参数无效"));
 	}
-	
+
 	@Test
 	public void testGetEnumByCodeValue() {
 		RetEnum retEnum = RetEnum.getEnumByCodeValue(0);
 		assertTrue(retEnum.getCode()==0);
-		
+
 		retEnum = RetEnum.getEnumByCodeValue(10);
 		assertNull(retEnum);
 	}

@@ -1,33 +1,35 @@
 package com.platon.browser.analyzer.epoch;
 
 import com.platon.browser.AgentTestBase;
-import com.platon.browser.client.PlatOnClient;
+import com.platon.browser.bean.CollectionEvent;
 import com.platon.browser.bean.EpochMessage;
+import com.platon.browser.bean.NodeItem;
 import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.cache.ProposalCache;
-import com.platon.browser.bean.NodeItem;
-import com.platon.browser.bean.CollectionEvent;
-import com.platon.browser.service.proposal.ProposalService;
+import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.custommapper.NewBlockMapper;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Proposal;
 import com.platon.browser.dao.mapper.ProposalMapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.service.govern.ParameterService;
+import com.platon.browser.service.proposal.ProposalService;
 import com.platon.browser.service.statistic.StatisticService;
+import com.platon.browser.v0150.V0150Config;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.ParamItem;
 import com.platon.contracts.ppos.dto.resp.ParamValue;
 import com.platon.contracts.ppos.dto.resp.TallyResult;
-import com.platon.browser.v0150.V0150Config;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -40,6 +42,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class) //配合用junit5
 public class OnNewBlockAnalyzerTest extends AgentTestBase {
 
     @Mock
@@ -76,7 +79,7 @@ public class OnNewBlockAnalyzerTest extends AgentTestBase {
     @Spy
     private OnNewBlockAnalyzer target;
 
-    @Before
+    @BeforeEach //配合用junit5
     public void setup() throws Exception {
         NodeItem nodeItem = NodeItem.builder()
                 .nodeId("0x77fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c82055499050")
@@ -113,7 +116,7 @@ public class OnNewBlockAnalyzerTest extends AgentTestBase {
     }
 
 
-    @Test
+    @Test //配合用junit5
     public void convert() throws Exception {
         Block block = blockList.get(0);
         EpochMessage epochMessage = EpochMessage.newInstance();

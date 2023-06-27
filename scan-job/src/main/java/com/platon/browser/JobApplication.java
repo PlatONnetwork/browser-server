@@ -29,6 +29,7 @@ import java.util.Properties;
 @EnableScheduling
 @SpringBootApplication
 @EnableEncryptableProperties
+// @ServletComponentScan
 @MapperScan(basePackages = {"com.platon.browser", "com.platon.browser.dao.mapper", "com.platon.browser.dao.custommapper"})
 public class JobApplication implements ApplicationRunner {
 

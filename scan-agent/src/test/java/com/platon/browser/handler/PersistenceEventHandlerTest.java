@@ -5,11 +5,9 @@ import com.platon.browser.cache.NetworkStatCache;
 import com.platon.browser.service.elasticsearch.EsImportService;
 import com.platon.browser.service.redis.RedisImportService;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @description: MySQL/ES/Redis启动一致性自检服务测试

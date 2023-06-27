@@ -87,5 +87,5 @@ public interface CustomToken1155HolderMapper {
      * @param list
      * @return
      */
-    int batchChange(List<Token1155Holder> list);
+    void batchChange(@Param("list") List<Token1155Holder> list);
 }
