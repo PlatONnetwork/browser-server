@@ -13,4 +13,7 @@ public class ContractInfo {
     private String tokenSymbol; //为空不传
     private int tokenDecimals; //为空不传
     private BigDecimal tokenTotalSupply; //为空不传
+    private boolean supportErc721Metadata;
+    private boolean supportErc721Enumerable;
+    private boolean supportErc1155Metadata;
 }

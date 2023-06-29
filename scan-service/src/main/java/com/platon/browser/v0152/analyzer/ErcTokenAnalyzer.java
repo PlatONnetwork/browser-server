@@ -21,7 +21,6 @@ import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
-import com.platon.tx.exceptions.PlatonCallTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -72,7 +71,7 @@ public class ErcTokenAnalyzer {
      * @param blockNumber
      * @return 如果不是ERC标准，则返回null
      */
-    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId) throws PlatonCallTimeoutException {
+    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId, ContractInfo contractInfo) {
         Token token = new Token();
         token.setAddress(contractAddress);
         token.setName(contractId.getName());
@@ -104,8 +103,8 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc20(false);
                 token.setIsSupportErc165(true);
                 token.setIsSupportErc721(true);
-                token.setIsSupportErc721Enumeration(ercDetectService.isSupportErc721Enumerable(contractAddress, blockNumber));
-                token.setIsSupportErc721Metadata(ercDetectService.isSupportErc721Metadata(contractAddress, blockNumber));
+                token.setIsSupportErc721Enumeration(contractInfo.isSupportErc721Enumerable());
+                token.setIsSupportErc721Metadata(contractInfo.isSupportErc721Metadata());
                 token.setIsSupportErc1155(false);
                 token.setIsSupportErc1155Metadata(false);
                 // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
@@ -121,7 +120,7 @@ public class ErcTokenAnalyzer {
                 token.setIsSupportErc721Metadata(false);
                 //
                 token.setIsSupportErc1155(true);
-                token.setIsSupportErc1155Metadata(ercDetectService.isSupportErc1155Metadata(contractAddress, blockNumber));
+                token.setIsSupportErc1155Metadata(contractInfo.isSupportErc1155Metadata());
                 // 在com.platon.browser.analyzer.TransactionAnalyzer.analyze时，
                 // 会调用com.platon.browser.cache.NewAddressCache.addNewContractAddressToBlockCtx
                 // 把新地址类型加入NewAddressCache

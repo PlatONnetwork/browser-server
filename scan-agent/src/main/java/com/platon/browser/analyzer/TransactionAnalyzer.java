@@ -139,8 +139,8 @@ public class TransactionAnalyzer {
                 if (ercType !=null){
                     //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
                     //todo: ercContractCache /tokenCache要统一起来
-                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercType);
-                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
+                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercType, contract);
+                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId, contract);
                 }
 
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
