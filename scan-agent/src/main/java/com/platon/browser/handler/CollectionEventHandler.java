@@ -9,6 +9,7 @@ import com.platon.browser.bean.TxAnalyseResult;
 import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.NodeCache;
 import com.platon.browser.dao.custommapper.*;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.NodeMapper;
 import com.platon.browser.elasticsearch.dto.DelegationReward;
 import com.platon.browser.elasticsearch.dto.ErcTx;
@@ -87,6 +88,10 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
     @Resource
     private CustomToken1155HolderMapper customToken1155HolderMapper;
+
+    @Resource
+    private CustomTxTransferBakMapper customTxTransferBakMapper;
+
     /**
      * 重试次数
      */
@@ -184,7 +189,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             List<ErcTx> erc20List = new ArrayList<>();
             List<ErcTx> erc721List = new ArrayList<>();
             List<ErcTx> erc1155List = new ArrayList<>();
-            this.getErcTx(transactions, erc20List, erc721List, erc1155List);
+            List<TxTransferBak> embedTransferTxList = new ArrayList<>();
+            this.getErcTx(transactions, erc20List, erc721List, erc1155List,embedTransferTxList);
             if (CollUtil.isNotEmpty(transactions)) {
                 // 依赖于数据库的自增id
                 watch.start("入库TxBak");
@@ -205,6 +211,11 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             if (CollUtil.isNotEmpty(erc1155List)) {
                 watch.start("入库Tx1155Bak");
                 customTx1155BakMapper.batchInsert(erc1155List);
+                watch.stop();
+            }
+            if (CollUtil.isNotEmpty(embedTransferTxList)) {
+                watch.start("入库TxTransferBak");
+                customTxTransferBakMapper.batchInsert(embedTransferTxList);
                 watch.stop();
             }
             List<DelegationReward> delegationRewardList = txAnalyseResult.getDelegationRewardList();
@@ -307,7 +318,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
     }*/
 
 
-    private void getErcTx(List<com.platon.browser.elasticsearch.dto.Transaction> transactions, List<ErcTx> erc20List, List<ErcTx> erc721List, List<ErcTx>erc1155List){
+    private void getErcTx(List<com.platon.browser.elasticsearch.dto.Transaction> transactions, List<ErcTx> erc20List, List<ErcTx> erc721List, List<ErcTx>erc1155List, List<TxTransferBak> embedTransferTxList){
         transactions.forEach(transaction -> {
             if (CollUtil.isNotEmpty(transaction.getErc20TxList())) {
                 erc20List.addAll(transaction.getErc20TxList());
@@ -317,6 +328,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             }
             if (CollUtil.isNotEmpty(transaction.getErc1155TxList())) {
                 erc1155List.addAll(transaction.getErc1155TxList());
+            }
+            if (CollUtil.isNotEmpty(transaction.getTransferTxList())) {
+                embedTransferTxList.addAll(transaction.getTransferTxList());
             }
         });
     }

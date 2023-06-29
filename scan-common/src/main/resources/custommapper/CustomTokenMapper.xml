@@ -189,4 +189,8 @@
         on t1.address = t2.token_address
         set t1.holder = t2.count
     </update>
+
+    <update id="updateProxyToken">
+        update token set address = #{proxy.address}, name = #{impl.tokenName}, symbol = #{impl.tokenSymbol}, total_supply = #{impl.tokenTotalSupply}, decimal = #{impl.tokenDecimals} where address = #{impl.address}
+    </update>
 </mapper>

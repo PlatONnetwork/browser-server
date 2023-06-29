@@ -31,13 +31,5 @@ public class ErcContractId {
     /**
      * 供应总量
      */
-    private String totalSupply;
-
-    private Boolean isSupportErc20;
-    private Boolean isSupportErc165;
-    private Boolean isSupportErc721;
-    private Boolean isSupportErc721Metadata;
-    private Boolean isSupportErc721Enumeration;
-    private Boolean isSupportErc1155;
-    private Boolean isSupportErc1155Metadata;
+    private BigDecimal totalSupply;
 }

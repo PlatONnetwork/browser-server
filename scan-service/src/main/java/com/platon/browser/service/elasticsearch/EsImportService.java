@@ -3,7 +3,10 @@ package com.platon.browser.service.elasticsearch;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.platon.browser.dao.entity.TxTransferBak;
-import com.platon.browser.elasticsearch.dto.*;
+import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.elasticsearch.dto.DelegationReward;
+import com.platon.browser.elasticsearch.dto.ErcTx;
+import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -214,7 +217,7 @@ public class EsImportService {
             } else if (eSKeyEnum.compareTo(ESKeyEnum.Erc1155Tx) == 0) {
                 log.info("ES批量入库成功统计:erc1155交易数[{}]", data.size());
             } else if (eSKeyEnum.compareTo(ESKeyEnum.TransferTx) == 0) {
-                log.info("ES批量入库成功统计:transferTx交易数[{}]", data.size());
+                log.info("ES批量入库成功统计:embedTransferTx交易数[{}]", data.size());
             }
         } catch (Exception e) {
             log.error("ES批量入库成功统计打印异常", e);

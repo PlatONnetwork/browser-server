@@ -277,6 +277,25 @@ public class ErcDetectService {
         return contractId;
     }
 
+    public ErcContractId getErcContractId(String contractAddress, BigInteger blockNumber, ErcTypeEnum ercType) throws PlatonCallTimeoutException {
+        ErcContract ercContract = null;
+        switch (ercType) {
+            case ERC20:
+                ercContract = Erc20Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+                break;
+            case ERC721:
+                ercContract = Erc721Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+                break;
+            case ERC1155:
+                ercContract = Erc1155Contract.load(contractAddress, platOnClient.getWeb3jWrapper().getWeb3j(), ErcDetectService.CREDENTIALS, ErcDetectService.GAS_PROVIDER, blockNumber);
+                break;
+        }
+        ErcContractId contractId = resolveContractId(ercContract);
+        contractId.setTypeEnum(ercType);
+        ercContractCache.put(contractAddress, ercContract);
+
+        return null;
+    }
 
     public ErcContractId getErcContractId(String contractAddress, BigInteger blockNumber, String binHexNo0x) throws PlatonCallTimeoutException {
         if (isSupportErc721(contractAddress, blockNumber)) {

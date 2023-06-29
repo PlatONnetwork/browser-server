@@ -8,7 +8,6 @@ import com.platon.browser.bean.DelegationStaking;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.dao.custommapper.CustomDelegationMapper;
 import com.platon.browser.dao.custommapper.CustomNodeMapper;
-import com.platon.browser.dao.custommapper.CustomStakingMapper;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.entity.Node;
@@ -44,8 +43,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class StakeEpochServiceTest extends ApiTestMockBase {
 
-    @Mock
-    private CustomStakingMapper customStakingMapper;
 
     @Mock
     private CustomDelegationMapper customDelegationMapper;
@@ -68,7 +65,6 @@ public class StakeEpochServiceTest extends ApiTestMockBase {
     @Before
     public void setup() {
         ReflectionTestUtils.setField(this.target, "statisticCacheService", this.statisticCacheService);
-        ReflectionTestUtils.setField(this.target, "customStakingMapper", this.customStakingMapper);
         ReflectionTestUtils.setField(this.target, "customDelegationMapper", this.customDelegationMapper);
         ReflectionTestUtils.setField(this.target, "nodeMapper", this.nodeMapper);
         ReflectionTestUtils.setField(this.target, "ESNodeOptRepository", this.ESNodeOptRepository);

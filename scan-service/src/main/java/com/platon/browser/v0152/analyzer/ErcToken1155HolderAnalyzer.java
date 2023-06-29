@@ -49,7 +49,7 @@ public class ErcToken1155HolderAnalyzer {
                 toHolder.setTokenId(tx.getTokenId());
                 toHolder.setIncrement(new BigDecimal(tx.getValue())); //变动量
                 changeBalanceList.add(toHolder);
-            }if (StringUtils.isBlank(tx.getTo()) || AddressUtil.isAddrZero(tx.getTo())) { //销毁
+            }else if (StringUtils.isBlank(tx.getTo()) || AddressUtil.isAddrZero(tx.getTo())) { //销毁
                 Token1155Holder fromHolder = new Token1155Holder();
                 fromHolder.setTokenAddress(tx.getContract());
                 fromHolder.setAddress(tx.getFrom());

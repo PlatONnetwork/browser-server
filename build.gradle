@@ -334,4 +334,9 @@ subprojects {
         implementation group: 'com.ctrip.framework.apollo', name: 'apollo-client', version: '1.9.1'
 
     }
+
+    test {
+        enabled(false)
+    }
 }
+

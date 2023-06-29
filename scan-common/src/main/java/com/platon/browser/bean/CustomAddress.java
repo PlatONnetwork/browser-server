@@ -49,6 +49,12 @@ public class CustomAddress extends Address {
         address.setHaveReward(BigDecimal.ZERO);
         return address;
     }
+
+
+    public static CustomAddress createDefaultAccountAddress(String addr){
+        CustomAddress address = initDefaultAccountAddress(addr);
+        return address;
+    }
     public static CustomAddress createNewAccountAddress(String addr){
         CustomAddress address = initDefaultAccountAddress(addr);
         address.setOption(Option.NEW);

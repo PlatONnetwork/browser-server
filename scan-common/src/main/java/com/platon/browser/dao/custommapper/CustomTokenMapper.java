@@ -1,10 +1,7 @@
 package com.platon.browser.dao.custommapper;
 
 import com.github.pagehelper.Page;
-import com.platon.browser.bean.CustomToken;
-import com.platon.browser.bean.CustomTokenDetail;
-import com.platon.browser.bean.DestroyContract;
-import com.platon.browser.bean.TokenQty;
+import com.platon.browser.bean.*;
 import com.platon.browser.dao.entity.Token;
 import org.apache.ibatis.annotations.Param;
 
@@ -56,4 +53,6 @@ public interface CustomTokenMapper {
      * @return
      */
     List<Token> listNotDestroyedToUpdateTotalSupply(@Param("offset") int offset, @Param("pageSize") int pageSize);
+
+    void updateProxyToken(@Param("offset")ContractInfo proxy, @Param("impl")ContractInfo impl);
 }

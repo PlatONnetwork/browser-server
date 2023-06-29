@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.ContractInfo;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
@@ -135,6 +136,15 @@ public class ErcTokenAnalyzer {
         newAddressCache.addTokenCache(token.getAddress(), token);
         log.debug("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
         return token;
+    }
+
+    public void updateProxyToken(ContractInfo proxy , ContractInfo impl) {
+
+        //原来impl已经在tokenCache中，要把key替换成proxy的，并更新name/symbol等
+        //首先更新缓存，再更新db
+        newAddressCache.updateProxyTokenCache(proxy, impl);
+
+        customTokenMapper.updateProxyToken(proxy, impl);
     }
 
     /**

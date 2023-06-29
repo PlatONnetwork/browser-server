@@ -70,11 +70,6 @@ public class StompPushTaskTest {
 	}
 
 	@Test
-	public void test_Eswarm() {
-		stompPushTask.eswarm();
-	}
-
-	@Test
 	public void test_UpdateConfig() {
 		stompPushTask.updateConfig();
 	}

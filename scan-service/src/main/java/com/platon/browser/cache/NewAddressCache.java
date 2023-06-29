@@ -1,6 +1,7 @@
 package com.platon.browser.cache;
 
 import cn.hutool.json.JSONUtil;
+import com.platon.browser.bean.ContractInfo;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
@@ -81,6 +82,23 @@ public class NewAddressCache {
         this.addAddressTypeCache(address.getAddress(), AddressTypeEnum.getEnum(address.getType()));
         blockRelatedAddressCache.put(address.getAddress(), address);
     }
+
+    /**
+     *
+     * @param modifiedAddress
+     */
+    public void modifyAddressTypeToBlockCtx(CustomAddress modifiedAddress){
+        AddressTypeEnum proxyAddressTypeEnum = this.getAddressType(modifiedAddress.getAddress());
+        if (proxyAddressTypeEnum!=null && proxyAddressTypeEnum != AddressTypeEnum.getEnum(modifiedAddress.getType())){
+            modifiedAddress.setOption(CustomAddress.Option.RESET_TYPE);
+
+            //更新地址类型
+            this.addAddressTypeCache(modifiedAddress.getAddress(), AddressTypeEnum.getEnum(modifiedAddress.getType()));
+            blockRelatedAddressCache.put(modifiedAddress.getAddress(), modifiedAddress);
+        }
+
+    }
+
     public void addSuicidedAddressToBlockCtx(String address){
         CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(address);
         relatedAddress.setOption(CustomAddress.Option.SUICIDED);
@@ -268,5 +286,29 @@ public class NewAddressCache {
                 return token;
             }
         }
+    }
+
+    /**
+     * 因为此处会持续从db加载缓存，所以更新代理合约时，要先更新缓存，再更新db
+     * @param proxy
+     * @param impl
+     */
+    public void updateProxyTokenCache(ContractInfo proxy, ContractInfo impl) {
+        //用getToken，会持续加载到缓存
+        Token tobeResetToken = getToken(impl.getAddress());
+        if(tobeResetToken == null){
+            throw new RuntimeException("cannot find the implementation contract");
+        }
+
+        //删除旧缓存
+        AllTokenCache.remove(tobeResetToken.getAddress());
+
+        //增加代理token到缓存
+        tobeResetToken.setAddress(proxy.getAddress());
+        tobeResetToken.setName(impl.getTokenName());
+        tobeResetToken.setSymbol(impl.getTokenSymbol());
+        tobeResetToken.setDecimal(impl.getTokenDecimals());
+        tobeResetToken.setTotalSupply(impl.getTokenTotalSupply().toPlainString());
+        AllTokenCache.put(tobeResetToken.getAddress(), tobeResetToken);
     }
 }

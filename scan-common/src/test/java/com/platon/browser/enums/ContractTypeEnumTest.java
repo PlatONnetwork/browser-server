@@ -1,8 +1,8 @@
 package com.platon.browser.enums;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class ContractTypeEnumTest {
 
@@ -15,8 +15,6 @@ public class ContractTypeEnumTest {
 		enumm = ContractTypeEnum.INNER;
 		assertNotNull(enumm);
 		enumm = ContractTypeEnum.WASM;
-		assertNotNull(enumm);
-		enumm = ContractTypeEnum.UNKNOWN;
 		assertNotNull(enumm);
 	}
 

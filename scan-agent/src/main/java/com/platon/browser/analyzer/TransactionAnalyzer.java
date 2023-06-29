@@ -9,12 +9,13 @@ import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
 import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
+import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
-import com.platon.browser.decoder.TxInputDecodeUtil;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractTypeEnum;
+import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.param.DelegateExitParam;
 import com.platon.browser.param.DelegateRewardClaimParam;
@@ -122,36 +123,26 @@ public class TransactionAnalyzer {
         //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
         //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
         //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
-        if (CollUtil.isNotEmpty(receipt.getContractCreated())) {
-            log.debug("新建合约的交易回执：{}", JSON.toJSONString(receipt));
+        if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getContractCreated()) ) {
+            log.debug("交易回执中的新建合约：{}", JSON.toJSONString(receipt.getContractCreated()));
 
             for(ContractInfo contract : receipt.getContractCreated()){
                 //合约是新建的，因此获取binCode
-                watch.start("获取新建合约的binCode");
+
                 // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
-                String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
-                watch.stop();
-                ContractTypeEnum contractType;
-                if(StringUtils.isBlank(binCode) || binCode.equalsIgnoreCase("0x")){
-                    contractType = ContractTypeEnum.EVM;
-                    log.warn("发现bin为空的新合约地址，默认为普通EVM合约:{}", contract.getAddress());
-                }else{
-                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), binCode);
-                    if (ercContractId != null){
-                        contractType = ercContractId.getTypeEnum().convertToContractType();
-                        //解析token
-                        // solidity 类型 erc20 或 721 token检测及入口
-                        watch.start("解析新建合约的具体类型");
-                        Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
-                        watch.stop();
-                    }else{
-                        if (TxInputDecodeUtil.isWASM(dtoTransaction.getInput())){
-                            contractType = ContractTypeEnum.WASM;
-                        }else{
-                            contractType = ContractTypeEnum.EVM;
-                        }
-                    }
+                //String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
+                String binCode = contract.getBin();
+                ContractTypeEnum contractType = ContractTypeEnum.getEnum(contract.getContractType());
+
+                ErcTypeEnum ercType =  contractType.convertToErcType();
+
+                if (ercType !=null){
+                    //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
+                    //todo: ercContractCache /tokenCache要统一起来
+                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercType);
+                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId);
                 }
+
                 CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
                 //设置地址类型
                 relatedAddress.setType(contractType.convertToAddressType().getCode());
@@ -162,19 +153,76 @@ public class TransactionAnalyzer {
                 relatedAddress.setContractCreatehash(dtoTransaction.getHash());
 
                 //把新建的合约地址保存在当前block的上下文中
-                ////todo: 2023/05/04 lvxiaoyi 这个地址有可能是存在的（参考create2地址算法）
+                // todo: 2023/05/04 lvxiaoyi 这个地址有可能是存在的（参考create2地址算法）
                 newAddressCache.addPossibleNewContractAddressToBlockCtx(relatedAddress);
+
+
             }
         }
 
         // 销毁合约处理
-        if (CollUtil.isNotEmpty(receipt.getContractSuicided())) {
-            log.info("销毁合约的交易回执：{}", JSON.toJSONString(receipt));
+        if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getContractSuicided())) {
+            log.info("交易回执的销毁合约：{}", JSON.toJSONString(receipt.getContractSuicided()));
             for(ContractInfo contract : receipt.getContractSuicided()){
                 newAddressCache.addSuicidedAddressToBlockCtx(contract.getAddress());
             }
         }
 
+        // 合约内部转账记录
+        // 都是指LAT的转账：1.调用合约时，带有VALUE值；2.合约内部向其它地址转账；3.合约销毁时的转账
+        // 原始交易成功，非常规转账才会成功;
+        if(receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
+            List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
+            embedTransferTxList.stream().forEach(embedTransferTx ->{
+                newAddressCache.addPendingAddressToBlockCtx(embedTransferTx.getFrom());
+                newAddressCache.addPendingAddressToBlockCtx(embedTransferTx.getTo());
+            });
+            dtoTransaction.setTransferTxList(embedTransferTxList);
+            dtoTransaction.setTransferTxInfo(JSON.toJSONString(embedTransferTxList));
+        }
+
+
+        // 识别到的合约代理调用
+        if (CollUtil.isNotEmpty(receipt.getProxyPatterns())) {
+            log.info("交易回执的合约代理：{}", JSON.toJSONString(receipt.getProxyPatterns()));
+            for(ProxyPattern proxyPattern : receipt.getProxyPatterns()){
+                // 发现代理模式之前：
+                // proxy 在 address 表中type = evm，在 token 表中不存在（因为之前只是个evm合约，不是token合约）
+                // impl 在 address 表中type = erc20 / erc721 / erc1155，在 token 表中存在并和普通token合约类似
+
+                // 发现代理关系之后，需要做的改变：
+                // proxy 在 address 表中type改成impl的type
+                // impl 在 address 表中type改成evm，token表中的impl地址，改成proxy地址（顺便更新impl的中包含的name/symbol/decimals/totalSupply）
+
+                ContractInfo proxyContract = proxyPattern.getProxy();
+                ContractTypeEnum proxyContractType = ContractTypeEnum.getEnum(proxyContract.getContractType());
+
+                ContractInfo implContract = proxyPattern.getImplementation();
+                ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
+
+                CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress());
+                //设置地址类型
+                proxyAddress.setType(implContractType.convertToAddressType().getCode());
+                proxyAddress.setContractType(implContractType);
+                newAddressCache.modifyAddressTypeToBlockCtx(proxyAddress);
+
+                CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress());
+                //设置地址类型
+                implAddress.setType(proxyContractType.convertToAddressType().getCode());
+                implAddress.setContractType(proxyContractType);
+                newAddressCache.modifyAddressTypeToBlockCtx(implAddress);
+                // 更新token表
+                // address 表有专门的地址类型修改批量更新：
+                // 参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer.analyze
+                ercTokenAnalyzer.updateProxyToken(proxyContract, implContract);
+            }
+        }
+
+        // 识别到的合约代理调用
+        if (CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
+            log.info("交易回执的隐式PPOS交易：{}", JSON.toJSONString(receipt.getImplicitPPOSTxs()));
+            //todo:
+        }
 
         ComplementInfo ci = new ComplementInfo();
         // 处理交易信息
@@ -406,6 +454,28 @@ public class TransactionAnalyzer {
                 log.error("找不到该代理合约地址{}", "lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
             }
         }
+    }
+
+    private List<TxTransferBak> resolveEmbedTransferTx(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, Receipt receipt) {
+        List<TxTransferBak> transferBakList = new ArrayList<>();
+        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfers()) {
+            if(embedTransfer.getAmount() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
+                log.warn("当前交易[{}]的合约内部转账记录不全, embedTransfer = [{}]", tx.getHash(), embedTransfer);
+                continue;
+            }
+            TxTransferBak transferBak =  new TxTransferBak();
+            transferBak.setSeq(collectionBlock.getSeq().incrementAndGet());
+            transferBak.setFrom(embedTransfer.getFrom());
+            transferBak.setFromType(newAddressCache.getAddressType(embedTransfer.getFrom()).getCode());
+            transferBak.setTo(embedTransfer.getTo());
+            transferBak.setToType(newAddressCache.getAddressType(embedTransfer.getTo()).getCode());
+            transferBak.setValue(embedTransfer.getAmount().toBigInteger().toString());
+            transferBak.setHash(tx.getHash());
+            transferBak.setBn(collectionBlock.getNum());
+            transferBak.setbTime(tx.getTime());
+            transferBakList.add(transferBak);
+        }
+        return transferBakList;
     }
 
 }
