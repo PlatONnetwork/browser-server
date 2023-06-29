@@ -124,7 +124,7 @@ public class TransactionAnalyzer {
         //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
         //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
         if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getContractCreated()) ) {
-            log.debug("/：{}", JSON.toJSONString(receipt.getContractCreated()));
+            log.info("交易回执中的新建合约：{}", JSON.toJSONString(receipt.getContractCreated()));
 
             for(ContractInfo contract : receipt.getContractCreated()){
                 //合约是新建的，因此获取binCode
@@ -172,6 +172,7 @@ public class TransactionAnalyzer {
         // 都是指LAT的转账：1.调用合约时，带有VALUE值；2.合约内部向其它地址转账；3.合约销毁时的转账
         // 原始交易成功，非常规转账才会成功;
         if(receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
+            log.info("交易回执的非常规转账：{}", JSON.toJSONString(receipt.getEmbedTransfers()));
             List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
             embedTransferTxList.stream().forEach(embedTransferTx ->{
                 newAddressCache.addPendingAddressToBlockCtx(embedTransferTx.getFrom());
