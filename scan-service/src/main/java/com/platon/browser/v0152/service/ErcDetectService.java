@@ -220,31 +220,29 @@ public class ErcDetectService {
     }*/
     private ErcContractId resolveContractId(ErcContract ercContract, ContractInfo contractInfo) {
         ErcContractId contractId = new ErcContractId();
-        if (ercContract instanceof Erc20Contract) {
-            try {
-                contractId.setName(ercContract.name().send());
-                contractId.setSymbol(ercContract.symbol().send());
-                contractId.setDecimal(ercContract.decimals().send().intValue());
-                contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
-            }catch (Exception e){
-                log.warn("获取ERC20基本属性出错", e);
-            }
-
-        }else if (ercContract instanceof Erc721Contract ) {
-            try{
-                if (contractInfo.isSupportErc721Metadata()){
-                    contractId.setName(ercContract.name().send());
-                    contractId.setSymbol(ercContract.symbol().send());
-                }
-                if(contractInfo.isSupportErc721Enumerable()){
-                    contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
-                }
-            }catch (Exception e){
-                log.warn("获取ERC721基本属性出错", e);
-            }
-        }else if (ercContract instanceof Erc1155Contract ) {
-            //do nothing
+        //只要是erc token，都尝试获取以下基本属性，是为了兼容早期非标准的erc token
+        try {
+            contractId.setName(ercContract.name().send());
+        } catch (Exception e) {
+            log.warn("获取ERC Token Name出错", e);
         }
+        try {
+            contractId.setSymbol(ercContract.symbol().send());
+        } catch (Exception e) {
+            log.warn("获取ERC Token Symbol出错", e);
+        }
+        try {
+            contractId.setDecimal(ercContract.decimals().send().intValue());
+
+        } catch (Exception e) {
+            log.warn("获取ERC Token Decimal出错", e);
+        }
+        try {
+            contractId.setTotalSupply(new BigDecimal(ercContract.totalSupply().send()));
+        }catch (Exception e){
+            log.warn("获取ERC Token TotalSupply出错", e);
+        }
+
         return contractId;
     }
 

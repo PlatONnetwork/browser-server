@@ -354,7 +354,7 @@ ALTER TABLE `tx_erc_20_bak`
 
 ALTER TABLE `tx_erc_721_bak`
     MODIFY COLUMN `seq`       bigint          NOT NULL COMMENT '序号ID',
-    MODIFY COLUMN `name`      varchar(64)     NOT NULL COMMENT '合约名称',
+    MODIFY COLUMN `name`      varchar(64)     DEFAULT NULL COMMENT '合约名称',
     MODIFY COLUMN `symbol`    varchar(64)     DEFAULT NULL COMMENT '单位',
     MODIFY COLUMN `decimal`   int(20)         DEFAULT NULL COMMENT '精度',
     MODIFY COLUMN `contract`  char(42)        NOT NULL COMMENT '合约地址',
