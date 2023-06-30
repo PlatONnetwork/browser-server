@@ -51,33 +51,19 @@ public class CustomAddress extends Address {
     }
 
 
-    public static CustomAddress createDefaultAccountAddress(String addr){
+    public static CustomAddress createDefaultAccountAddress(String addr, Option option){
         CustomAddress address = initDefaultAccountAddress(addr);
-        return address;
-    }
-    public static CustomAddress createNewAccountAddress(String addr){
-        CustomAddress address = initDefaultAccountAddress(addr);
-        address.setOption(Option.NEW);
+        address.setOption(option);
         return address;
     }
 
-    /**
-     * 对于db中已经存在的，也可以用此创建，一般和其它option配合使用
-     * @param addr
-     * @return
-     */
-    public static CustomAddress createPendingAccountAddress(String addr){
-        CustomAddress address = initDefaultAccountAddress(addr);
-        address.setOption(Option.PENDING);
-        return address;
-    }
 
     /*public enum Option {
         NEW, SUICIDED, REWARD_CLAIM, PENDING
     }*/
 
     public enum Option {
-        PENDING(0),
+        PENDING(0), //没什么用
         NEW(1),
         REWARD_CLAIM(2),
         SUICIDED(4),

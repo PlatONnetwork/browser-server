@@ -93,7 +93,7 @@ public class TransactionUtil {
 
             //2023/04/14 lvxiaoyi 如何用户合约发起内置合约调用时，是用其它私钥前面的话（按理不可能把私钥放到用户合约中）
             //这里可以设置下以防万一
-            newAddressCache.addPendingAddressToBlockCtx(invokeContractInput.getFrom());
+            newAddressCache.addCommonAddressToBlockCtx(invokeContractInput.getFrom());
 
             virtualTx.setFrom(invokeContractInput.getFrom());
             virtualTx.setTo(invokeContractInput.getTo());
@@ -299,6 +299,7 @@ public class TransactionUtil {
         //ci.setBinCode(binCode);
         //ci.setBinCode(TransactionUtil.getContractBinCode(result, platOnClient, result.getContractAddress()));
 
+        ci.setContractType(contractTypeEnum.getCode());
         if (contractTypeEnum == ContractTypeEnum.ERC20_EVM) {
             ci.setType(com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.ERC20_CONTRACT_CREATE.getCode());
             ci.setToType(com.platon.browser.elasticsearch.dto.Transaction.ToTypeEnum.ERC20_CONTRACT.getCode());

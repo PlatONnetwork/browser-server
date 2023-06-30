@@ -113,7 +113,7 @@ public class TransactionAnalyzer {
         //initGeneralContractCache();
 
         //首先把from加入相关地址列表（此时不知from是否是新地址，所以设置pending标志）
-        newAddressCache.addPendingAddressToBlockCtx(dtoTransaction.getFrom());
+        newAddressCache.addCommonAddressToBlockCtx(dtoTransaction.getFrom());
 
 
         // 新创建合约处理
@@ -143,7 +143,7 @@ public class TransactionAnalyzer {
                     Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId, contract);
                 }
 
-                CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(contract.getAddress());
+                CustomAddress relatedAddress = CustomAddress.createDefaultAccountAddress(contract.getAddress(), CustomAddress.Option.PENDING);
                 //设置地址类型
                 relatedAddress.setType(contractType.convertToAddressType().getCode());
                 //relatedAddress.setOption(CustomAddress.Option.NEW);
@@ -154,7 +154,7 @@ public class TransactionAnalyzer {
 
                 //把新建的合约地址保存在当前block的上下文中
                 // todo: 2023/05/04 lvxiaoyi 这个地址有可能是存在的（参考create2地址算法）
-                newAddressCache.addPossibleNewContractAddressToBlockCtx(relatedAddress);
+                newAddressCache.addCreatedContractAddressToBlockCtx(relatedAddress);
 
 
             }
@@ -175,8 +175,8 @@ public class TransactionAnalyzer {
             log.info("交易回执的非常规转账：{}", JSON.toJSONString(receipt.getEmbedTransfers()));
             List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
             embedTransferTxList.stream().forEach(embedTransferTx ->{
-                newAddressCache.addPendingAddressToBlockCtx(embedTransferTx.getFrom());
-                newAddressCache.addPendingAddressToBlockCtx(embedTransferTx.getTo());
+                newAddressCache.addCommonAddressToBlockCtx(embedTransferTx.getFrom());
+                newAddressCache.addCommonAddressToBlockCtx(embedTransferTx.getTo());
             });
             dtoTransaction.setTransferTxList(embedTransferTxList);
             dtoTransaction.setTransferTxInfo(JSON.toJSONString(embedTransferTxList));
@@ -201,17 +201,17 @@ public class TransactionAnalyzer {
                 ContractInfo implContract = proxyPattern.getImplementation();
                 ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
 
-                CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress());
+                CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress(), null);
                 //设置地址类型
                 proxyAddress.setType(implContractType.convertToAddressType().getCode());
                 proxyAddress.setContractType(implContractType);
-                newAddressCache.modifyAddressTypeToBlockCtx(proxyAddress);
+                newAddressCache.addModifiedAddressTypeToBlockCtx(proxyAddress);
 
-                CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress());
+                CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress(), null);
                 //设置地址类型
                 implAddress.setType(proxyContractType.convertToAddressType().getCode());
                 implAddress.setContractType(proxyContractType);
-                newAddressCache.modifyAddressTypeToBlockCtx(implAddress);
+                newAddressCache.addModifiedAddressTypeToBlockCtx(implAddress);
                 // 更新token表
                 // address 表有专门的地址类型修改批量更新：
                 // 参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer.analyze
@@ -248,15 +248,16 @@ public class TransactionAnalyzer {
                         platOnClient,
                         ci,
                         contractType);
+
                 dtoTransaction.setTo(receipt.getContractAddress());
 
                 log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
                         dtoTransaction.getHash(),
                         dtoTransaction.getFrom(),
                         dtoTransaction.getTo(),
-                        dtoTransaction.getType(),
-                        dtoTransaction.getToType(),
-                        dtoTransaction.getContractType());
+                        ci.getType(),
+                        ci.getToType(),
+                        ci.getContractType());
             } else {
                 ContractTypeEnum contractType = newAddressCache.getContractType(dtoTransaction.getTo());
                 if (contractType != null && inputWithoutPrefix.length() >= 8) {
@@ -295,7 +296,7 @@ public class TransactionAnalyzer {
                 } else {
                     BigInteger value = StringUtils.isNotBlank(dtoTransaction.getValue()) ? new BigInteger(dtoTransaction.getValue()) : BigInteger.ZERO;
                     if (value.compareTo(BigInteger.ZERO) >= 0) {
-                        newAddressCache.addPendingAddressToBlockCtx(dtoTransaction.getTo());
+                        newAddressCache.addCommonAddressToBlockCtx(dtoTransaction.getTo());
 
                         // 如果输入为空且value大于0，则是普通转账
                         TransactionUtil.resolveGeneralTransferTxComplementInfo(dtoTransaction, ci, newAddressCache);

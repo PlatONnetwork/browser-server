@@ -1,6 +1,9 @@
 package com.platon.browser.cache;
 
 import cn.hutool.json.JSONUtil;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.platon.browser.bean.ContractInfo;
 import com.platon.browser.bean.CustomAddress;
 import com.platon.browser.dao.entity.Address;
@@ -10,9 +13,11 @@ import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractDescEnum;
 import com.platon.browser.enums.ContractTypeEnum;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,7 +43,19 @@ public class NewAddressCache {
     /**
      * 缓存范围：进程
      */
-    private Map<String, AddressTypeEnum> AllAddressTypeCache = new HashMap<>();
+    // private Map<String, AddressTypeEnum> AllAddressTypeCache = new HashMap<>();
+
+    private LoadingCache<String, AddressTypeEnum> AllAddressTypeCache = Caffeine.newBuilder().maximumSize(10000).build(new CacheLoader<String, AddressTypeEnum>() {
+        @Override
+        public @Nullable AddressTypeEnum load(@NonNull String address) {
+            Address addressEntity =  addressMapper.selectByPrimaryKey(address);
+            if (addressEntity==null){
+                return null;
+            }else{
+                return AddressTypeEnum.getEnum(addressEntity.getType());
+            }
+        }
+    });
 
     /**
      * 缓存范围：进程
@@ -53,9 +70,22 @@ public class NewAddressCache {
     /**
      * 缓存范围：区块
      * 2023/04/12 lvxiaoyi 区块中所有交易涉及的地址集合，区块中交易处理完毕后，需要根据此map的数据，新增或者更新address表。
-     * 实际上，我们并没有把区块涉及的所有地址都加入此缓存，只是把新发现的的、销毁的，或者有需要更新的地址才加入此缓存
+     * 实际上，我们并没有把区块涉及的所有地址都加入此缓存，只是把新建的合约、销毁的合约，或者有需要更新地址类型的，有领取奖励的地址才加入此缓存；其它情况的不需要加入。
+     * todo: 那么，转账from/to，怎么判断是否是新地址？
      */
     private Map<String, CustomAddress> blockRelatedAddressCache = new HashMap<>();
+
+
+
+    /**
+     * 缓存范围：进程
+     */
+    /*private Cache<String, Address> AllAddressCache = Caffeine.newBuilder().maximumSize(10000).build(new CacheLoader<String, Address>() {
+        @Override
+        public @Nullable Address load(@NonNull String s) {
+            return addressMapper.selectByPrimaryKey(s);
+        }
+    });*/
 
     public void clearBlockRelatedAddressCache(){
         blockRelatedAddressCache.clear();
@@ -65,17 +95,21 @@ public class NewAddressCache {
      * 这里加入的地址有可能以前就已经存在了，如果存在，则需要修原地址的类型，以及相关的缓存
      * @param address
      */
-    public void addPossibleNewContractAddressToBlockCtx(CustomAddress address){
+    public void addCreatedContractAddressToBlockCtx(CustomAddress address){
         AddressTypeEnum addressTypeEnum = this.getAddressType(address.getAddress());
-        if (addressTypeEnum!=null && addressTypeEnum != AddressTypeEnum.getEnum(address.getType())){
+        if (addressTypeEnum == null) { //地址在db中没有，是新地址
+            address.setOption(CustomAddress.Option.NEW);
+        }else if (addressTypeEnum != AddressTypeEnum.getEnum(address.getType())){
             // todo: 2023/05/04 lvxiaoyi
             //  在特殊节点中，会采集opCreate /opCreate2 操作码中的新建合约地址
             //  但是这两个操作码对scan的影响不同：
             //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
             //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
             //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
-            address.unsetOption(CustomAddress.Option.NEW);
             address.setOption(CustomAddress.Option.RESET_TYPE);
+        }else{
+            log.warn("Impossible duplicate contract address:{}", address.getAddress());
+            return;
         }
 
         //更新地址类型
@@ -87,7 +121,7 @@ public class NewAddressCache {
      *
      * @param modifiedAddress
      */
-    public void modifyAddressTypeToBlockCtx(CustomAddress modifiedAddress){
+    public void addModifiedAddressTypeToBlockCtx(CustomAddress modifiedAddress){
         AddressTypeEnum proxyAddressTypeEnum = this.getAddressType(modifiedAddress.getAddress());
         if (proxyAddressTypeEnum!=null && proxyAddressTypeEnum != AddressTypeEnum.getEnum(modifiedAddress.getType())){
             modifiedAddress.setOption(CustomAddress.Option.RESET_TYPE);
@@ -95,41 +129,50 @@ public class NewAddressCache {
             //更新地址类型
             this.addAddressTypeCache(modifiedAddress.getAddress(), AddressTypeEnum.getEnum(modifiedAddress.getType()));
             blockRelatedAddressCache.put(modifiedAddress.getAddress(), modifiedAddress);
+        }else{
+            log.warn("cannot find address: {} to modify type",  modifiedAddress.getAddress());
         }
-
     }
 
     public void addSuicidedAddressToBlockCtx(String address){
-        CustomAddress relatedAddress = CustomAddress.createNewAccountAddress(address);
+        CustomAddress relatedAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.SUICIDED);
         relatedAddress.setOption(CustomAddress.Option.SUICIDED);
         //把销毁的合约地址在当前block的上下文中
         //todo:考虑下：销毁的合约类型是否要加入缓存
         blockRelatedAddressCache.put(address, relatedAddress);
     }
 
-    public void addPendingAddressToBlockCtx(String address){
+
+    public void addCommonAddressToBlockCtx(String address){
         AddressTypeEnum addressTypeEnum = this.getAddressType(address);
         if (addressTypeEnum == null) { //地址在db中没有，是新地址
             this.addAddressTypeCache(address, AddressTypeEnum.ACCOUNT);
-            CustomAddress customAddress = CustomAddress.createNewAccountAddress(address);
-            customAddress.setOption(CustomAddress.Option.NEW);
+            CustomAddress customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.NEW);
             blockRelatedAddressCache.put(address, customAddress);
         }
+        // 1. 在address表，已经有此地址
+        // 2. 在之前，已经有加入过addressTypeCache。
+        // 2.1 如果是以前区块加入的，说明已经保存到address表
+        // 2.2 如果是本区块加入的，说明已经保存到blockRelatedAddressCache中，并设置了Option，这里无需重复操作
+        //那么在blockRelatedAddressCache，是否加入了过
+        /*CustomAddress customAddress = blockRelatedAddressCache.get(address);
+        if (customAddress == null) {
+            customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.PENDING);
+            blockRelatedAddressCache.put(address, customAddress);
+        }*/
     }
 
     public void addRewardClaimAddressToBlockCtx(String address, BigDecimal delegateReward){
         AddressTypeEnum addressTypeEnum = this.getAddressType(address);
         if (addressTypeEnum == null) { //地址在db中没有，是新地址
             this.addAddressTypeCache(address, AddressTypeEnum.ACCOUNT);
-            CustomAddress customAddress = CustomAddress.createNewAccountAddress(address);
-            customAddress.setHaveReward(delegateReward);
-            customAddress.setOption(CustomAddress.Option.NEW);
+            CustomAddress customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.NEW);
             blockRelatedAddressCache.put(address, customAddress);
         }
 
         CustomAddress customAddress = blockRelatedAddressCache.get(address);
         if (customAddress == null) {
-            customAddress = CustomAddress.createPendingAccountAddress(address);
+            customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.PENDING);
             blockRelatedAddressCache.put(address, customAddress);
         }
         customAddress.setHaveReward(delegateReward);
@@ -160,7 +203,8 @@ public class NewAddressCache {
      * @return
      */
     public AddressTypeEnum getAddressType(String address){
-        if(AllAddressTypeCache.containsKey(address)){ //内置地址已经初始到AddressTypeCache
+        return AllAddressTypeCache.get(address);
+        /*if(AllAddressTypeCache.containsKey(address)){ //内置地址已经初始到AddressTypeCache
             return AllAddressTypeCache.get(address);
         }else{
             //持续加载到缓存中
@@ -172,7 +216,7 @@ public class NewAddressCache {
                 AllAddressTypeCache.put(address, addressTypeEnum);
                 return addressTypeEnum;
             }
-        }
+        }*/
     }
 
 
@@ -194,7 +238,7 @@ public class NewAddressCache {
     public void initForBlock0() {
         List<Address> innerAddressList = new ArrayList<>();
         for (ContractDescEnum contractDescEnum : ContractDescEnum.values()) {
-            Address address = CustomAddress.createNewAccountAddress(contractDescEnum.getAddress());
+            CustomAddress address = CustomAddress.createDefaultAccountAddress(contractDescEnum.getAddress(),CustomAddress.Option.NEW);
             address.setType(AddressTypeEnum.INNER_CONTRACT.getCode());
             innerAddressList.add(address);
         }

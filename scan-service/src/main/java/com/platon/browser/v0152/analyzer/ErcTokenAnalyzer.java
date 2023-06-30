@@ -187,8 +187,8 @@ public class ErcTokenAnalyzer {
         List<ErcTx> txList = new ArrayList<>();
         eventList.forEach(event -> {
             //event.from/to地址可能是新地址
-            newAddressCache.addPendingAddressToBlockCtx(event.getFrom());
-            newAddressCache.addPendingAddressToBlockCtx(event.getTo());
+            newAddressCache.addCommonAddressToBlockCtx(event.getFrom());
+            newAddressCache.addCommonAddressToBlockCtx(event.getTo());
             log.debug("event.from:{} to:{}地址可能是新地址", event.getFrom(), event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
@@ -229,7 +229,7 @@ public class ErcTokenAnalyzer {
         List<ErcTx> txList = new ArrayList<>();
         eventList.forEach(event -> {
             //event.to地址可能是新地址
-            newAddressCache.addPendingAddressToBlockCtx(event.getTo());
+            newAddressCache.addCommonAddressToBlockCtx(event.getTo());
             log.info("event.to:{}地址可能是新地址", event.getTo());
             // 转换参数进行设置内部交易
             ErcTx ercTx = ErcTx.builder()
@@ -266,10 +266,10 @@ public class ErcTokenAnalyzer {
      */
     private void addAddressCache(String from, String to) {
         if (StrUtil.isNotBlank(from) && !AddressUtil.isAddrZero(from)) {
-            newAddressCache.addPendingAddressToBlockCtx(from);
+            newAddressCache.addCommonAddressToBlockCtx(from);
         }
         if (StrUtil.isNotBlank(to) && !AddressUtil.isAddrZero(to)) {
-            newAddressCache.addPendingAddressToBlockCtx(to);
+            newAddressCache.addCommonAddressToBlockCtx(to);
         }
     }
 
