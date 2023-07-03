@@ -29,7 +29,8 @@ ALTER TABLE `delegation`
     MODIFY COLUMN `delegate_hes`            decimal(32, 0)  NOT NULL DEFAULT 0 COMMENT '未锁定委托金额(von)',
     MODIFY COLUMN `delegate_locked`         decimal(32, 0)  NOT NULL DEFAULT 0 COMMENT '已锁定委托金额(von)',
     MODIFY COLUMN `delegate_released`       decimal(32, 0)  NOT NULL DEFAULT 0 COMMENT '待提取的金额(von)',
-    MODIFY COLUMN `is_history`              tinyint         NOT NULL DEFAULT 2 COMMENT '是否为历史:\r\n1是,\r\n2否';
+    MODIFY COLUMN `is_history`              tinyint         NOT NULL DEFAULT 2 COMMENT '是否为历史:\r\n1是,\r\n2否',
+    ADD INDEX ('is_history');
 
 ALTER TABLE `gas_estimate`
     COMMENT '委托用户未领取委托奖励持续的epoch数量',
@@ -307,7 +308,7 @@ ALTER TABLE `tx_bak`
     MODIFY COLUMN `from`             char(42)         DEFAULT NULL COMMENT 'from地址',
     MODIFY COLUMN `to`               char(42)         DEFAULT NULL COMMENT 'to地址',
     MODIFY COLUMN `value`            decimal(32, 0)   DEFAULT NULL COMMENT '转账金额',
-    MODIFY COLUMN `type`             SMALLINT         DEFAULT NULL COMMENT '交易类型',
+    MODIFY COLUMN `type`             SMALLINT         DEFAULT NULL COMMENT '交易类型(0转账,21合约销毁1EVM合约创建,2EVM合约调用,3WASM合约创建,4其他,5MPC交易,6ERC20创建,7ERC20调用,8ERC721创建,9ERC721调用,10ERC1155创建,11ERC1155调用,1000质押,1004委托...)',
     MODIFY COLUMN `cost`             decimal(32, 0)   DEFAULT NULL COMMENT '成本',
     MODIFY COLUMN `to_type`          SMALLINT         DEFAULT NULL COMMENT 'to地址类型(1EOA,2内置合约,3EVM合约,4WASM合约,5ERC20EVM合约,6ERC721EVM合约,7ERC1155EVM合约)',
     MODIFY COLUMN `seq`              bigint           DEFAULT NULL COMMENT 'seq=num*100000+index',

@@ -123,8 +123,8 @@ public class TransactionAnalyzer {
         //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
         //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
         //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
-        if (CollUtil.isNotEmpty(receipt.getContractCreated()) ) {
-            log.info("交易回执中的新建合约：{}", JSON.toJSONString(receipt.getContractCreated()));
+        if (CollUtil.isNotEmpty(receipt.getContractCreated()) ) { //合约发布交易没有成功的话，特殊节点不会采集此合约的地址
+            log.info("交易回执中的新建成功的合约：{}", JSON.toJSONString(receipt.getContractCreated()));
 
             for(ContractInfo contract : receipt.getContractCreated()){
                 //合约是新建的，因此获取binCode
@@ -239,12 +239,12 @@ public class TransactionAnalyzer {
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约。此时新合约地址、类型已经在前面的逻辑中加入相关地址缓存了
             if (StringUtils.isBlank(dtoTransaction.getTo())) {
-                ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
-                if (contractType == null) {
-                    contractType = ContractTypeEnum.EVM;
-                    /*log.error("can not find the contract type: {}", receipt.getContractAddress());
-                    throw new RuntimeException("can not find the contract type");*/
+
+                ContractTypeEnum contractType = ContractTypeEnum.EVM;
+                if (receipt.getStatus() == Receipt.SUCCESS){
+                    contractType = newAddressCache.getContractType(receipt.getContractAddress());
                 }
+
                 TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
                         receipt.getContractAddress(),
                         platOnClient,

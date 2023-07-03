@@ -81,8 +81,9 @@ CREATE TABLE `delegation`
     `create_time`              timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`              timestamp      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`delegate_addr`, `staking_block_num`, `node_id`),
+    KEY `staking_block_num` (`staking_block_num`) USING BTREE,
     KEY `node_id` (`node_id`) USING BTREE,
-    KEY `staking_block_num` (`staking_block_num`) USING BTREE
+    INDEX (`is_history`)
 );
 
 DROP TABLE IF EXISTS `gas_estimate`;
@@ -468,7 +469,7 @@ CREATE TABLE `tx_bak`
     `from`             char(42)         DEFAULT NULL COMMENT 'from地址',
     `to`               char(42)         DEFAULT NULL COMMENT 'to地址',
     `value`            decimal(32, 0)   DEFAULT NULL COMMENT '转账金额',
-    `type`             SMALLINT         DEFAULT NULL COMMENT '交易类型',
+    `type`             SMALLINT         DEFAULT NULL COMMENT '交易类型(0转账,21合约销毁1EVM合约创建,2EVM合约调用,3WASM合约创建,4其他,5MPC交易,6ERC20创建,7ERC20调用,8ERC721创建,9ERC721调用,10ERC1155创建,11ERC1155调用,1000质押,1004委托...)',
     `cost`             decimal(32, 0)   DEFAULT NULL COMMENT '成本',
     `to_type`          SMALLINT         DEFAULT NULL COMMENT 'to地址类型(1EOA,2内置合约,3EVM合约,4WASM合约,5ERC20EVM合约,6ERC721EVM合约,7ERC1155EVM合约)',
     `seq`              bigint           DEFAULT NULL COMMENT 'seq=num*100000+index',
