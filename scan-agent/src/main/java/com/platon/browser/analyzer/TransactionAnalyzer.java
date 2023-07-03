@@ -238,27 +238,29 @@ public class TransactionAnalyzer {
             log.debug("当前交易[{}]为内置合约,from[{}],to[{}],解码交易输入", dtoTransaction.getHash(), dtoTransaction.getFrom(), dtoTransaction.getTo());
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约。此时新合约地址、类型已经在前面的逻辑中加入相关地址缓存了
-            if (receipt.getStatus() == Receipt.SUCCESS && StringUtils.isBlank(dtoTransaction.getTo()) ) {
-                ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
-                if (contractType == null) {
-                    log.error("can not find the contract type: {}", receipt.getContractAddress());
-                    throw new RuntimeException("can not find the contract type");
+            if (StringUtils.isBlank(dtoTransaction.getTo())) {
+                if (receipt.getStatus() == Receipt.SUCCESS){
+                    ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
+                    if (contractType == null) {
+                        log.error("can not find the contract type: {}", receipt.getContractAddress());
+                        throw new RuntimeException("can not find the contract type");
+                    }
+                    TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
+                            receipt.getContractAddress(),
+                            platOnClient,
+                            ci,
+                            contractType);
+
+                    dtoTransaction.setTo(receipt.getContractAddress());
+
+                    log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
+                            dtoTransaction.getHash(),
+                            dtoTransaction.getFrom(),
+                            dtoTransaction.getTo(),
+                            ci.getType(),
+                            ci.getToType(),
+                            ci.getContractType());
                 }
-                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
-                        receipt.getContractAddress(),
-                        platOnClient,
-                        ci,
-                        contractType);
-
-                dtoTransaction.setTo(receipt.getContractAddress());
-
-                log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
-                        dtoTransaction.getHash(),
-                        dtoTransaction.getFrom(),
-                        dtoTransaction.getTo(),
-                        ci.getType(),
-                        ci.getToType(),
-                        ci.getContractType());
             } else {
                 ContractTypeEnum contractType = newAddressCache.getContractType(dtoTransaction.getTo());
                 if (contractType != null && inputWithoutPrefix.length() >= 8) {
