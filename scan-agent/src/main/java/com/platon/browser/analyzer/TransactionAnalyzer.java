@@ -219,8 +219,9 @@ public class TransactionAnalyzer {
             }
         }
 
-        // 识别到的合约代理调用
-        if (CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
+        // 识别到的隐式PPOS调用（用户合约内发起的调用）
+        if ( CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
+        //if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
             log.info("交易回执的隐式PPOS交易：{}", JSON.toJSONString(receipt.getImplicitPPOSTxs()));
             //todo:
         }
@@ -237,7 +238,7 @@ public class TransactionAnalyzer {
             log.debug("当前交易[{}]为内置合约,from[{}],to[{}],解码交易输入", dtoTransaction.getHash(), dtoTransaction.getFrom(), dtoTransaction.getTo());
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约。此时新合约地址、类型已经在前面的逻辑中加入相关地址缓存了
-            if (StringUtils.isBlank(dtoTransaction.getTo())) {
+            if (receipt.getStatus() == Receipt.SUCCESS && StringUtils.isBlank(dtoTransaction.getTo()) ) {
                 ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
                 if (contractType == null) {
                     log.error("can not find the contract type: {}", receipt.getContractAddress());
