@@ -219,7 +219,8 @@ ALTER TABLE `staking`
     MODIFY COLUMN `un_stake_end_block`           bigint           DEFAULT NULL COMMENT '解质押冻结的最后一个区块：理论结束块与投票结束块中的最大者',
     MODIFY COLUMN `zero_produce_freeze_duration` int              DEFAULT NULL COMMENT '零出块节点锁定结算周期数',
     MODIFY COLUMN `zero_produce_freeze_epoch`    int              DEFAULT NULL COMMENT '零出块锁定时所在结算周期',
-    MODIFY COLUMN `low_rate_slash_count`         int              NOT NULL DEFAULT 0 COMMENT '节点零出块次数';
+    MODIFY COLUMN `low_rate_slash_count`         int              NOT NULL DEFAULT 0 COMMENT '节点零出块次数',
+    ADD INDEX (`status`);
 
 ALTER TABLE `staking_history`
     MODIFY COLUMN `node_id`                   char(130)           NOT NULL COMMENT '质押节点地址',

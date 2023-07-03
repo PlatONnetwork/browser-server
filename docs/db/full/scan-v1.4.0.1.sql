@@ -358,7 +358,8 @@ CREATE TABLE `staking`
     `create_time`                  timestamp        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`                  timestamp        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`node_id`, `staking_block_num`),
-    KEY `staking_addr` (`staking_addr`) USING BTREE
+    KEY (`staking_addr`),
+    INDEX (`status`)
 );
 
 DROP TABLE IF EXISTS `staking_history`;

@@ -123,7 +123,7 @@ public class TransactionAnalyzer {
         //  opCreate操作码新建的合约地址，肯定是在scan没有出现过的
         //  而opCreate2操作码新建合约的地址，可能在之前，就给这个地址转账过，即scan上可能已有此地址。
         //  不过目前，特殊节点采集新建合约地址时，没有区分这两种情况，造成receipt.getContractCreated()返回的地址并不一定都是新地址
-        if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getContractCreated()) ) {
+        if (CollUtil.isNotEmpty(receipt.getContractCreated()) ) {
             log.info("交易回执中的新建合约：{}", JSON.toJSONString(receipt.getContractCreated()));
 
             for(ContractInfo contract : receipt.getContractCreated()){
@@ -161,7 +161,7 @@ public class TransactionAnalyzer {
         }
 
         // 销毁合约处理
-        if (receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getContractSuicided())) {
+        if (CollUtil.isNotEmpty(receipt.getContractSuicided())) {
             log.info("交易回执的销毁合约：{}", JSON.toJSONString(receipt.getContractSuicided()));
             for(ContractInfo contract : receipt.getContractSuicided()){
                 newAddressCache.addSuicidedAddressToBlockCtx(contract.getAddress());
@@ -171,7 +171,7 @@ public class TransactionAnalyzer {
         // 合约内部转账记录
         // 都是指LAT的转账：1.调用合约时，带有VALUE值；2.合约内部向其它地址转账；3.合约销毁时的转账
         // 原始交易成功，非常规转账才会成功;
-        if(receipt.getStatus() == Receipt.SUCCESS && CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
+        if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
             log.info("交易回执的非常规转账：{}", JSON.toJSONString(receipt.getEmbedTransfers()));
             List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
             embedTransferTxList.stream().forEach(embedTransferTx ->{
@@ -239,28 +239,27 @@ public class TransactionAnalyzer {
         } else {
             // to地址为空 或者 contractAddress有值时代表交易为创建合约。此时新合约地址、类型已经在前面的逻辑中加入相关地址缓存了
             if (StringUtils.isBlank(dtoTransaction.getTo())) {
-                if (receipt.getStatus() == Receipt.SUCCESS){
-                    ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
-                    if (contractType == null) {
-                        log.error("can not find the contract type: {}", receipt.getContractAddress());
-                        throw new RuntimeException("can not find the contract type");
-                    }
-                    TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
-                            receipt.getContractAddress(),
-                            platOnClient,
-                            ci,
-                            contractType);
-
-                    dtoTransaction.setTo(receipt.getContractAddress());
-
-                    log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
-                            dtoTransaction.getHash(),
-                            dtoTransaction.getFrom(),
-                            dtoTransaction.getTo(),
-                            ci.getType(),
-                            ci.getToType(),
-                            ci.getContractType());
+                ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
+                if (contractType == null) {
+                    log.error("can not find the contract type: {}", receipt.getContractAddress());
+                    throw new RuntimeException("can not find the contract type");
                 }
+                TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
+                        receipt.getContractAddress(),
+                        platOnClient,
+                        ci,
+                        contractType);
+
+                dtoTransaction.setTo(receipt.getContractAddress());
+
+                log.debug("当前交易[{}]为创建合约,from[{}],to[{}],type为[{}],toType[{}],contractType为[{}]",
+                        dtoTransaction.getHash(),
+                        dtoTransaction.getFrom(),
+                        dtoTransaction.getTo(),
+                        ci.getType(),
+                        ci.getToType(),
+                        ci.getContractType());
+
             } else {
                 ContractTypeEnum contractType = newAddressCache.getContractType(dtoTransaction.getTo());
                 if (contractType != null && inputWithoutPrefix.length() >= 8) {
