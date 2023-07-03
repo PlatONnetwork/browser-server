@@ -102,7 +102,7 @@ public class TransactionAnalyzer {
      * @date 2021/4/20
      */
     public com.platon.browser.elasticsearch.dto.Transaction analyze(Block collectionBlock, Transaction rawTransaction, Receipt receipt) throws Exception {
-        log.debug("开始分析区块交易，块高：{}", collectionBlock.getNum());
+        log.debug("开始分析区块交易，块高：{}, receipt:{}", collectionBlock.getNum(), JSON.toJSONString(receipt));
         StopWatch watch = new StopWatch("分析区块交易");
 
         com.platon.browser.elasticsearch.dto.Transaction  dtoTransaction = DtoTransactionUtil.newDtoTransaction();
