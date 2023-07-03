@@ -241,8 +241,9 @@ public class TransactionAnalyzer {
             if (StringUtils.isBlank(dtoTransaction.getTo())) {
                 ContractTypeEnum contractType = newAddressCache.getContractType(receipt.getContractAddress());
                 if (contractType == null) {
-                    log.error("can not find the contract type: {}", receipt.getContractAddress());
-                    throw new RuntimeException("can not find the contract type");
+                    contractType = ContractTypeEnum.EVM;
+                    /*log.error("can not find the contract type: {}", receipt.getContractAddress());
+                    throw new RuntimeException("can not find the contract type");*/
                 }
                 TransactionUtil.resolveGeneralContractCreateTxComplementInfo(dtoTransaction,
                         receipt.getContractAddress(),
