@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.platon.browser.dao.custommapper.CustomStakingHistoryMapper">
   <insert id="backupQuitedStaking">
-    /* 先备份 */
     INSERT INTO staking_history (
         node_id,
         staking_block_num,
@@ -94,7 +93,7 @@
         update_time
     FROM staking
     WHERE STATUS = 3;
-    /* 再删除 */
+
     DELETE FROM staking WHERE STATUS = 3;
   </insert>
 </mapper>
