@@ -6,6 +6,7 @@ import com.platon.browser.exception.CollectionBlockException;
 import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.methods.response.PlatonBlock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,7 @@ public class BlockRetryService {
      * @param currentBlockNumber
      * @throws
      */
-    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE)
+    @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 2000L, multiplier = 1.5))
     void checkBlockNumber(Long currentBlockNumber) throws IOException, CollectionBlockException {
         try {
             if (latestBlockNumber == null || currentBlockNumber > latestBlockNumber.longValue()) {
