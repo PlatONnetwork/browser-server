@@ -157,9 +157,8 @@
         t.create_time as createTime
         FROM
         token_holder th
-        LEFT JOIN token t ON th.token_address = t.address
-        LEFT JOIN token_inventory ti ON th.address = ti.`owner`
-        AND th.token_address = ti.token_address
+        JOIN token t ON th.token_address = t.address AND t.type = "erc721"
+        JOIN token_inventory ti ON th.address = ti.`owner` AND th.token_address = ti.token_address
         WHERE
         th.balance != '0'
         <if test="tokenAddress != null">
@@ -168,9 +167,8 @@
         <if test="address != null">
             and th.address = #{address}
         </if>
-        AND t.type = "erc721"
         ORDER BY
-        balance DESC
+        balance DESC, tokenId
     </select>
 
     <select id="getZeroBalanceTokenHolderList" resultType="com.platon.browser.dao.entity.TokenHolder">
