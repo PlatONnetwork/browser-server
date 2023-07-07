@@ -506,12 +506,13 @@ public class ErcTokenUpdateTask {
     /**
      * 更新token对应的持有人的数量
      * todo: 在涉及的表记录数量多时，这个统计效率并不高。最好的做法是在查看token的持有人数量时，再实时统计。就是说，这个数据没有必要持续统计并更新到表中。
+     * 2023/07/07 演练环境出现和scan-agent争用token_holder表的行锁的情况，虽然scan-agent可以retry，但是还是先改用触发器来更新token的持有人数量
      * @param
      * @return void
      * @date 2021/3/17
      */
 
-    @XxlJob("updateTokenHolderCountJobHandler")
+    /*@XxlJob("updateTokenHolderCountJobHandler")
     public void updateTokenHolderCount() {
         log.debug("开始执行:统计token的持有人数量任务");
 
@@ -524,5 +525,5 @@ public class ErcTokenUpdateTask {
         watch.stop();
         log.debug("结束执行:统计token的持有人数量任务，耗时统计:{}ms", watch.getLastTaskTimeMillis());
         XxlJobHelper.log("统计token的持有人数量完成");
-    }
+    }*/
 }
