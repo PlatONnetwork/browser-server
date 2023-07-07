@@ -1,19 +1,16 @@
 package com.platon.browser.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.platon.browser.bean.*;
 import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.client.SpecialApi;
-import com.platon.browser.dao.entity.Address;
 import com.platon.browser.dao.entity.Token;
 import com.platon.browser.dao.entity.TxTransferBak;
 import com.platon.browser.dao.mapper.AddressMapper;
 import com.platon.browser.dao.mapper.TokenMapper;
 import com.platon.browser.elasticsearch.dto.Block;
-import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
@@ -410,55 +407,9 @@ public class TransactionAnalyzer {
         collectionBlock.setTxFee(txFee);
         // 累加当前交易的能量限制到当前区块的txGasLimit
         collectionBlock.setTxGasLimit(collectionBlock.decimalTxGasLimit().add(dtoTransaction.decimalGasLimit()).toString());
-        proxyContract(dtoTransaction.getHash());
         watch.stop();
         log.debug("结束分析区块交易，块高：{}，耗时统计：{}", collectionBlock.getNum(), watch.prettyPrint());
         return dtoTransaction;
-    }
-
-    /**
-     * 针对特殊合约修改，仅对主网生效
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/2/9
-     */
-    private void proxyContract(String txHash) {
-        // 创建合约后的第一条交易，会设置合约的721属性
-        if ("0x908a9f487a1c9d39a17afe1a868705eec9b0ec899998eb7036412634388755ad".equalsIgnoreCase(txHash)) {
-            Address address = addressMapper.selectByPrimaryKey("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            if (ObjectUtil.isNotNull(address)) {
-                Address newAddress = new Address();
-                newAddress.setAddress(address.getAddress());
-                newAddress.setType(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
-                addressMapper.updateByPrimaryKeySelective(newAddress);
-                Token token = new Token();
-                token.setAddress("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-                token.setType("erc721");
-                token.setName("QPassport");
-                token.setSymbol("QPT");
-                token.setTotalSupply("0");
-                token.setDecimal(0);
-                token.setIsSupportErc165(true);
-                token.setIsSupportErc20(false);
-                token.setIsSupportErc721(true);
-                token.setIsSupportErc721Enumeration(true);
-                token.setIsSupportErc721Metadata(true);
-                token.setIsSupportErc1155(false);
-                token.setIsSupportErc1155Metadata(false);
-                token.setTokenTxQty(0);
-                token.setHolder(0);
-                token.setContractDestroyBlock(0L);
-                token.setContractDestroyUpdate(false);
-                tokenMapper.insertSelective(token);
-                // 重置此地址的合约类型缓存
-                newAddressCache.addAddressTypeCache("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6", AddressTypeEnum.ERC721_EVM_CONTRACT);
-                /*ercCache.init();
-                addressCache.getEvmContractAddressCache().remove("lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");*/
-            } else {
-                log.error("找不到该代理合约地址{}", "lat1w9ys9726hyhqk9yskffgly08xanpzdgqvp2sz6");
-            }
-        }
     }
 
     private List<TxTransferBak> resolveEmbedTransferTx(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, Receipt receipt) {
