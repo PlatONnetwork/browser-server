@@ -848,3 +848,68 @@ BEGIN
     where `address` = NEW.`from` OR address = NEW.`to`;
 END||
 DELIMITER ;
+
+
+-- token_holder记录增加后，修改token的持有人数量
+DROP TRIGGER IF EXISTS trigger_token_holder_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_token_holder_insert AFTER INSERT
+    ON token_holder FOR EACH ROW
+BEGIN
+    update `token`
+    set holder = holder + 1
+    where `address` = NEW.`token_address`;
+END||
+DELIMITER ;
+
+
+-- token_holder记录修改后，修改token的持有人数量
+DROP TRIGGER IF EXISTS trigger_token_holder_update;
+DELIMITER ||
+CREATE TRIGGER trigger_token_holder_update AFTER update
+    ON token_holder FOR EACH ROW
+BEGIN
+    IF NEW.balance = 0 THEN
+        update `token`
+        set holder = holder - 1
+        where `address` = NEW.`token_address`;
+    ELSEIF OLD.balance = 0 AND NEW.balance > 0 THEN
+        update `token`
+        set holder = holder + 1
+        where `address` = NEW.`token_address`;
+    END IF;
+
+END||
+DELIMITER ;
+
+
+-- token_1155_holder记录增加后，修改token的持有人数量
+DROP TRIGGER IF EXISTS trigger_token_1155_holder_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_token_1155_holder_insert AFTER INSERT
+    ON token_1155_holder FOR EACH ROW
+BEGIN
+    update `token`
+    set holder = holder + 1
+    where `address` = NEW.`token_address`;
+END||
+DELIMITER ;
+
+
+-- token_1155_holder记录修改后，修改token的持有人数量
+DROP TRIGGER IF EXISTS trigger_token_1155_holder_update;
+DELIMITER ||
+CREATE TRIGGER trigger_token_1155_holder_update AFTER update
+    ON token_1155_holder FOR EACH ROW
+BEGIN
+    IF NEW.balance = 0 THEN
+        update `token`
+        set holder = holder - 1
+        where `address` = NEW.`token_address`;
+    ELSEIF OLD.balance = 0 AND NEW.balance > 0 THEN
+        update `token`
+        set holder = holder + 1
+        where `address` = NEW.`token_address`;
+    END IF;
+END||
+DELIMITER ;
