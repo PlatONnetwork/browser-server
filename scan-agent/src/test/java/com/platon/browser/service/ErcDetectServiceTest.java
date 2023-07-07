@@ -1,6 +1,6 @@
 package com.platon.browser.service;
 
-import com.platon.AgentApplicationTest;
+import com.platon.browser.AgentApplication;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.DefaultBlockParameter;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@SpringBootTest(classes = { AgentApplicationTest.class })
+@SpringBootTest(classes = { AgentApplication.class })
 @ActiveProfiles("platon")
 public class ErcDetectServiceTest {
 

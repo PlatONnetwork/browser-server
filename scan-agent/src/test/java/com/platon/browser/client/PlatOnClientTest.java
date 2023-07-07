@@ -1,6 +1,6 @@
 package com.platon.browser.client;
 
-import com.platon.AgentApplicationTest;
+import com.platon.browser.AgentApplication;
 import com.platon.protocol.core.DefaultBlockParameter;
 import com.platon.protocol.core.methods.response.PlatonGetCode;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 @Slf4j
-@SpringBootTest(classes = { AgentApplicationTest.class })
+@SpringBootTest(classes = { AgentApplication.class })
 @ActiveProfiles("platon")
 public class PlatOnClientTest {
 

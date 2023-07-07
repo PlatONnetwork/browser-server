@@ -1,6 +1,6 @@
 package com.platon.browser.service.receipt;
 
-import com.platon.AgentApplicationTest;
+import com.platon.browser.AgentApplication;
 import com.platon.browser.bean.ReceiptResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
  */
 
 @Slf4j
-@SpringBootTest(classes = { AgentApplicationTest.class })
+@SpringBootTest(classes = { AgentApplication.class })
 @ActiveProfiles("platon")
 public class RetryServiceTest {
     @Resource

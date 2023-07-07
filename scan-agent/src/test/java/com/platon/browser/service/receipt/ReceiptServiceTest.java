@@ -1,6 +1,6 @@
 package com.platon.browser.service.receipt;
 
-import com.platon.AgentApplicationTest;
+import com.platon.browser.AgentApplication;
 import com.platon.browser.AgentTestBase;
 import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
  **/
 
 @Slf4j
-@SpringBootTest(classes = { AgentApplicationTest.class })
+@SpringBootTest(classes = { AgentApplication.class })
 @ActiveProfiles("platon")
 public class ReceiptServiceTest extends AgentTestBase {
 

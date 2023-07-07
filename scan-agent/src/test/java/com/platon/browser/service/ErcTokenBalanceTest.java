@@ -1,7 +1,7 @@
 package com.platon.browser.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.platon.AgentApplicationTest;
+import com.platon.browser.AgentApplication;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.ErcTypeEnum;
 import com.platon.browser.v0152.contract.Erc1155Contract;
@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 
 @Slf4j
-@SpringBootTest(classes = { AgentApplicationTest.class })
+@SpringBootTest(classes = { AgentApplication.class })
 @ActiveProfiles("platon")
 public class ErcTokenBalanceTest {
     @Resource
