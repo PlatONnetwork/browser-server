@@ -89,4 +89,8 @@ public class AppStatusUtil {
         }
     }
 
+
+    public static boolean isRunningJUnitTest(){
+        return JUnitTestUtils.IsRunningTest();
+    }
 }

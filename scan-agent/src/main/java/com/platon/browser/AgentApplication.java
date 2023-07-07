@@ -91,7 +91,10 @@ public class AgentApplication implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws Exception{
+        if (AppStatusUtil.isRunningJUnitTest()){
+            return;
+        }
         if (AppStatusUtil.isStopped()) {
             return;
         }
