@@ -242,7 +242,8 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             event.releaseRef();
             retryCount.set(0);
         } catch (Exception e) {
-            log.error(String.format("区块：%d 解析交易异常", event.getBlock().getNum()), e);
+            e.printStackTrace();
+            log.error("区块：{} 解析交易异常", event.getBlock().getNum());
             throw e;
         }
         /*
