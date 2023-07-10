@@ -198,7 +198,7 @@ public class CommonUtilTest {
 
     @Test
     public void testBit(){
-        CustomAddress address =  CustomAddress.createDefaultAccountAddress("abcd", null);
+        CustomAddress address =  CustomAddress.createDefaultAccountAddress("abcd", CustomAddress.Option.PENDING);
 
         address.setOption(CustomAddress.Option.NEW);
         address.setOption(CustomAddress.Option.REWARD_CLAIM);

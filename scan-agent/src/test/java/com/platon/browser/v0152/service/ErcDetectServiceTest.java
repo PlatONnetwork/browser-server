@@ -70,7 +70,7 @@ public class ErcDetectServiceTest extends AgentTestBase {
         //when(ercContract.name()).thenReturn(remoteCall);
         //when(remoteCall.send()).thenThrow(new PlatonCallTimeoutException(1, "超时", response));
         //ercDetectService.getContractId(contractAddress);
-        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.getErcContractId(contractAddress, new BigInteger("8748738"), ErcTypeEnum.ERC20, null));
+        Assertions.assertThrows(BusinessException.class, () -> ercDetectService.getErcContractId(contractAddress, new BigInteger("8748738"), ErcTypeEnum.ERC20));
     }
 
 }

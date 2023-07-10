@@ -123,14 +123,18 @@ public class NewAddressCache {
      */
     public void addModifiedAddressTypeToBlockCtx(CustomAddress modifiedAddress){
         AddressTypeEnum proxyAddressTypeEnum = this.getAddressType(modifiedAddress.getAddress());
-        if (proxyAddressTypeEnum!=null && proxyAddressTypeEnum != AddressTypeEnum.getEnum(modifiedAddress.getType())){
+        if(proxyAddressTypeEnum ==null){
+            log.warn("cannot find address: {} type",  modifiedAddress.getAddress());
+            return;
+        }
+        if (proxyAddressTypeEnum != AddressTypeEnum.getEnum(modifiedAddress.getType())){
+            AddressTypeEnum newAddressType = AddressTypeEnum.getEnum(modifiedAddress.getType());
+            log.debug("address: {} type has changed from: {} to: {}", modifiedAddress.getAddress(), proxyAddressTypeEnum.getDesc(), newAddressType.getDesc());
             modifiedAddress.setOption(CustomAddress.Option.RESET_TYPE);
 
             //更新地址类型
-            this.addAddressTypeCache(modifiedAddress.getAddress(), AddressTypeEnum.getEnum(modifiedAddress.getType()));
+            this.addAddressTypeCache(modifiedAddress.getAddress(), newAddressType);
             blockRelatedAddressCache.put(modifiedAddress.getAddress(), modifiedAddress);
-        }else{
-            log.warn("cannot find address: {} to modify type",  modifiedAddress.getAddress());
         }
     }
 
@@ -204,7 +208,8 @@ public class NewAddressCache {
      */
     public AddressTypeEnum getAddressType(String address){
         return AllAddressTypeCache.get(address);
-        /*if(AllAddressTypeCache.containsKey(address)){ //内置地址已经初始到AddressTypeCache
+        // 有 com.github.benmanes.caffeine.cache.CacheLoader.load()来代替加载
+       /* if(AllAddressTypeCache.containsKey(address)){ //内置地址已经初始到AddressTypeCache
             return AllAddressTypeCache.get(address);
         }else{
             //持续加载到缓存中
@@ -339,20 +344,21 @@ public class NewAddressCache {
      */
     public void updateProxyTokenCache(ContractInfo proxy, ContractInfo impl) {
         //用getToken，会持续加载到缓存
-        Token tobeResetToken = getToken(impl.getAddress());
-        if(tobeResetToken == null){
+        Token implToken = getToken(impl.getAddress());
+        if(implToken == null){
+            log.warn("cannot find the implementation contract: {}, maybe it has been proxied", impl.getAddress() );
             throw new RuntimeException("cannot find the implementation contract");
         }
 
         //删除旧缓存
-        AllTokenCache.remove(tobeResetToken.getAddress());
+        AllTokenCache.remove(impl.getAddress());
 
         //增加代理token到缓存
-        tobeResetToken.setAddress(proxy.getAddress());
-        tobeResetToken.setName(impl.getTokenName());
-        tobeResetToken.setSymbol(impl.getTokenSymbol());
-        tobeResetToken.setDecimal(impl.getTokenDecimals());
-        tobeResetToken.setTotalSupply(impl.getTokenTotalSupply().toPlainString());
-        AllTokenCache.put(tobeResetToken.getAddress(), tobeResetToken);
+        implToken.setAddress(proxy.getAddress()); //直接改成代理合约地址，代理合约变成一个impl类型的token合约
+        implToken.setName(impl.getTokenName());
+        implToken.setSymbol(impl.getTokenSymbol());
+        implToken.setDecimal(impl.getTokenDecimals());
+        implToken.setTotalSupply(impl.getTokenTotalSupply().toPlainString());
+        AllTokenCache.put(proxy.getAddress(), implToken);
     }
 }

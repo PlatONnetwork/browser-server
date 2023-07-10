@@ -19,6 +19,7 @@ import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.utils.TransactionUtil;
 import com.platon.browser.v0152.analyzer.ErcTokenAnalyzer;
 import com.platon.browser.v0152.bean.ErcContractId;
+import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.methods.response.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -133,11 +134,18 @@ public class TransactionAnalyzer {
 
                 ErcTypeEnum ercType =  contractType.convertToErcType();
 
-                if (ercType !=null){
-                    //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
-                    //todo: ercContractCache /tokenCache要统一起来
-                    ErcContractId ercContractId = ercDetectService.getErcContractId(contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercType, contract);
-                    Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId, contract);
+
+
+                if (ercType != null){
+                    ErcContract ercContract = ercDetectService.getErcContract(ercType, contract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                    if (ercContract != null){
+                        ErcContractId ercContractId = ercDetectService.resolveContractId(ercContract);
+                        ercContractId.setTypeEnum(ercType);
+                        //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
+                        //todo: ercContractCache /tokenCache要统一起来
+                        Token token = ercTokenAnalyzer.resolveNewToken(contract.getAddress(),  BigInteger.valueOf(collectionBlock.getNum()), ercContractId, contract, false);
+                    }
+
                 }
 
                 CustomAddress relatedAddress = CustomAddress.createDefaultAccountAddress(contract.getAddress(), CustomAddress.Option.PENDING);
@@ -185,34 +193,59 @@ public class TransactionAnalyzer {
             log.info("交易回执的合约代理：{}", JSON.toJSONString(receipt.getProxyPatterns()));
             for(ProxyPattern proxyPattern : receipt.getProxyPatterns()){
                 // 发现代理模式之前：
-                // proxy 在 address 表中type = evm，在 token 表中不存在（因为之前只是个evm合约，不是token合约）
-                // impl 在 address 表中type = erc20 / erc721 / erc1155，在 token 表中存在并和普通token合约类似
+                // address 表中 proxy地址的type = evm, impl地址的type = erc20 / erc721 / erc1155
+                // token 表中, impl地址存在，而proxy地址不存在
 
                 // 发现代理关系之后，需要做的改变：
-                // proxy 在 address 表中type改成impl的type
-                // impl 在 address 表中type改成evm，token表中的impl地址，改成proxy地址（顺便更新impl的中包含的name/symbol/decimals/totalSupply）
+                // address 表中 proxy地址的type改成impl地址的type； impl地址的类型改成proxy的类型
+                // token 表中，把proxy地址新增进去，type/name/symbol/decimals/totalSupply 都是impl的属性值；把impl的地址删除
+                // 要注意，代理地址可以代理成另一个实现地址
 
                 ContractInfo proxyContract = proxyPattern.getProxy();
+                //特殊节点只是从bincode来分析得到合约类型，缺省就是EVM合约
                 ContractTypeEnum proxyContractType = ContractTypeEnum.getEnum(proxyContract.getContractType());
+                ErcTypeEnum proxyErcType = proxyContractType.convertToErcType();
 
                 ContractInfo implContract = proxyPattern.getImplementation();
                 ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
+                ErcTypeEnum implErcType = implContractType.convertToErcType();
+
+
+                //交换合约类型
+                proxyContract.setContractType(implContractType.getCode());
+                implContract.setContractType(proxyContractType.getCode());
+
 
                 CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress(), CustomAddress.Option.PENDING);
-                //设置地址类型
+                //交换proxy/impl的地址类型，合约类型
                 proxyAddress.setType(implContractType.convertToAddressType().getCode());
                 proxyAddress.setContractType(implContractType);
                 newAddressCache.addModifiedAddressTypeToBlockCtx(proxyAddress);
 
+
                 CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress(), CustomAddress.Option.PENDING);
-                //设置地址类型
+                //交换proxy/impl的地址类型，合约类型
                 implAddress.setType(proxyContractType.convertToAddressType().getCode());
                 implAddress.setContractType(proxyContractType);
                 newAddressCache.addModifiedAddressTypeToBlockCtx(implAddress);
+
+
+                //实现地址不再表示为一个token，从token表中删除
+                tokenMapper.deleteByPrimaryKey(implAddress.getAddress());
+
+                //proxy要当作一个新的token（有可能已经代理过其它实现地址，这次是代理另一个实现地址）
+                ErcContract proxyErcContract = ercDetectService.getErcContract(implErcType, proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcContractId ercContractId = ercDetectService.getErcContractIdFromContractInfo(implErcType, proxyContract);
+                //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
+                //todo: ercContractCache /tokenCache要统一起来
+
+
+                Token token = ercTokenAnalyzer.resolveNewToken(proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercContractId, proxyContract, true);
+
                 // 更新token表
                 // address 表有专门的地址类型修改批量更新：
                 // 参考：com.platon.browser.analyzer.statistic.StatisticsAddressAnalyzer.analyze
-                ercTokenAnalyzer.updateProxyToken(proxyContract, implContract);
+                //ercTokenAnalyzer.updateProxyToken(proxyContract, implContract);
             }
         }
 

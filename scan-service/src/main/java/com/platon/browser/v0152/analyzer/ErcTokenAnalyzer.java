@@ -71,7 +71,7 @@ public class ErcTokenAnalyzer {
      * @param blockNumber
      * @return 如果不是ERC标准，则返回null
      */
-    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId, ContractInfo contractInfo) {
+    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId, ContractInfo contractInfo, boolean isPorxy) {
         Token token = new Token();
         token.setAddress(contractAddress);
         token.setName(contractId.getName());
@@ -131,6 +131,10 @@ public class ErcTokenAnalyzer {
 
         // 检查token是否合法
         checkToken(token);
+        if(isPorxy){
+            //（有可能已经代理过其它实现地址，这次是代理另一个实现地址）
+            tokenMapper.deleteByPrimaryKey(token.getAddress());
+        }
         tokenMapper.insert(token);
         newAddressCache.addTokenCache(token.getAddress(), token);
         log.debug("创建合约成功，合约地址为[{}],合约类型为[{}]", token.getAddress(), token.getType());
@@ -138,6 +142,8 @@ public class ErcTokenAnalyzer {
     }
 
     public void updateProxyToken(ContractInfo proxy , ContractInfo impl) {
+        //2023/07/10，
+        // todo:在第一次识别代理模式成功后，考虑改变impl合约，或者改变代理合约的情况：
 
         //原来impl已经在tokenCache中，要把key替换成proxy的，并更新name/symbol等
         //首先更新缓存，再更新db
