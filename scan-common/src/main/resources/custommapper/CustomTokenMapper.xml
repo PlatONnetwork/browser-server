@@ -191,6 +191,6 @@
     </update>
 
     <update id="updateProxyToken">
-        update token set address = #{proxy.address}, name = #{impl.tokenName}, symbol = #{impl.tokenSymbol}, total_supply = #{impl.tokenTotalSupply}, decimal = #{impl.tokenDecimals} where address = #{impl.address}
+        update token set address = #{proxy.address}, name = #{impl.tokenName}, symbol = #{impl.tokenSymbol}, total_supply = #{impl.tokenTotalSupply}, `decimal` = #{impl.tokenDecimals} where address = #{impl.address}
     </update>
 </mapper>
