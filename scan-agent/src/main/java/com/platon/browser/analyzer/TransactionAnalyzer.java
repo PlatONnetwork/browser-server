@@ -198,13 +198,13 @@ public class TransactionAnalyzer {
                 ContractInfo implContract = proxyPattern.getImplementation();
                 ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
 
-                CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress(), null);
+                CustomAddress proxyAddress = CustomAddress.createDefaultAccountAddress(proxyContract.getAddress(), CustomAddress.Option.PENDING);
                 //设置地址类型
                 proxyAddress.setType(implContractType.convertToAddressType().getCode());
                 proxyAddress.setContractType(implContractType);
                 newAddressCache.addModifiedAddressTypeToBlockCtx(proxyAddress);
 
-                CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress(), null);
+                CustomAddress implAddress = CustomAddress.createDefaultAccountAddress(implContract.getAddress(), CustomAddress.Option.PENDING);
                 //设置地址类型
                 implAddress.setType(proxyContractType.convertToAddressType().getCode());
                 implAddress.setContractType(proxyContractType);
