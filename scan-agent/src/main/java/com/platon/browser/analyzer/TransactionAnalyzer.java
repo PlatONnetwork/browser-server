@@ -206,6 +206,7 @@ public class TransactionAnalyzer {
                 ContractTypeEnum proxyContractType = ContractTypeEnum.getEnum(proxyContract.getContractType());
                 ErcTypeEnum proxyErcType = proxyContractType.convertToErcType();
 
+                //implContract 包含着token.name, symbol, decimals, totalSupply等信息
                 ContractInfo implContract = proxyPattern.getImplementation();
                 ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
                 ErcTypeEnum implErcType = implContractType.convertToErcType();
@@ -233,14 +234,15 @@ public class TransactionAnalyzer {
                 //实现地址不再表示为一个token，从token表中删除
                 tokenMapper.deleteByPrimaryKey(implAddress.getAddress());
 
-                //proxy要当作一个新的token（有可能已经代理过其它实现地址，这次是代理另一个实现地址）
-                ErcContract proxyErcContract = ercDetectService.getErcContract(implErcType, proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
-                ErcContractId ercContractId = ercDetectService.getErcContractIdFromContractInfo(implErcType, proxyContract);
+                //proxy要当作一个新的token，token属性是impl的属性（特殊节点采集）（有可能已经代理过其它实现地址，这次是代理另一个实现地址）
+                ErcContract finalProxyErcContract = ercDetectService.getErcContract(implErcType, proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()));
+                ErcContractId finalProxyErcContractId = ercDetectService.getErcContractIdFromContractInfo(implErcType, implContract);
                 //是关注的erc token, 则去链上获取token的基本资料：name / symbol等，并增加到token表中，以及缓存中
                 //todo: ercContractCache /tokenCache要统一起来
 
 
-                Token token = ercTokenAnalyzer.resolveNewToken(proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), ercContractId, proxyContract, true);
+                //要把impl 当作 一个新的合约，但是合约地址是 proxy的地址
+                Token token = ercTokenAnalyzer.resolveNewToken(proxyContract.getAddress(), BigInteger.valueOf(collectionBlock.getNum()), finalProxyErcContractId, implContract, true);
 
                 // 更新token表
                 // address 表有专门的地址类型修改批量更新：
