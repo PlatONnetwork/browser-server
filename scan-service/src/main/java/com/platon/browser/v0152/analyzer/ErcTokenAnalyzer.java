@@ -71,7 +71,7 @@ public class ErcTokenAnalyzer {
      * @param blockNumber
      * @return 如果不是ERC标准，则返回null
      */
-    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId, ContractInfo contractInfo, boolean isPorxy) {
+    public Token resolveNewToken(String contractAddress, BigInteger blockNumber, ErcContractId contractId, ContractInfo contractInfo, boolean isProxy) {
         Token token = new Token();
         token.setAddress(contractAddress);
         token.setName(contractId.getName());
@@ -131,7 +131,7 @@ public class ErcTokenAnalyzer {
 
         // 检查token是否合法
         checkToken(token);
-        if(isPorxy){
+        if(isProxy){
             //（有可能已经代理过其它实现地址，这次是代理另一个实现地址）
             tokenMapper.deleteByPrimaryKey(token.getAddress());
         }
