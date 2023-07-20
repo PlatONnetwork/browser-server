@@ -1,9 +1,11 @@
 package com.platon.browser.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.platon.browser.AgentApplication;
 import com.platon.browser.client.PlatOnClient;
 import com.platon.browser.enums.ErcTypeEnum;
+import com.platon.browser.v0152.bean.ErcContractId;
 import com.platon.browser.v0152.contract.Erc1155Contract;
 import com.platon.browser.v0152.contract.Erc20Contract;
 import com.platon.browser.v0152.contract.Erc721Contract;
@@ -25,6 +27,8 @@ import java.math.BigInteger;
 public class ErcTokenBalanceTest {
     @Resource
     PlatOnClient platOnClient;
+    @Resource
+    ErcDetectService ercDetectService;
 
     Credentials credentials = Credentials.create("4484092b68df58d639f11d59738983e2b8b81824f3c0c759edd6773f9adadfe7");
 
@@ -71,6 +75,12 @@ public class ErcTokenBalanceTest {
         return balance;
     }
 
+    @Test
+    public void testErcContractId() {
+        ErcContract ercContract = getErcContract("lat1vwrycedvrhstqxkhvulhp7tw2cp7yu7vumw7nz", ErcTypeEnum.ERC20);
+        ErcContractId ercContractId = ercDetectService.resolveContractId(ercContract);
+        System.out.println("ercContractId:" + JSON.toJSONString(ercContractId));
+    }
 
     @SneakyThrows
     @Test
