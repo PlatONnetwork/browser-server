@@ -777,9 +777,9 @@ BEGIN
     set
         tx_qty = tx_qty + 1,
         transfer_qty = case when NEW.`type` = 0 then transfer_qty + 1 else transfer_qty end,
-        staking_qty = case when NEW.`type` in (13,14,15,16,26) then staking_qty + 1 else staking_qty end,
-        delegate_qty = case when NEW.`type` in (17,19,28) then delegate_qty + 1 else delegate_qty end,
-        proposal_qty = case when NEW.`type` in (20,21,22,23,24,25) then proposal_qty + 1 else proposal_qty end
+        staking_qty = case when NEW.`type` in (1000,1001,1002,1003,3000) then staking_qty + 1 else staking_qty end,
+        delegate_qty = case when NEW.`type` in (1004,1005,1006,5000) then delegate_qty + 1 else delegate_qty end,
+        proposal_qty = case when NEW.`type` in (2000,2001,2002,2003,2004,2005) then proposal_qty + 1 else proposal_qty end
     where `address` = NEW.`from` OR address = NEW.`to`;
 END||
 DELIMITER ;
