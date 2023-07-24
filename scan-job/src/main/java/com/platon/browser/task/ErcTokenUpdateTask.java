@@ -1177,59 +1177,6 @@ public class ErcTokenUpdateTask {
         return res;
     }
 
-
-    private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
-        HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
-        if (CollUtil.isNotEmpty(map)) {
-            for (Map.Entry<String, HashSet<String>> entry : map.entrySet()) {
-                if (!destroyContracts.contains(entry.getKey())) {
-                    res.put(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 过滤erc1155被销毁的地址
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.Token1155Holder>
-     * @date: 2022/8/3
-     */
-    private List<Token1155Holder> subtractErc1155ToLis(List<Token1155Holder> list, Set<String> destroyContracts) {
-        List<Token1155Holder> newList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(list)) {
-            for (Token1155Holder token1155Holder : list) {
-                if (!destroyContracts.contains(token1155Holder.getTokenAddress())) {
-                    newList.add(token1155Holder);
-                }
-            }
-        }
-        return newList;
-    }
-
-    /**
-     * 过滤销毁的合约
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.TokenHolder>
-     * @date: 2021/10/14
-     */
-    private List<TokenHolder> subtractToList(List<TokenHolder> list, Set<String> destroyContracts) {
-        List<TokenHolder> res = CollUtil.newArrayList();
-        if (CollUtil.isNotEmpty(list)) {
-            for (TokenHolder tokenHolder : list) {
-                if (!destroyContracts.contains(tokenHolder.getTokenAddress())) {
-                    res.add(tokenHolder);
-                }
-            }
-        }
-        return res;
-    }
-
     /**
      * 更新token对应的持有人的数量
      * todo: 在涉及的表记录数量多时，这个统计效率并不高。最好的做法是在查看token的持有人数量时，再实时统计。就是说，这个数据没有必要持续统计并更新到表中。
