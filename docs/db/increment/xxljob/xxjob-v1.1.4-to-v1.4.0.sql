@@ -8,3 +8,5 @@ INSERT INTO `xxl_job_info`(`job_group`, `job_desc`, `add_time`, `update_time`, `
 
 delete from xxl_job_info where job_group = 2 and executor_handler = 'incrementUpdateTokenHolderBalanceJobHandler';
 delete from xxl_job_info where job_group = 2 and executor_handler = 'totalUpdateTokenHolderBalanceJobHandler';
+
+UPDATE xxl_job_info SET schedule_conf = '*/5 * * * * ?' WHERE job_group = 2 AND executor_handler = 'updateTokenQtyJobHandler';
