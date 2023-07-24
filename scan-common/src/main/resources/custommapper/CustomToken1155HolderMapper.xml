@@ -154,15 +154,13 @@
         token_1155_holder th
         LEFT JOIN token t ON th.token_address = t.address
         LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address AND th.token_id = ti.token_id
-        WHERE
-        th.balance != 0
+        WHERE t.type = "erc1155"
         <if test="tokenAddress != null">
             and th.token_address = #{tokenAddress}
         </if>
         <if test="address != null">
             and th.address = #{address}
         </if>
-        AND t.type = "erc1155"
         ORDER BY
         balance DESC
     </select>
