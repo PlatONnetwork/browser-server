@@ -1464,16 +1464,30 @@ public class ErcTokenUpdateTask {
     @XxlJob("updateTokenHolderCountJobHandler")
     public void updateTokenHolderCount() {
         log.debug("开始执行:统计token的持有人数量任务");
-
         StopWatch watch = new StopWatch();
         watch.start("统计token的持有人数量");
-
-        customTokenMapper.updateErc20TokenHolderCount();
-        customTokenMapper.updateErc1155TokenHolderCount();
-
+        updateTokenHolderCount(ErcTypeEnum.ERC1155);
+        // ERC20 AND ERC721
+        updateTokenHolderCount(ErcTypeEnum.ERC20);
         watch.stop();
         log.debug("结束执行:统计token的持有人数量任务，耗时统计:{}ms", watch.getLastTaskTimeMillis());
         XxlJobHelper.log("统计token的持有人数量完成");
     }
 
+    private void updateTokenHolderCount(ErcTypeEnum type){
+        try {
+            List<Token> tokenList;
+            if (type == ErcTypeEnum.ERC1155){
+                tokenList = customTokenMapper.count1155TokenHolder();
+            } else {
+                tokenList = customTokenMapper.countTokenHolder();
+            }
+
+            if (tokenList.size() > 0){
+                customTokenMapper.batchUpdateTokenHolder(tokenList);
+            }
+        } catch (Exception e){
+            log.error("统计token的持有人数量任务异常，type = {}", type, e);
+        }
+    }
 }

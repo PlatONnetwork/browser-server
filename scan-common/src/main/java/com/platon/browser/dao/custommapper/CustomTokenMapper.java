@@ -47,4 +47,8 @@ public interface CustomTokenMapper {
      int updateErc20TokenHolderCount();
 
     int updateErc1155TokenHolderCount();
+
+    List<Token> countTokenHolder();
+
+    List<Token> count1155TokenHolder();
 }

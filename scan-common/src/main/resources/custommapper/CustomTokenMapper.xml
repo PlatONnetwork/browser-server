@@ -174,4 +174,20 @@
             on t1.address = t2.token_address
         set t1.holder = t2.count
     </update>
+
+    <select id="countTokenHolder" resultType="com.platon.browser.dao.entity.Token">
+        SELECT token_address as address,
+               count(1) as holder
+        FROM `token_holder`
+        WHERE balance > 0
+        GROUP BY token_address;
+    </select>
+    <select id="count1155TokenHolder" resultType="com.platon.browser.dao.entity.Token">
+        SELECT token_address as address,
+               count(1) as holder
+        FROM `token_1155_holder`
+        WHERE balance > 0
+        GROUP BY token_address;
+    </select>
+
 </mapper>
