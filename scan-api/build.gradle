@@ -16,7 +16,6 @@ bootJar {
 
 dependencies {
 	compile project(":scan-service")
-	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	compile 'io.projectreactor.netty:reactor-netty:0.8.10.RELEASE'

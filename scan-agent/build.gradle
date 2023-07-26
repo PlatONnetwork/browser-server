@@ -15,7 +15,6 @@ bootJar {
 
 dependencies {
     compile project(":scan-service")
-    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compile "com.google.guava:guava:$guavaVersion"
     compile group: 'com.lmax', name: 'disruptor', version: '3.4.2'

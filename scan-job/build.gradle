@@ -76,7 +76,6 @@ task deployToTestEnv(dependsOn: ['build'], group: 'deploy') {
 
 dependencies {
     compile project(":scan-service")
-    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
     compile "com.alibaba:druid:$druidVersion"
     runtimeOnly "mysql:mysql-connector-java:$mysqlConnectorVersion"
