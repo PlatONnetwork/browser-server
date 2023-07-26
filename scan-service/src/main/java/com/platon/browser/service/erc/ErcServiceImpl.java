@@ -88,7 +88,9 @@ public class ErcServiceImpl {
                 Result result = (Result) resultList.get(i);
                 if ( result.success ){
                     List<BigInteger> balanceList = convertToNative(FunctionReturnDecoder.decode(Numeric.toHexString(result.returnData), Utils.convert( Collections.singletonList(new TypeReference<Uint256>() {}))));
-                    tokenHolder.setBalance(balanceList.get(0).toString());
+                    if(balanceList.size() == 1){
+                        tokenHolder.setBalance(balanceList.get(0).toString());
+                    }
                 }
             }
             tokenHolderList.add(tokenHolder);
@@ -130,7 +132,9 @@ public class ErcServiceImpl {
                 Result result = (Result) resultList.get(i);
                 if ( result.success ){
                     List<BigInteger> balanceList = convertToNative(FunctionReturnDecoder.decode(Numeric.toHexString(result.returnData), Utils.convert( Collections.singletonList(new TypeReference<Uint256>() {}))));
-                    tokenHolder.setBalance(balanceList.get(0).toString());
+                    if(balanceList.size() == 1){
+                        tokenHolder.setBalance(balanceList.get(0).toString());
+                    }
                 }
             }
             tokenHolderList.add(tokenHolder);
@@ -412,9 +416,6 @@ public class ErcServiceImpl {
     private static <S extends Type, T> List<T> convertToNative(List<S> arr) {
         List<T> out = new ArrayList<>();
         for (final S s : arr) {
-
-            System.out.println(s instanceof Result);
-
             if (StructType.class.isAssignableFrom(s.getClass())) {
                 out.add((T) s);
             } else {
