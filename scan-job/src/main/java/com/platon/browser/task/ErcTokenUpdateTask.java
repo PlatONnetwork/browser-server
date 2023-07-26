@@ -28,6 +28,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -103,6 +104,9 @@ public class ErcTokenUpdateTask {
     @Resource
     private TxErc721BakMapper txErc721BakMapper;
 
+    @Resource
+    private TxErc1155BakMapper txErc1155BakMapper;
+
     private static final int TOKEN_BATCH_SIZE = 10;
 
     private static final ExecutorService TOKEN_UPDATE_POOL = Executors.newFixedThreadPool(TOKEN_BATCH_SIZE);
@@ -148,169 +152,18 @@ public class ErcTokenUpdateTask {
      * @date 2021/2/1
      */
     @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
+    @Scheduled(cron = "0/5 * * * * ?")
     public void incrementUpdateTokenHolderBalance() {
         if (tokenHolderLock.tryLock()) {
             try {
                 incrementUpdateErc20TokenHolderBalance();
                 incrementUpdateErc721TokenHolderBalance();
-                incrementUpdateErc1155TokenHolderBalance();
+//                incrementUpdateErc1155TokenHolderBalance();
             } catch (Exception e) {
                 log.error("增量更新token持有者余额异常", e);
             } finally {
                 tokenHolderLock.unlock();
             }
-        }
-    }
-
-    /**
-     * 全量更新token持有者余额
-     * 每天00:00:00执行一次
-     */
-    @XxlJob("totalUpdateTokenHolderBalanceJobHandler")
-    public void totalUpdateTokenHolder() {
-        totalUpdateTokenHolderBalance();
-        totalUpdateToken1155HolderBalance();
-    }
-
-    /**
-     * 更新erc20/erc721持有者余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/8/3
-     */
-    private void totalUpdateTokenHolderBalance() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
-        tokenHolderLock.lock();
-        try {
-            // 分页更新holder的balance
-            List<TokenHolder> batch;
-            int page = 0;
-            do {
-                TokenHolderExample condition = new TokenHolderExample();
-                condition.setOrderByClause(" token_address asc, address asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
-                batch = tokenHolderMapper.selectByExample(condition);
-                List<ErcToken> ercTokens = getErcTokens();
-                // 过滤销毁的合约
-                List<TokenHolder> res = subtractToList(batch, getDestroyContracts());
-                List<TokenHolder> updateParams = new ArrayList<>();
-                if (CollUtil.isNotEmpty(res)) {
-                    CountDownLatch latch = new CountDownLatch(res.size());
-                    res.forEach(holder -> {
-                        HOLDER_UPDATE_POOL.submit(() -> {
-                            try {
-                                // 查询余额并回填
-                                ErcToken token = CollUtil.findOne(ercTokens, ercToken -> ercToken.getAddress().equalsIgnoreCase(holder.getTokenAddress()));
-                                if (token != null) {
-                                    BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), token.getTypeEnum(), holder.getAddress(), null);
-                                    if (ObjectUtil.isNull(holder.getBalance()) || new BigDecimal(holder.getBalance()).compareTo(new BigDecimal(balance)) != 0) {
-                                        log.info("token[{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]", holder.getTokenAddress(), holder.getAddress(), holder.getBalance(), balance.toString());
-                                        // 余额有变动才加入更新列表，避免频繁访问表
-                                        holder.setBalance(balance.toString());
-                                        updateParams.add(holder);
-                                    }
-                                } else {
-                                    String msg = StrUtil.format("找不到对应的token[{}]", holder.getTokenAddress());
-                                    XxlJobHelper.log(msg);
-                                    log.error(msg);
-                                }
-                            } catch (Exception e) {
-                                XxlJobHelper.log(StrUtil.format("查询token holder的余额失败，合约[{}]地址[{}]", holder.getTokenAddress(), holder.getAddress()));
-                                log.warn(StrFormatter.format("查询余额失败,地址[{}],合约地址[{}]", holder.getAddress(), holder.getTokenAddress()), e);
-                            } finally {
-                                latch.countDown();
-                            }
-                        });
-                    });
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        log.error("", e);
-                    }
-                }
-                if (CollUtil.isNotEmpty(updateParams)) {
-                    customTokenHolderMapper.batchUpdate(updateParams);
-                    TaskUtil.console("更新token持有者余额{}", JSONUtil.toJsonStr(updateParams));
-                }
-                page++;
-            } while (!batch.isEmpty());
-            XxlJobHelper.log("全量更新token持有者余额成功");
-        } catch (Exception e) {
-            log.error("更新地址代币余额异常", e);
-        } finally {
-            tokenHolderLock.unlock();
-        }
-    }
-
-    /**
-     * 更新erc1155持有者余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/8/3
-     */
-    private void totalUpdateToken1155HolderBalance() {
-        // 只有程序正常运行才执行任务
-        if (!AppStatusUtil.isRunning()) {
-            return;
-        }
-        token1155HolderLock.lock();
-        try {
-            // 分页更新holder的balance
-            List<Token1155Holder> batch;
-            int page = 0;
-            do {
-                Token1155HolderExample condition = new Token1155HolderExample();
-                condition.setOrderByClause(" id asc limit " + page * HOLDER_BATCH_SIZE + "," + HOLDER_BATCH_SIZE);
-                batch = token1155HolderMapper.selectByExample(condition);
-                // 过滤销毁的合约
-                List<Token1155Holder> res = subtractErc1155ToLis(batch, getDestroyContracts());
-                List<Token1155Holder> updateParams = new ArrayList<>();
-                if (CollUtil.isNotEmpty(res)) {
-                    CountDownLatch latch = new CountDownLatch(res.size());
-                    res.forEach(holder -> {
-                        HOLDER_UPDATE_POOL.submit(() -> {
-                            try {
-                                BigInteger balance = ercServiceImpl.getBalance(holder.getTokenAddress(), ErcTypeEnum.ERC1155, holder.getAddress(), new BigInteger(holder.getTokenId()));
-                                if (!balance.toString().equalsIgnoreCase(holder.getBalance())) {
-                                    log.info("1155token[{}][{}]address[{}]余额有变动需要更新,旧值[{}]新值[{}]",
-                                             holder.getTokenAddress(),
-                                             holder.getTokenId(),
-                                             holder.getAddress(),
-                                             holder.getBalance(),
-                                             balance.toString());
-                                    // 余额有变动才加入更新列表，避免频繁访问表
-                                    holder.setBalance(balance.toString());
-                                    updateParams.add(holder);
-                                }
-                            } catch (Exception e) {
-                                XxlJobHelper.log(StrUtil.format("查询1155token holder的余额失败，合约[{}][{}]地址[{}]", holder.getTokenAddress(), holder.getTokenId(), holder.getAddress()));
-                                log.warn(StrFormatter.format("查询1155余额失败,地址[{}],合约地址[{}][{}]", holder.getAddress(), holder.getTokenAddress(), holder.getTokenId()), e);
-                            } finally {
-                                latch.countDown();
-                            }
-                        });
-                    });
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        log.error("异常", e);
-                    }
-                }
-                if (CollUtil.isNotEmpty(updateParams)) {
-                    customToken1155HolderMapper.batchUpdate(updateParams);
-                    TaskUtil.console("更新1155token持有者余额{}", JSONUtil.toJsonStr(updateParams));
-                }
-                page++;
-            } while (!batch.isEmpty());
-            XxlJobHelper.log("全量更新155token持有者余额成功");
-        } catch (Exception e) {
-            log.error("更新1155地址代币余额异常", e);
-        } finally {
-            token1155HolderLock.unlock();
         }
     }
 
@@ -464,7 +317,7 @@ public class ErcTokenUpdateTask {
             return;
         }
         try {
-            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 50);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(5);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TxErc20BakExample example = new TxErc20BakExample();
@@ -500,32 +353,19 @@ public class ErcTokenUpdateTask {
                     map.put(v.getContract(), addressSet);
                 }
             });
-            // 过滤销毁的合约
-            HashMap<String, HashSet<String>> res = subtractToMap(map, getDestroyContracts());
-            if (MapUtil.isNotEmpty(res)) {
-                // 串行查余额
-                res.forEach((contract, addressSet) -> {
+            if (MapUtil.isNotEmpty(map)) {
+                // 批量查询
+                List<TokenHolder> tokenHolderKeyList = new ArrayList<>();
+                map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
-                        try {
-                            BigInteger balance = ercServiceImpl.getBalance(contract, ErcTypeEnum.ERC20, address, BigInteger.ZERO);
-                            TokenHolder holder = new TokenHolder();
-                            holder.setTokenAddress(contract);
-                            holder.setAddress(address);
-                            holder.setBalance(balance.toString());
-                            updateParams.add(holder);
-                            log.info("[erc20] token holder查询到余额[{}]，合约[{}]地址[{}]", balance, contract, address);
-                            try {
-                                TimeUnit.MILLISECONDS.sleep(100);
-                            } catch (InterruptedException interruptedException) {
-                                interruptedException.printStackTrace();
-                            }
-                        } catch (Exception e) {
-                            String msg = StrFormatter.format("查询[erc20] token holder的余额失败,contract:{},address:{}", contract, address);
-                            XxlJobHelper.log(msg);
-                            log.warn(msg, e);
-                        }
+                        TokenHolder holder = new TokenHolder();
+                        holder.setTokenAddress(contract);
+                        holder.setAddress(address);
+                        tokenHolderKeyList.add(holder);
                     });
                 });
+                List<TokenHolder> tokenHolderList = ercServiceImpl.batchBalanceOfOwner(tokenHolderKeyList);
+                updateParams.addAll(tokenHolderList.stream().filter(item -> item.getBalance() != null).collect(Collectors.toList()));
             }
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
@@ -555,7 +395,7 @@ public class ErcTokenUpdateTask {
             return;
         }
         try {
-            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 50);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(6);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TxErc721BakExample example = new TxErc721BakExample();
@@ -591,32 +431,19 @@ public class ErcTokenUpdateTask {
                     map.put(v.getContract(), addressSet);
                 }
             });
-            // 过滤销毁的合约
-            HashMap<String, HashSet<String>> res = subtractToMap(map, getDestroyContracts());
-            if (MapUtil.isNotEmpty(res)) {
-                // 串行查余额
-                res.forEach((contract, addressSet) -> {
+            if (MapUtil.isNotEmpty(map)) {
+                // 批量查询
+                List<TokenHolder> tokenHolderKeyList = new ArrayList<>();
+                map.forEach((contract, addressSet) -> {
                     addressSet.forEach(address -> {
-                        try {
-                            BigInteger balance = ercServiceImpl.getBalance(contract, ErcTypeEnum.ERC721, address, BigInteger.ZERO);
-                            TokenHolder holder = new TokenHolder();
-                            holder.setTokenAddress(contract);
-                            holder.setAddress(address);
-                            holder.setBalance(balance.toString());
-                            updateParams.add(holder);
-                            log.info("[erc721] token holder查询到余额[{}]，合约[{}]地址[{}]", balance, contract, address);
-                            try {
-                                TimeUnit.MILLISECONDS.sleep(100);
-                            } catch (InterruptedException interruptedException) {
-                                interruptedException.printStackTrace();
-                            }
-                        } catch (Exception e) {
-                            String msg = StrFormatter.format("查询[erc721] token holder的余额失败,contract:{},address:{}", contract, address);
-                            XxlJobHelper.log(msg);
-                            log.warn(msg, e);
-                        }
+                        TokenHolder holder = new TokenHolder();
+                        holder.setTokenAddress(contract);
+                        holder.setAddress(address);
+                        tokenHolderKeyList.add(holder);
                     });
                 });
+                List<TokenHolder> tokenHolderList = ercServiceImpl.batchBalanceOfOwner(tokenHolderKeyList);
+                updateParams.addAll(tokenHolderList.stream().filter(item -> item.getBalance() != null).collect(Collectors.toList()));
             }
             if (CollUtil.isNotEmpty(updateParams)) {
                 customTokenHolderMapper.batchUpdate(updateParams);
@@ -647,51 +474,51 @@ public class ErcTokenUpdateTask {
         }
         try {
             int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
-            PointLog pointLog = pointLogMapper.selectByPrimaryKey(8);
+            PointLog pointLog = pointLogMapper.selectByPrimaryKey(12);
             long oldPosition = Convert.toLong(pointLog.getPosition());
-            Token1155HolderExample example = new Token1155HolderExample();
-            example.setOrderByClause("id");
-            example.createCriteria().andIdGreaterThan(oldPosition).andIdLessThanOrEqualTo(oldPosition + pageSize);
-            List<Token1155Holder> list = token1155HolderMapper.selectByExample(example);
+            TxErc1155BakExample example = new TxErc1155BakExample();
+            example.setOrderByClause("id asc limit " + pageSize);
+            example.createCriteria().andIdGreaterThan(oldPosition);
+            List<TxErc1155Bak> list = txErc1155BakMapper.selectByExample(example);
+            List<Token1155Holder> updateParams = new ArrayList<>();
+            TaskUtil.console("[erc1155]当前页数为[{}]，断点为[{}]", pageSize, oldPosition);
             if (CollUtil.isEmpty(list)) {
                 TaskUtil.console("[erc1155]该断点[{}]未找到交易", oldPosition);
                 return;
             }
-            // 过滤销毁的合约
-            List<Token1155Holder> res = subtractErc1155ToLis(list, getDestroyContracts());
-            List<Token1155Holder> updateParams = new ArrayList<>();
-            if (CollUtil.isNotEmpty(res)) {
-                res.forEach(token1155Holder -> {
-                    try {
-                        BigInteger balance = ercServiceImpl.getBalance(token1155Holder.getTokenAddress(),
-                                                                       ErcTypeEnum.ERC1155,
-                                                                       token1155Holder.getAddress(),
-                                                                       new BigInteger(token1155Holder.getTokenId()));
-                        Token1155Holder holder = new Token1155Holder();
-                        holder.setTokenAddress(token1155Holder.getTokenAddress());
-                        holder.setAddress(token1155Holder.getAddress());
-                        holder.setTokenId(token1155Holder.getTokenId());
-                        holder.setBalance(balance.toString());
-                        updateParams.add(holder);
-                        log.info("[erc1155] token holder查询到余额[{}]", JSONUtil.toJsonStr(holder));
-                        try {
-                            TimeUnit.MILLISECONDS.sleep(100);
-                        } catch (InterruptedException interruptedException) {
-                            interruptedException.printStackTrace();
+            Map<String, Map<String, HashSet<String>>> contract2tokenId2addressSet = new HashMap<>();
+            list.sort(Comparator.comparing(ErcTx::getSeq));
+            list.forEach(v -> {
+                Map<String, HashSet<String>> tokenId2addressSet = contract2tokenId2addressSet.computeIfAbsent(v.getContract(), contract -> new HashMap<>());
+                HashSet<String> addressSet = tokenId2addressSet.computeIfAbsent(v.getTokenId(), tokenId -> new HashSet<>());
+                if (!AddressUtil.isAddrZero(v.getTo())) {
+                    addressSet.add(v.getTo());
+                }
+                if (!AddressUtil.isAddrZero(v.getFrom())) {
+                    addressSet.add(v.getFrom());
+                }
+            });
+            if (MapUtil.isNotEmpty(contract2tokenId2addressSet)) {
+                // 批量查询
+                List<Token1155Holder> tokenHolderKeyList = new ArrayList<>();
+                for (String contract: contract2tokenId2addressSet.keySet()) {
+                    for (String tokenId:contract2tokenId2addressSet.get(contract).keySet()){
+                        for (String address : contract2tokenId2addressSet.get(contract).get(tokenId)) {
+                            Token1155Holder holder = new Token1155Holder();
+                            holder.setTokenAddress(contract);
+                            holder.setTokenId(tokenId);
+                            holder.setAddress(address);
+                            tokenHolderKeyList.add(holder);
                         }
-                    } catch (Exception e) {
-                        String msg = StrFormatter.format("查询[erc1155] token holder的余额失败,contract:{},tokenId:{},address:{}",
-                                                         token1155Holder.getTokenAddress(),
-                                                         token1155Holder.getTokenId(),
-                                                         token1155Holder.getAddress());
-                        XxlJobHelper.log(msg);
-                        log.warn(msg, e);
                     }
-                });
+                }
+                List<Token1155Holder> tokenHolderList = ercServiceImpl.batchBalanceOfOwnerAndId(tokenHolderKeyList);
+                updateParams.addAll(tokenHolderList.stream().filter(item -> item.getBalance() != null).collect(Collectors.toList()));
             }
             if (CollUtil.isNotEmpty(updateParams)) {
                 customToken1155HolderMapper.batchUpdate(updateParams);
                 TaskUtil.console("更新[erc1155] token holder的余额{}", JSONUtil.toJsonStr(updateParams));
+                XxlJobHelper.handleSuccess("更新[erc1155] token holder的余额成功");
             }
             String newPosition = CollUtil.getLast(list).getId().toString();
             pointLog.setPosition(newPosition);
