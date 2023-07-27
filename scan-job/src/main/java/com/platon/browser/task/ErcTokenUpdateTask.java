@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -28,17 +27,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -70,12 +66,6 @@ public class ErcTokenUpdateTask {
 
     @Resource
     private CustomToken1155InventoryMapper customToken1155InventoryMapper;
-
-    @Resource
-    private Token1155HolderMapper token1155HolderMapper;
-
-    @Resource
-    private TokenHolderMapper tokenHolderMapper;
 
     @Resource
     private CustomTokenHolderMapper customTokenHolderMapper;
@@ -113,15 +103,10 @@ public class ErcTokenUpdateTask {
 
     private static final int HOLDER_BATCH_SIZE = 10;
 
-    private static final ExecutorService HOLDER_UPDATE_POOL = Executors.newFixedThreadPool(HOLDER_BATCH_SIZE);
-
     private final Lock lock = new ReentrantLock();
 
     private final Lock tokenInventoryLock = new ReentrantLock();
 
-    private final Lock tokenHolderLock = new ReentrantLock();
-
-    private final Lock token1155HolderLock = new ReentrantLock();
 
     /**
      * 全量更新token的总供应量
@@ -143,29 +128,6 @@ public class ErcTokenUpdateTask {
         }
     }
 
-    /**
-     * 增量更新token持有者余额
-     * 每1分钟运行一次
-     *
-     * @param
-     * @return void
-     * @date 2021/2/1
-     */
-    @XxlJob("incrementUpdateTokenHolderBalanceJobHandler")
-    @Scheduled(cron = "0/5 * * * * ?")
-    public void incrementUpdateTokenHolderBalance() {
-        if (tokenHolderLock.tryLock()) {
-            try {
-                incrementUpdateErc20TokenHolderBalance();
-                incrementUpdateErc721TokenHolderBalance();
-//                incrementUpdateErc1155TokenHolderBalance();
-            } catch (Exception e) {
-                log.error("增量更新token持有者余额异常", e);
-            } finally {
-                tokenHolderLock.unlock();
-            }
-        }
-    }
 
     /**
      * 全量更新token库存信息
@@ -306,12 +268,9 @@ public class ErcTokenUpdateTask {
 
     /**
      * 更新erc20的token holder的余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2021/12/17
      */
-    private void incrementUpdateErc20TokenHolderBalance() throws Exception {
+    @XxlJob("incrementUpdatePrc20TokenHolderBalanceJobHandler")
+    public void incrementUpdateErc20TokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -378,18 +337,14 @@ public class ErcTokenUpdateTask {
             XxlJobHelper.log("更新[erc20] token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
-            throw e;
         }
     }
 
     /**
      * 更新erc721的token holder的余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2021/12/17
      */
-    private void incrementUpdateErc721TokenHolderBalance() throws Exception {
+    @XxlJob("incrementUpdatePrc721TokenHolderBalanceJobHandler")
+    public void incrementUpdateErc721TokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
@@ -456,24 +411,20 @@ public class ErcTokenUpdateTask {
             XxlJobHelper.log("更新[erc721] token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新token持有者余额异常", e);
-            throw e;
         }
     }
 
     /**
      * 更新erc1155的token holder的余额
-     *
-     * @param :
-     * @return: void
-     * @date: 2022/2/12
      */
-    private void incrementUpdateErc1155TokenHolderBalance() throws Exception {
+    @XxlJob("incrementUpdatePrc1155TokenHolderBalanceJobHandler")
+    public void incrementUpdateErc1155TokenHolderBalance() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {
             return;
         }
         try {
-            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 500);
+            int pageSize = Convert.toInt(XxlJobHelper.getJobParam(), 30);
             PointLog pointLog = pointLogMapper.selectByPrimaryKey(12);
             long oldPosition = Convert.toLong(pointLog.getPosition());
             TxErc1155BakExample example = new TxErc1155BakExample();
@@ -526,7 +477,6 @@ public class ErcTokenUpdateTask {
             XxlJobHelper.log("更新[erc1155] token holder的余额成功，断点为[{}]->[{}]", oldPosition, newPosition);
         } catch (Exception e) {
             log.error("更新1155token持有者余额异常", e);
-            throw e;
         }
     }
 
@@ -1257,57 +1207,4 @@ public class ErcTokenUpdateTask {
         }
         XxlJobHelper.log("更新token对应的持有人的数量完成");
     }
-
-    private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
-        HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
-        if (CollUtil.isNotEmpty(map)) {
-            for (Map.Entry<String, HashSet<String>> entry : map.entrySet()) {
-                if (!destroyContracts.contains(entry.getKey())) {
-                    res.put(entry.getKey(), entry.getValue());
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * 过滤erc1155被销毁的地址
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.Token1155Holder>
-     * @date: 2022/8/3
-     */
-    private List<Token1155Holder> subtractErc1155ToLis(List<Token1155Holder> list, Set<String> destroyContracts) {
-        List<Token1155Holder> newList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(list)) {
-            for (Token1155Holder token1155Holder : list) {
-                if (!destroyContracts.contains(token1155Holder.getTokenAddress())) {
-                    newList.add(token1155Holder);
-                }
-            }
-        }
-        return newList;
-    }
-
-    /**
-     * 过滤销毁的合约
-     *
-     * @param list:
-     * @param destroyContracts:
-     * @return: java.util.List<com.platon.browser.dao.entity.TokenHolder>
-     * @date: 2021/10/14
-     */
-    private List<TokenHolder> subtractToList(List<TokenHolder> list, Set<String> destroyContracts) {
-        List<TokenHolder> res = CollUtil.newArrayList();
-        if (CollUtil.isNotEmpty(list)) {
-            for (TokenHolder tokenHolder : list) {
-                if (!destroyContracts.contains(tokenHolder.getTokenAddress())) {
-                    res.add(tokenHolder);
-                }
-            }
-        }
-        return res;
-    }
-
 }
