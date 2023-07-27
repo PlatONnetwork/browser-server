@@ -76,7 +76,7 @@ public class ErcServiceImpl {
                         DefaultBlockParameterName.LATEST)
                         .send();
         if(ethCall.hasError()){
-            throw new BusinessException("查询合约失败(MultiCall3)  msg = " + ethCall.getError());
+            throw new RuntimeException("查询合约失败(MultiCall3)  msg = " + ethCall.getError().getMessage() + " code = " + ethCall.getError().getCode() );
         }
         List resultList = executeCallSingleValueReturn(FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters()), List.class);
         for (int i = 0; i < tokenHolderKeyList.size(); i++) {
@@ -119,7 +119,7 @@ public class ErcServiceImpl {
                         DefaultBlockParameterName.LATEST)
                 .send();
         if(ethCall.hasError()){
-            throw new BusinessException("查询合约失败(MultiCall3)  msg = " + ethCall.getError());
+            throw new RuntimeException("查询合约失败(MultiCall3)  msg = " + ethCall.getError().getMessage() + " code = " + ethCall.getError().getCode() );
         }
         List resultList = executeCallSingleValueReturn(FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters()), List.class);
         for (int i = 0; i < tokenHolderKeyList.size(); i++) {
