@@ -29,6 +29,10 @@ public interface CustomTokenHolderMapper {
 
     int batchInsertOrUpdateSelective(@Param("list") List<TokenHolder> list, @Param("selective") TokenHolder.Column... selective);
 
+    int batchInsert(@Param("list") List<TokenHolder> list);
+
+    int batchUpdateTokenTxQty(@Param("list")  List<TokenHolder> insert);
+
     /**
      * 批量更新token持有者余额
      *

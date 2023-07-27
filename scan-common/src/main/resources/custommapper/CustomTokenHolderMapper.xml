@@ -132,10 +132,23 @@
             )
         </foreach>
     </insert>
+    <insert id="batchInsert">
+        insert into `token_holder` ( `token_address`, `address`, `balance`, `token_tx_qty` )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tokenAddress}, #{item.address}, #{item.balance}, #{item.tokenTxQty})
+        </foreach>
+    </insert>
 
     <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
             update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateTokenTxQty">
+        <foreach collection="list" item="item" separator=";">
+            update token_holder set `token_tx_qty`=#{item.tokenTxQty} where token_address=#{item.tokenAddress} and address=#{item.address}
         </foreach>
     </update>
 
