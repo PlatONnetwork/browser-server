@@ -28,6 +28,7 @@ import okhttp3.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -263,7 +264,6 @@ public class ErcTokenUpdateTask {
             updateParams.forEach(token -> token.setDirty(false));
         }
         XxlJobHelper.log("全量更新token的总供应量成功");
-        updateTokenHolderCount();
     }
 
     /**
@@ -1037,19 +1037,28 @@ public class ErcTokenUpdateTask {
      */
     private void contractErc721DestroyUpdateBalance() {
         try {
+            //查询出被销毁的721合约地址
             List<String> contractErc721Destroys = customAddressMapper.findContractDestroy(AddressTypeEnum.ERC721_EVM_CONTRACT.getCode());
             if (CollUtil.isNotEmpty(contractErc721Destroys)) {
                 for (String tokenAddress : contractErc721Destroys) {
+                    //查询每个销毁721合约，所有持有人以及他们持有tokenID的数量
                     List<Erc721ContractDestroyBalanceVO> list = customToken721InventoryMapper.findErc721ContractDestroyBalance(tokenAddress);
+
+                    //查询每个销毁721合约的所有持有人的记录
                     Page<CustomTokenHolder> ids = customTokenHolderMapper.selectERC721Holder(tokenAddress);
                     List<TokenHolder> updateParams = new ArrayList<>();
                     StringBuilder res = new StringBuilder();
+                    //遍历每个持有人
                     for (CustomTokenHolder tokenHolder : ids) {
+
+                        //过滤找出每个持有人的持有tokenID的数量
                         List<Erc721ContractDestroyBalanceVO> filterList = list.stream().filter(v -> v.getOwner().equalsIgnoreCase(tokenHolder.getAddress())).collect(Collectors.toList());
                         int balance = 0;
                         if (CollUtil.isNotEmpty(filterList)) {
+                            //设置持有销毁721合约的余额（即持有token_id数量)
                             balance = filterList.get(0).getNum();
                         }
+                        //如果持有人的持有销毁721合约的当前余额，和持有数量不一致，则更新
                         if (!tokenHolder.getBalance().equalsIgnoreCase(cn.hutool.core.convert.Convert.toStr(balance))) {
                             TokenHolder updateTokenHolder = new TokenHolder();
                             updateTokenHolder.setTokenAddress(tokenHolder.getTokenAddress());
@@ -1168,43 +1177,94 @@ public class ErcTokenUpdateTask {
         return res;
     }
 
+
+    private HashMap<String, HashSet<String>> subtractToMap(HashMap<String, HashSet<String>> map, Set<String> destroyContracts) {
+        HashMap<String, HashSet<String>> res = CollUtil.newHashMap();
+        if (CollUtil.isNotEmpty(map)) {
+            for (Map.Entry<String, HashSet<String>> entry : map.entrySet()) {
+                if (!destroyContracts.contains(entry.getKey())) {
+                    res.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 过滤erc1155被销毁的地址
+     *
+     * @param list:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.dao.entity.Token1155Holder>
+     * @date: 2022/8/3
+     */
+    private List<Token1155Holder> subtractErc1155ToLis(List<Token1155Holder> list, Set<String> destroyContracts) {
+        List<Token1155Holder> newList = new ArrayList<>();
+        if (CollUtil.isNotEmpty(list)) {
+            for (Token1155Holder token1155Holder : list) {
+                if (!destroyContracts.contains(token1155Holder.getTokenAddress())) {
+                    newList.add(token1155Holder);
+                }
+            }
+        }
+        return newList;
+    }
+
+    /**
+     * 过滤销毁的合约
+     *
+     * @param list:
+     * @param destroyContracts:
+     * @return: java.util.List<com.platon.browser.dao.entity.TokenHolder>
+     * @date: 2021/10/14
+     */
+    private List<TokenHolder> subtractToList(List<TokenHolder> list, Set<String> destroyContracts) {
+        List<TokenHolder> res = CollUtil.newArrayList();
+        if (CollUtil.isNotEmpty(list)) {
+            for (TokenHolder tokenHolder : list) {
+                if (!destroyContracts.contains(tokenHolder.getTokenAddress())) {
+                    res.add(tokenHolder);
+                }
+            }
+        }
+        return res;
+    }
+
     /**
      * 更新token对应的持有人的数量
-     *
+     * todo: 在涉及的表记录数量多时，这个统计效率并不高。最好的做法是在查看token的持有人数量时，再实时统计。就是说，这个数据没有必要持续统计并更新到表中。
      * @param
      * @return void
      * @date 2021/3/17
      */
-    private void updateTokenHolderCount() {
-        List<Token> updateTokenList = new ArrayList<>();
-        List<TokenHolderCount> list = customTokenHolderMapper.findTokenHolderCount();
-        List<Token> tokenList = tokenMapper.selectByExample(null);
-        if (CollUtil.isNotEmpty(list) && CollUtil.isNotEmpty(tokenList)) {
-            list.forEach(tokenHolderCount -> {
-                tokenList.forEach(token -> {
-                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
-                        token.setHolder(tokenHolderCount.getTokenHolderCount());
-                        updateTokenList.add(token);
-                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
-                    }
-                });
-            });
+
+    @XxlJob("updateTokenHolderCountJobHandler")
+    public void updateTokenHolderCount() {
+        log.debug("开始执行:统计token的持有人数量任务");
+        StopWatch watch = new StopWatch();
+        watch.start("统计token的持有人数量");
+        updateTokenHolderCount(ErcTypeEnum.ERC1155);
+        // ERC20 AND ERC721
+        updateTokenHolderCount(ErcTypeEnum.ERC20);
+        watch.stop();
+        log.debug("结束执行:统计token的持有人数量任务，耗时统计:{}ms", watch.getLastTaskTimeMillis());
+        XxlJobHelper.log("统计token的持有人数量完成");
+    }
+
+    private void updateTokenHolderCount(ErcTypeEnum type){
+        try {
+            List<Token> tokenList;
+            if (type == ErcTypeEnum.ERC1155){
+                tokenList = customTokenMapper.count1155TokenHolder();
+            } else {
+                tokenList = customTokenMapper.countTokenHolder();
+            }
+
+            if (tokenList.size() > 0){
+                customTokenMapper.batchUpdateTokenHolder(tokenList);
+            }
+        } catch (Exception e){
+            log.error("统计token的持有人数量任务异常，type = {}", type, e);
         }
-        List<TokenHolderCount> token1155List = customToken1155HolderMapper.findToken1155Holder();
-        if (CollUtil.isNotEmpty(token1155List) && CollUtil.isNotEmpty(tokenList)) {
-            token1155List.forEach(tokenHolderCount -> {
-                tokenList.forEach(token -> {
-                    if (token.getAddress().equalsIgnoreCase(tokenHolderCount.getTokenAddress()) && !token.getHolder().equals(tokenHolderCount.getTokenHolderCount())) {
-                        token.setHolder(tokenHolderCount.getTokenHolderCount());
-                        updateTokenList.add(token);
-                        TaskUtil.console("更新token[{}]对应的持有人的数量[{}]", token.getAddress(), token.getHolder());
-                    }
-                });
-            });
-        }
-        if (CollUtil.isNotEmpty(updateTokenList)) {
-            customTokenMapper.batchUpdateTokenHolder(updateTokenList);
-        }
-        XxlJobHelper.log("更新token对应的持有人的数量完成");
     }
 }

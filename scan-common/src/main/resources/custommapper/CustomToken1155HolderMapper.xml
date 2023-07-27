@@ -61,6 +61,15 @@
         </foreach>
     </update>
 
+    <update id="batchChange">
+        <foreach collection="list" item="item" separator=";">
+            INSERT INTO token_1155_holder (token_address, token_id, address, balance, token_owner_tx_qty )
+            VALUES (#{item.tokenAddress},#{item.tokenId},  #{item.address}, #{item.increment}, 1)
+            ON DUPLICATE KEY
+            UPDATE balance = balance + #{item.increment}, token_owner_tx_qty = token_owner_tx_qty + 1
+        </foreach>
+    </update>
+
     <select id="findDestroyContract" parameterType="integer" resultType="com.platon.browser.bean.Erc1155ContractDestroyBean">
         select
         t1.address as tokenAddress ,
@@ -145,15 +154,13 @@
         token_1155_holder th
         LEFT JOIN token t ON th.token_address = t.address
         LEFT JOIN token_1155_inventory ti ON th.token_address = ti.token_address AND th.token_id = ti.token_id
-        WHERE
-        th.balance != 0
+        WHERE t.type = "erc1155"
         <if test="tokenAddress != null">
             and th.token_address = #{tokenAddress}
         </if>
         <if test="address != null">
             and th.address = #{address}
         </if>
-        AND t.type = "erc1155"
         ORDER BY
         balance DESC
     </select>

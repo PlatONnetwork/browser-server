@@ -15,16 +15,17 @@
         th.token_tx_qty as txCount,
         t.create_time as createTime
         from token_holder th left join token t on th.token_address = t.address
-        where th.balance != '0'
-        <if test="tokenAddress != null">
-            and th.token_address = #{tokenAddress}
-        </if>
-        <if test="address != null">
-            and th.address = #{address}
-        </if>
-        <if test="type != null">
-            AND t.type = #{type}
-        </if>
+        <where>
+            <if test="tokenAddress != null">
+                th.token_address = #{tokenAddress}
+            </if>
+            <if test="address != null">
+                and th.address = #{address}
+            </if>
+            <if test="type != null">
+                AND t.type = #{type}
+            </if>
+        </where>
         order by balance desc
     </select>
     <select id="selectERC721Holder" parameterType="java.lang.String"
@@ -35,7 +36,6 @@
                t.symbol,
                t.name,
                t.total_supply   as totalSupply,
-               th.token_id      as tokenId,
                th.balance,
                t.decimal,
                th.token_tx_qty  as txCount
@@ -137,6 +137,20 @@
         <foreach collection="list" item="item" separator=";">
             update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}
         </foreach>
+    </update>
+
+    <update id="batchChange">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE token_holder
+            SET balance = balance + #{item.increment}, token_tx_qty = token_tx_qty + 1
+            WHERE token_address = #{item.tokenAddress} AND address = #{item.address}
+        </foreach>
+        ;
+        <foreach collection="list" item="item" separator=";">
+            INSERT IGNORE INTO token_holder (token_address, address, balance, token_tx_qty )
+            VALUES (#{item.tokenAddress}, #{item.address}, #{item.increment}, 1)
+        </foreach>
+        ;
     </update>
 
     <select id="findTokenHolderCount" resultType="com.platon.browser.bean.TokenHolderCount">
