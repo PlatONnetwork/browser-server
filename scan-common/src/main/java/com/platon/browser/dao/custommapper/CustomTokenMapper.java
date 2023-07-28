@@ -55,4 +55,8 @@ public interface CustomTokenMapper {
     List<Token> listNotDestroyedToUpdateTotalSupply(@Param("offset") int offset, @Param("pageSize") int pageSize);
 
     void updateProxyToken(@Param("proxy")ContractInfo proxy, @Param("impl")ContractInfo impl);
+
+    List<Token> countTokenHolder();
+
+    List<Token> count1155TokenHolder();
 }

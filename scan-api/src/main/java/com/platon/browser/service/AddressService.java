@@ -18,6 +18,7 @@ import com.platon.browser.dao.entity.RpPlan;
 import com.platon.browser.dao.entity.RpPlanExample;
 import com.platon.browser.dao.mapper.RpPlanMapper;
 import com.platon.browser.elasticsearch.dto.Block;
+import com.platon.browser.enums.AddressTypeEnum;
 import com.platon.browser.enums.I18nEnum;
 import com.platon.browser.enums.TokenTypeEnum;
 import com.platon.browser.exception.BusinessException;
@@ -87,6 +88,9 @@ public class AddressService {
     @Resource
     private StatisticCacheService statisticCacheService;
 
+    @Resource
+    private PlatOnClient platOnClient;
+
     /**
      * 查询地址详情
      *
@@ -120,6 +124,14 @@ public class AddressService {
             resp.setContractCreateHash(item.getContractCreatehash());
             resp.setDestroyHash(item.getContractDestroyHash());
             resp.setContractName(ConvertUtil.captureName(item.getContractName()));
+
+            if (resp.getType() > AddressTypeEnum.INNER_CONTRACT.getCode()){
+                try {
+                    resp.setContractBin(platOnClient.getAddressCode(req.getAddress()));
+                } catch (Exception e) {
+                    logger.warn("getAddressCode error", e);
+                }
+            }
         }
         /** 特殊账户余额直接查询链  */
         try {

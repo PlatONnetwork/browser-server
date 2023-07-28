@@ -150,6 +150,7 @@ platon:
       pageCount: 250
   #Es索引命名空间
   es-namespace: browser_${profile}
+  multiCallContractAddress: lat1tpxs26wjlnksnmygura8n3qn9cjukwfjsju62g
 task:
   #允许更新的最大地址数量
   maxAddressCount: 5004

@@ -382,6 +382,11 @@ public class BlockChainConfig {
      */
     private BigInteger detectContractBlockNumber;
 
+    /**
+     * multiCall合约地址
+     */
+    private String multiCallContractAddress;
+
     @PostConstruct
     public void init() throws ConfigLoadingException {
 

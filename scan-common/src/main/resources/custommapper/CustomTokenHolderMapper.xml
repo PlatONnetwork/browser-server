@@ -15,16 +15,17 @@
         th.token_tx_qty as txCount,
         t.create_time as createTime
         from token_holder th left join token t on th.token_address = t.address
-        where th.balance != '0'
-        <if test="tokenAddress != null">
-            and th.token_address = #{tokenAddress}
-        </if>
-        <if test="address != null">
-            and th.address = #{address}
-        </if>
-        <if test="type != null">
-            AND t.type = #{type}
-        </if>
+        <where>
+            <if test="tokenAddress != null">
+                th.token_address = #{tokenAddress}
+            </if>
+            <if test="address != null">
+                and th.address = #{address}
+            </if>
+            <if test="type != null">
+                AND t.type = #{type}
+            </if>
+        </where>
         order by balance desc
     </select>
     <select id="selectERC721Holder" parameterType="java.lang.String"
@@ -111,10 +112,23 @@
             )
         </foreach>
     </insert>
+    <insert id="batchInsert">
+        insert into `token_holder` ( `token_address`, `address`, `balance`, `token_tx_qty` )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tokenAddress}, #{item.address}, #{item.balance}, #{item.tokenTxQty})
+        </foreach>
+    </insert>
 
     <update id="batchUpdate">
         <foreach collection="list" item="item" separator=";">
             update token_holder set balance=#{item.balance} where token_address=#{item.tokenAddress} and address=#{item.address}
+        </foreach>
+    </update>
+
+    <update id="batchUpdateTokenTxQty">
+        <foreach collection="list" item="item" separator=";">
+            update token_holder set `token_tx_qty`=#{item.tokenTxQty} where token_address=#{item.tokenAddress} and address=#{item.address}
         </foreach>
     </update>
 

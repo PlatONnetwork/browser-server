@@ -29,6 +29,10 @@ public interface CustomToken1155HolderMapper {
      */
     int batchInsertOrUpdateSelective1155(@Param("list") List<Token1155Holder> list, @Param("selective") Token1155Holder.Column... selective);
 
+    int batchInsert(List<Token1155Holder> insert);
+
+    int batchUpdateTokenOwnerTxQty(List<Token1155Holder> insert);
+
     /**
      * 批量更新token持有者余额
      *
