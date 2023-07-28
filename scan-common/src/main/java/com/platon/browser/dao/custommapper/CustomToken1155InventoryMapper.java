@@ -6,6 +6,7 @@ import com.platon.browser.dao.entity.NftObject;
 import com.platon.browser.dao.entity.Token1155Inventory;
 import com.platon.browser.dao.entity.Token1155InventoryKey;
 import com.platon.browser.dao.entity.Token1155InventoryWithBLOBs;
+import com.platon.browser.elasticsearch.dto.ErcTx;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -39,4 +40,12 @@ public interface CustomToken1155InventoryMapper {
     void batchUpdateTokenUrl(List<NftObject> nftList);
 
     void batchUpdateTokenInfo(List<NftObject> finalNftList);
+
+    void burn(List<ErcTx> tobeDeletedTokenList);
+
+    void updateIfExist(List<ErcTx> tobeUpdatedTokenList);
+
+    void insertIgnore(List<ErcTx> tobeUpdatedTokenList);
+
+    void insertOnDuplicateUpdate(List<ErcTx> tobeInsertOnDuplicateUpdateList);
 }

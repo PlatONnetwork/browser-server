@@ -2,6 +2,7 @@ package com.platon.browser.v0152.analyzer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.entity.TokenInventory;
 import com.platon.browser.dao.entity.TokenInventoryExample;
@@ -9,7 +10,6 @@ import com.platon.browser.dao.entity.TokenInventoryKey;
 import com.platon.browser.dao.entity.TokenInventoryWithBLOBs;
 import com.platon.browser.dao.mapper.TokenInventoryMapper;
 import com.platon.browser.elasticsearch.dto.ErcTx;
-import com.platon.browser.service.erc.ErcServiceImpl;
 import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Erc721 token 库存服务
@@ -35,14 +36,41 @@ public class ErcTokenInventoryAnalyzer {
     @Resource
     private CustomTokenInventoryMapper customTokenInventoryMapper;
 
-    @Resource
-    private ErcServiceImpl ercServiceImpl;
+
+    /**
+     * 解析Token库存
+     */
+
+    public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
+        if(CollUtil.isEmpty(txList)){
+            return;
+        }
+        StopWatch watch = new StopWatch("分析区块token721库存信息，区块：" + blockNumber);
+
+        List<ErcTx> tobeDeletedTokenList = txList.stream().filter(tx-> StrUtil.isNotBlank(tx.getTo()) && AddressUtil.isAddrZero(tx.getTo())).collect(Collectors.toList());
+        List<ErcTx> tobeInsertOnDuplicateUpdateList = txList.stream().filter(tx-> StrUtil.isNotBlank(tx.getTo()) && !AddressUtil.isAddrZero(tx.getTo())).collect(Collectors.toList());
+
+        if (CollUtil.isNotEmpty(tobeDeletedTokenList)) {
+            log.debug("删除erc1155库存: {}", JSON.toJSONString(tobeDeletedTokenList));
+            watch.start("删除erc721库存，数量:" + tobeDeletedTokenList.size());
+            customTokenInventoryMapper.burn(tobeDeletedTokenList);
+            watch.stop();
+        }
+        if (CollUtil.isNotEmpty(tobeInsertOnDuplicateUpdateList)) {
+            watch.start("新增或更新erc721库存，数量:" + tobeInsertOnDuplicateUpdateList.size());
+            //如果on duplicate, 则说明这个NFT转给了其它人。owner发生了改变
+            customTokenInventoryMapper.insertOnDuplicateUpdate(tobeInsertOnDuplicateUpdateList);
+            watch.stop();
+        }
+        log.debug("结束分析区块token721库存信息，块高：{}，耗时统计：{}", blockNumber, watch.prettyPrint());
+    }
+
 
     /**
      * 解析Token库存
      */
     @Transactional(rollbackFor = {Exception.class, Error.class})
-    public void analyze(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
+    public void analyze_old(String txHash, List<ErcTx> txList, BigInteger blockNumber) {
         log.info("开始分析ERC721库存，块高：{}", blockNumber);
         StopWatch watch = new StopWatch("分析ERC721库存");
 
@@ -84,6 +112,7 @@ public class ErcTokenInventoryAnalyzer {
                         }*/
                         watch.stop();
                     }
+                    //todo: todo: 2023/07/25 lvxiaoyi，这个TokenOwnerTxQty，缺省是不是应该是 1 而不是 0？
                     if (tx.getTo().equalsIgnoreCase(tokenInventory.getOwner())) {
                         int tokenOwnerTxQty = tokenInventory.getTokenOwnerTxQty() == null ? 0 : tokenInventory.getTokenOwnerTxQty();
                         tokenInventory.setTokenOwnerTxQty(tokenOwnerTxQty + 1);

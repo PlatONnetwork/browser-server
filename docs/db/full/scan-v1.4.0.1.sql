@@ -913,3 +913,95 @@ BEGIN
     END IF;
 END||
 DELIMITER ;
+
+
+
+-- delegation记录新增后，修改address的委托数据
+DROP TRIGGER IF EXISTS trigger_delegation_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_delegation_insert AFTER insert
+    ON delegation FOR EACH ROW
+BEGIN
+    update address set
+       candidate_count = (select count(distinct node_id) from delegation where delegate_addr = NEW.delegate_addr and is_history = 2),
+       delegate_hes = delegate_hes + NEW.delegate_hes,
+       delegate_locked = delegate_locked + NEW.delegate_locked,
+       delegate_released = delegate_released + NEW.delegate_released,
+       delegate_value = delegate_hes + delegate_locked + delegate_released
+    where address = NEW.delegate_addr;
+END||
+DELIMITER ;
+
+-- delegation记录修改后，修改address的委托数据。根据复合主键修改delegation记录，并且没有修改主键：OLD.delegate_addr=NEW.delegate_addr
+DROP TRIGGER IF EXISTS trigger_delegation_update;
+DELIMITER ||
+CREATE TRIGGER trigger_delegation_update AFTER update
+    ON delegation FOR EACH ROW
+BEGIN
+    IF OLD.is_history = 2 AND NEW.is_history = 1  THEN -- 本记录变成历史状态，不需要统计了。重新统计OLD.delegate_addr的委托数据
+        update address set
+            -- candidate_count = candidate_count - (SELECT NOT EXISTS (SELECT 1 FROM delegation WHERE delegate_addr = OLD.delegate_addr and node_id = OLD.node_id and is_history = 2)),
+            candidate_count = (select count(distinct node_id) from delegation where delegate_addr = OLD.delegate_addr and is_history = 2),
+            delegate_hes = delegate_hes  - OLD.delegate_hes,
+            delegate_locked = delegate_locked - OLD.delegate_locked,
+            delegate_released = delegate_released - OLD.delegate_released,
+            delegate_value = delegate_hes + delegate_locked + delegate_released
+        where address = OLD.delegate_addr;
+    ELSEIF  OLD.is_history = 1 AND NEW.is_history = 2  THEN -- 本记录从历史变成不是历史状态，需要统计了。重新统计NEW.delegate_addr的委托数据
+        update address set
+           candidate_count = (select count(distinct node_id) from delegation where delegate_addr = NEW.delegate_addr and is_history = 2),
+           delegate_hes = delegate_hes + NEW.delegate_hes,
+           delegate_locked = delegate_locked + NEW.delegate_locked,
+           delegate_released = delegate_released + NEW.delegate_released,
+           delegate_value = delegate_hes + delegate_locked + delegate_released
+        where address = NEW.delegate_addr;
+    ELSEIF OLD.is_history = 2 AND NEW.is_history = 2 THEN -- 新旧记录都是需要统计的状态
+        update address set
+           -- 此值不需要再统计：candidate_count = (select count(distinct node_id) from delegation where delegate_addr = NEW.delegate_addr and is_history = 2),
+           delegate_hes = delegate_hes + NEW.delegate_hes - OLD.delegate_hes ,
+           delegate_locked = delegate_locked - NEW.delegate_locked - OLD.delegate_hes,
+           delegate_released = delegate_released - NEW.delegate_released - OLD.delegate_released,
+           delegate_value = delegate_hes + delegate_locked + delegate_released
+        where address = NEW.delegate_addr;
+    END IF;
+END||
+DELIMITER ;
+
+
+-- staking记录新增后，修改address的质押数据
+DROP TRIGGER IF EXISTS trigger_staking_insert;
+DELIMITER ||
+CREATE TRIGGER trigger_staking_insert AFTER insert
+    ON staking FOR EACH ROW
+BEGIN
+    update address set
+       redeemed_value = delegate_released + NEW.staking_reduction,
+       staking_value = NEW.staking_hes + NEW.staking_locked
+    where address = NEW.staking_addr;
+END||
+DELIMITER ;
+
+-- staking记录新增后，修改address的质押数据。根据复合主键修改staking记录，并且没有修改主键：OLD.staking_addr=NEW.staking_addr
+DROP TRIGGER IF EXISTS trigger_staking_update;
+DELIMITER ||
+CREATE TRIGGER trigger_staking_update AFTER update
+    ON staking FOR EACH ROW
+BEGIN
+    IF (OLD.STATUS = 1 or OLD.STATUS = 2) AND (NEW.STATUS = 3 or NEW.STATUS = 4) THEN -- 需要统计的状态，变成不要统计的状态
+        update address set
+           redeemed_value = delegate_released - OLD.staking_reduction, -- 不管staking_addr是否发生改变，只需重新统计OLD.staking_addr的质押数据
+           staking_value = staking_value - OLD.staking_locked
+        where address = OLD.staking_addr;
+    ELSEIF (OLD.STATUS = 3 or OLD.STATUS = 4) AND (NEW.STATUS = 1 or NEW.STATUS = 2) THEN -- 不管staking_addr是否发生改变，只需重新统计NEW.staking_addr的质押数据(相当于INSERT)
+        update address set
+           redeemed_value = delegate_released + NEW.staking_reduction, -- 新统计的是NEW记录的数据
+           staking_value = staking_value + NEW.staking_locked
+        where address = NEW.staking_addr;
+    ELSEIF (OLD.STATUS = 1 or OLD.STATUS = 2) AND (NEW.STATUS = 1 or NEW.STATUS = 2) THEN -- 新旧记录都是需要统计的状态
+        update address set
+           redeemed_value = delegate_released + NEW.staking_reduction - OLD.staking_reduction, -- 计算差额
+           staking_value = staking_value + NEW.staking_locked - OLD.staking_locked
+        where address = NEW.staking_addr;
+    END IF;
+END||
+DELIMITER ;

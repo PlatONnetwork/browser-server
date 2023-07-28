@@ -127,7 +127,8 @@ public class TransactionAnalyzer {
             for(ContractInfo contract : receipt.getContractCreated()){
                 //合约是新建的，因此获取binCode
 
-                // todo: 2023/05/04 lvxiaoyi 考虑在getTransactionReceipt时，随同contractCreated一起返回bincode
+                // 2023/05/04 lvxiaoyi 在getTransactionReceipt时，随同contractCreated一起返回bincode
+                // 2023/07/24 lvxiaoyi 拆分address表的contract_bin，拆分到单独的contract_bin表，
                 //String binCode = TransactionUtil.getContractBinCode(dtoTransaction, platOnClient, contract.getAddress());
                 String binCode = contract.getBin();
                 ContractTypeEnum contractType = ContractTypeEnum.getEnum(contract.getContractType());
@@ -449,7 +450,7 @@ public class TransactionAnalyzer {
 
     private List<TxTransferBak> resolveEmbedTransferTx(Block collectionBlock, com.platon.browser.elasticsearch.dto.Transaction tx, Receipt receipt) {
         List<TxTransferBak> transferBakList = new ArrayList<>();
-        for (EmbedTransfer embedTransfer: receipt.getEmbedTransfers()) {
+        for (EmbedTransfer embedTransfer : receipt.getEmbedTransfers()) {
             if(embedTransfer.getAmount() == null || StringUtils.isBlank(embedTransfer.getTo()) || StringUtils.isBlank(embedTransfer.getFrom())){
                 log.warn("当前交易[{}]的合约内部转账记录不全, embedTransfer = [{}]", tx.getHash(), embedTransfer);
                 continue;

@@ -15,10 +15,8 @@ import com.platon.browser.utils.AddressUtil;
 import com.platon.browser.utils.AppStatusUtil;
 import com.platon.browser.utils.TaskUtil;
 import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
@@ -68,13 +66,14 @@ public class AddressUpdateTask {
      * 地址表信息补充
      * 每5秒执行一次
      * 2023/03/29, lvxiaoyi, 改成用SQL来统计并更新地址的质押情况，委托情况
-     *
+     * 2023/07/24, lvxiaoyi, 原有JOB方式的SQL执行时间太长，会和agent冲突，造成表的死锁。改成在delegation/staking表上增加trigger来实时统计地址的质押，委托金额
      * @param :
      * @return: void
      * @date: 2021/12/7
      */
-    @XxlJob("addressUpdateJobHandler")
-    @Transactional(rollbackFor = {Exception.class, Error.class})
+
+    //@XxlJob("addressUpdateJobHandler")
+    //@Transactional(rollbackFor = {Exception.class, Error.class})
     public void updateStakingDelegationStats() {
         // 只有程序正常运行才执行任务
         if (!AppStatusUtil.isRunning()) {

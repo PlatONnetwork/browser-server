@@ -180,4 +180,31 @@
             where  id = #{item.tokenInventoryId,jdbcType=BIGINT}
         </foreach>
     </update>
+
+    <delete id="burn">
+        <foreach collection="list" item="item" separator=";">
+            delete from token_1155_inventory
+            where token_address = #{item.contract} and token_id = #{item.tokenId}
+        </foreach>
+    </delete>
+    <update id="updateIfExist">
+        <foreach collection="list" item="item" separator=";">
+            update token_1155_inventory
+            set token_tx_qty = token_tx_qty + 1, retry_num = 0
+            where token_address = #{item.contract} and token_id = #{item.tokenId}
+        </foreach>
+    </update>
+    <insert id="insertIgnore">
+        insert ignore into token_1155_inventory (token_address, token_id, token_tx_qty, retry_num) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.contract}, #{item.tokenId}, 1, 0)
+        </foreach>
+    </insert>
+    <insert id="insertOnDuplicateUpdate">
+        <foreach collection="list" item="item" separator=";">
+        insert into token_1155_inventory (token_address, token_id, token_tx_qty, retry_num)
+        values  (#{item.contract}, #{item.tokenId}, 1, 0)
+        on duplicate key update token_tx_qty = token_tx_qty +1, retry_num = 0
+        </foreach>
+    </insert>
 </mapper>

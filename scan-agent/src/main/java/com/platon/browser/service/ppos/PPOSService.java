@@ -105,9 +105,9 @@ public class PPOSService {
             //this.addressCache.update(tx);
             // 自增·
             allTxCount++;
-            // 分析真实交易
+            // 分析直接发给Platon内置PPOS合约的交易
             this.analyzePPosTx(event, tx, tar);
-            // 分析虚拟交易
+            // 分析通过用户合约，由用户合约调用platon内置PPOS合约，而产生的虚拟(或者叫间接的、代理的)ppos交易
             // 2023/04/14 lvixoayi 区块内交易的虚拟交易，目前仅仅限于：用户合约调用platon的内置合约。所有，虚拟交易的from/to，已经在NewAddressCache中
             List<Transaction> virtualTxes = tx.getVirtualTransactions();
             for (Transaction vt : virtualTxes) {

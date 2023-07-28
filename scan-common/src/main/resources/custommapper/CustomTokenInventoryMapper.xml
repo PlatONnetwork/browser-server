@@ -132,4 +132,19 @@
             update token_inventory set token_url =  #{item.tokenUrl,jdbcType=VARCHAR} where id = #{item.tokenInventoryId,jdbcType=BIGINT}
         </foreach>
     </update>
+
+    <delete id="burn">
+        <foreach collection="list" item="item" separator=";">
+            delete from token_inventory
+            where token_address = #{item.contract} and token_id = #{item.tokenId}
+        </foreach>
+    </delete>
+
+    <insert id="insertOnDuplicateUpdate">
+        <foreach collection="list" item="item" separator=";">
+            insert into token_inventory (token_address, token_id, `owner`, token_tx_qty, token_owner_tx_qty, retry_num)
+            values (#{item.contract}, #{item.tokenId}, #{item.to}, 1, 1, 0)
+            on duplicate key update `owner` = #{item.to}, token_tx_qty = token_tx_qty +1, token_owner_tx_qty = 1, retry_num = 0
+        </foreach>
+    </insert>
 </mapper>

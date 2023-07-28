@@ -320,7 +320,7 @@ public class ErcTokenAnalyzer {
                 return;
             }
 
-            log.debug("开始分析区块的token交易，块高：{}", collectionBlock.getNum());
+            log.debug("开始分析区块的token交易，块高：{}, tokenLogs: {}", collectionBlock.getNum(), JSON.toJSONString(tokenLogs));
             StopWatch watch = new StopWatch("分析区块token交易");
 
             tokenLogs.forEach(tokenLog -> {

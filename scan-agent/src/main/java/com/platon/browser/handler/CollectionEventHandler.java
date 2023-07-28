@@ -147,7 +147,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 // 解析区块中的交易，特别是token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
                 com.platon.browser.elasticsearch.dto.Transaction dtoTransaction = transactionAnalyzer.analyze(event.getBlock(), rawTx, receiptMap.get(rawTx.getHash()));
                 watch.stop();
-                // 把解析好的交易添加到当前区块的交易列表
+                // 把解析好的交易添加到当前区块的交易列表（交易类型已经设置号）
                 event.getBlock().getDtoTransactions().add(dtoTransaction);
                 // 设置当前块的erc20交易数和erc721u交易数，以便更新network_stat表
                 event.getBlock().setErc20TxQty(event.getBlock().getErc20TxQty() + dtoTransaction.getErc20TxList().size());
