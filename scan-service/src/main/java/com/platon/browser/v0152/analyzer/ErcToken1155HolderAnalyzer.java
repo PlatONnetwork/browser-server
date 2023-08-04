@@ -4,15 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
 import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.Token1155HolderKey;
+import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.elasticsearch.dto.ErcTx;
 import com.platon.browser.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Erc721 token 持有者服务
@@ -31,9 +35,10 @@ public class ErcToken1155HolderAnalyzer {
     public void analyze(List<ErcTx> txList) {
         List<Token1155Holder> insert = new ArrayList<>();
         List<Token1155Holder> update = new ArrayList<>();
+        Map<String, Token1155Holder> context = new HashMap<>();
         txList.forEach(tx -> {
-            resolveTokenHolder(tx.getFrom(), tx, insert, update);
-            resolveTokenHolder(tx.getTo(), tx, insert, update);
+            resolveTokenHolder(tx.getFrom(), tx, context, insert, update);
+            resolveTokenHolder(tx.getTo(), tx, context, insert, update);
         });
 
         if (CollUtil.isNotEmpty(insert)) {
@@ -52,30 +57,39 @@ public class ErcToken1155HolderAnalyzer {
      * @return: void
      * @date: 2022/8/1
      */
-    private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, List<Token1155Holder> insert, List<Token1155Holder> update) {
+    private void resolveTokenHolder(String ownerAddress, ErcTx ercTx, Map<String, Token1155Holder> context, List<Token1155Holder> insert, List<Token1155Holder> update) {
         // 零地址不需要創建holder
         if (AddressUtil.isAddrZero(ownerAddress)) {
             log.warn("该地址[{}]为0地址，不创建token holder", ownerAddress);
             return;
         }
-        Token1155HolderKey key = new Token1155HolderKey();
-        key.setTokenAddress(ercTx.getContract());
-        key.setAddress(ownerAddress);
-        key.setTokenId(ercTx.getTokenId());
-        Token1155Holder tokenHolder = customToken1155HolderMapper.selectByUK(key);
-        if (tokenHolder == null) {
-            tokenHolder = new Token1155Holder();
-            tokenHolder.setTokenAddress(key.getTokenAddress());
-            tokenHolder.setAddress(key.getAddress());
-            // 余额由定时任务更新，设置成默认值
-            tokenHolder.setBalance("0");
-            tokenHolder.setTokenId(ercTx.getTokenId());
-            tokenHolder.setTokenOwnerTxQty(1);
-            insert.add(tokenHolder);
+        // 是否在缓存
+        String objectKey = StringUtils.join(ercTx.getContract(), ercTx.getTokenId(), ownerAddress);
+        Token1155Holder tokenHolder = null;
+        if(context.containsKey(objectKey)){
+            tokenHolder = context.get(objectKey);
+            tokenHolder.setTokenOwnerTxQty(tokenHolder.getTokenOwnerTxQty() + 1);
         } else {
-            int tokenOwnerTxQty = tokenHolder.getTokenOwnerTxQty() == null ? 0 : tokenHolder.getTokenOwnerTxQty();
-            tokenHolder.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
-            update.add(tokenHolder);
+            Token1155HolderKey key = new Token1155HolderKey();
+            key.setTokenAddress(ercTx.getContract());
+            key.setAddress(ownerAddress);
+            key.setTokenId(ercTx.getTokenId());
+            tokenHolder = customToken1155HolderMapper.selectByUK(key);
+            if (tokenHolder == null) {
+                tokenHolder = new Token1155Holder();
+                tokenHolder.setTokenAddress(key.getTokenAddress());
+                tokenHolder.setAddress(key.getAddress());
+                // 余额由定时任务更新，设置成默认值
+                tokenHolder.setBalance("0");
+                tokenHolder.setTokenId(ercTx.getTokenId());
+                tokenHolder.setTokenOwnerTxQty(1);
+                insert.add(tokenHolder);
+            } else {
+                int tokenOwnerTxQty = tokenHolder.getTokenOwnerTxQty() == null ? 0 : tokenHolder.getTokenOwnerTxQty();
+                tokenHolder.setTokenOwnerTxQty(tokenOwnerTxQty + 1);
+                update.add(tokenHolder);
+            }
+            context.put(objectKey, tokenHolder);
         }
         log.info("该1155合约地址[{}][{}],持有者地址[{}],持有者对该合约的交易数为[{}]", tokenHolder.getTokenAddress(), tokenHolder.getTokenId(), tokenHolder.getAddress(), tokenHolder.getTokenOwnerTxQty());
     }
