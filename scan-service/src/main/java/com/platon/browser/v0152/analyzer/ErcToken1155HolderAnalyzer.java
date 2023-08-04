@@ -37,8 +37,12 @@ public class ErcToken1155HolderAnalyzer {
         List<Token1155Holder> update = new ArrayList<>();
         Map<String, Token1155Holder> context = new HashMap<>();
         txList.forEach(tx -> {
-            resolveTokenHolder(tx.getFrom(), tx, context, insert, update);
-            resolveTokenHolder(tx.getTo(), tx, context, insert, update);
+            if(StringUtils.equals(tx.getFrom(), tx.getTo())){
+                resolveTokenHolder(tx.getFrom(), tx, context, insert, update);
+            }else {
+                resolveTokenHolder(tx.getFrom(), tx, context, insert, update);
+                resolveTokenHolder(tx.getTo(), tx, context, insert, update);
+            }
         });
 
         if (CollUtil.isNotEmpty(insert)) {
