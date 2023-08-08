@@ -736,6 +736,19 @@ CREATE TABLE `token_tracker` (
 )  COMMENT ='token探测表';
 */
 
+DROP TABLE IF EXISTS `token_holder_balance_refresh_log`;
+CREATE TABLE `token_holder_balance_refresh_log`
+(
+    `id`            BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `block_number`  BIGINT NOT NULL COMMENT '块高',
+    `holder`        VARCHAR(42)  NOT NULL COMMENT '持有人账户地址',
+    `token_address` VARCHAR(42)  NOT NULL COMMENT 'token地址',
+    `token_type`    VARCHAR(8) NOT NULL COMMENT 'token类型, erc20, erc721, erc1155',
+    `token_id`      VARCHAR(255) COMMENT 'tokenId',
+    PRIMARY KEY (`id`)
+) COMMENT ='token持有人持有余额更新日志表';
+
+
 -- 初始化数据
 -- 还有部分基金会地址由运维手工导入
 INSERT INTO `internal_address` (`address`, `type`)
