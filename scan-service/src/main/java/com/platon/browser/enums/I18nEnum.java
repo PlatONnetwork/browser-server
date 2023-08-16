@@ -258,7 +258,8 @@ public enum I18nEnum {
     CODE304014,
     CODE304015,
     CODE305001,
-    DELETEGATE_CODE304013;
+    DELETEGATE_CODE304013,
+    REDEEM_DELEGATION; //com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.REDEEM_DELEGATION (1006, "领取解锁的委托"),
 
     private static final Map<String, I18nEnum> ENUMS = new HashMap<>();
 
