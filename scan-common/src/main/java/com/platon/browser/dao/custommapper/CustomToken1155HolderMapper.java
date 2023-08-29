@@ -60,6 +60,10 @@ public interface CustomToken1155HolderMapper {
      */
     Page<Token1155HolderListBean> findToken1155HolderList(@Param("contract") String contract);
 
+    CustomTokenHolder summaryTokenHolderList(@Param("tokenAddress") String tokenAddress);
+    List<Token1155HolderListBean> selectTokenHolderList(@Param("tokenAddress") String tokenAddress, @Param("limitBegin")  Integer limitBegin, @Param("limitSize")  Integer limitSize);
+
+
     /**
      * 库存列表
      *

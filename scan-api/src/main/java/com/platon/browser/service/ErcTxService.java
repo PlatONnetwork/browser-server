@@ -13,6 +13,7 @@ import com.platon.browser.bean.Token1155HolderListBean;
 import com.platon.browser.cache.TokenTransferRecordCacheDto;
 import com.platon.browser.config.DownFileCommon;
 import com.platon.browser.dao.custommapper.CustomToken1155HolderMapper;
+import com.platon.browser.dao.custommapper.CustomToken1155InventoryMapper;
 import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.entity.*;
 import com.platon.browser.dao.mapper.AddressMapper;
@@ -96,6 +97,9 @@ public class ErcTxService {
 
     @Resource
     private TokenInventoryMapper token721InventoryMapper;
+
+    @Resource
+    private CustomToken1155InventoryMapper customToken1155InventoryMapper;
 
     @Resource
     private TokenMapper tokenMapper;
@@ -448,30 +452,37 @@ public class ErcTxService {
         return result;
     }
 
+    // 目前查询不支持排序，因为地址持有的tokenId种类数是动态计算的, 所以排序会导致查询比较耗时
     public RespPage<QueryTokenHolderListResp> token1155HolderList(QueryTokenHolderListReq req) {
         RespPage<QueryTokenHolderListResp> result = new RespPage<>();
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
-        Page<Token1155HolderListBean> token1155HolderList = customToken1155HolderMapper.findToken1155HolderList(req.getContract());
-        List<QueryTokenHolderListResp> list = new ArrayList<>();
-        if (CollUtil.isNotEmpty(token1155HolderList)) {
-            for (Token1155HolderListBean token1155HolderListBean : token1155HolderList) {
-                QueryTokenHolderListResp queryTokenHolderListResp = new QueryTokenHolderListResp();
-                queryTokenHolderListResp.setAddress(token1155HolderListBean.getAddress());
-                queryTokenHolderListResp.setPercent(token1155HolderListBean.getPercent()
-                                                                           .multiply(BigDecimal.valueOf(100))
-                                                                           .setScale(decimal, RoundingMode.HALF_UP)
-                                                                           .stripTrailingZeros()
-                                                                           .toPlainString() + "%");
-                queryTokenHolderListResp.setBalance(new BigDecimal(token1155HolderListBean.getBalance()));
-                list.add(queryTokenHolderListResp);
-            }
-            list.sort((v1, v2) -> {
-                BigDecimal value1 = new BigDecimal(StrUtil.removeAll(v1.getPercent(), '%'));
-                BigDecimal value2 = new BigDecimal(StrUtil.removeAll(v2.getPercent(), '%'));
-                return value2.subtract(value1).compareTo(BigDecimal.ZERO);
-            });
-            result.init(token1155HolderList, list);
+
+        // 查询分页汇总信息
+        CustomTokenHolder summary = customToken1155HolderMapper.summaryTokenHolderList(req.getContract());
+        result.setTotalCount(summary.getHolderCount());
+        result.setDisplayTotalCount(summary.getHolderCount());
+        result.setTotalPages(summary.getHolderCount() % req.getPageSize() == 0 ? summary.getHolderCount() / req.getPageSize() : summary.getHolderCount() / req.getPageSize() + 1);
+        if(summary.getHolderCount() == 0){
+            return result;
         }
+
+        int limitBegin = (req.getPageNo() - 1) * req.getPageSize();
+        int limitSize = req.getPageSize();
+        List<Token1155HolderListBean> itemList = customToken1155HolderMapper.selectTokenHolderList(req.getContract(), limitBegin, limitSize);
+        if(itemList.isEmpty()){
+            return result;
+        }
+
+        result.setData(itemList.stream().map(item -> {
+            QueryTokenHolderListResp converted = new QueryTokenHolderListResp();
+            converted.setAddress(item.getAddress());
+            converted.setBalance(new BigDecimal(item.getBalance()));
+            converted.setPercent(converted.getBalance().divide(new BigDecimal(summary.getHolderSumBalance()), decimal, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(decimal, RoundingMode.HALF_UP)
+                    .stripTrailingZeros()
+                    .toPlainString() + "%");
+            return converted;
+        }).collect(Collectors.toList()));
         return result;
     }
 
