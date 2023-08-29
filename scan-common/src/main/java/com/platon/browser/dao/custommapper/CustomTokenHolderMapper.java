@@ -11,6 +11,8 @@ import java.util.List;
 public interface CustomTokenHolderMapper {
 
     Page<CustomTokenHolder> selectListByParams(@Param("tokenAddress") String tokenAddress, @Param("address") String address, @Param("type") String type);
+    CustomTokenHolder summaryTokenHolderList(@Param("tokenAddress") String tokenAddress);
+    List<CustomTokenHolder> selectTokenHolderList(@Param("tokenAddress") String tokenAddress, @Param("limitBegin") Integer limitBegin, @Param("limitSize") Integer limitSize);
 
     Page<CustomTokenHolder> selectERC721Holder(@Param("tokenAddress") String tokenAddress);
 

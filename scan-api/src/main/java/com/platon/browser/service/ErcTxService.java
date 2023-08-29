@@ -51,6 +51,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -401,68 +402,49 @@ public class ErcTxService {
             log.debug("~ tokenHolderList, params: " + JSON.toJSONString(req));
         }
         RespPage<QueryTokenHolderListResp> result = new RespPage<>();
-        PageHelper.startPage(req.getPageNo(), req.getPageSize());
-        Page<CustomTokenHolder> ids = this.customTokenHolderMapper.selectListByParams(req.getContract(), null, null);
-        if (ids == null || ids.isEmpty()) {
+        // 查询token信息
+        Token token = tokenMapper.selectByPrimaryKey(req.getContract());
+        if(token == null){
             return result;
         }
-        List<QueryTokenHolderListResp> respList = new ArrayList<>();
-        TokenInventoryExample token721Example = new TokenInventoryExample();
-        token721Example.createCriteria().andTokenAddressEqualTo(req.getContract());
-        Page<TokenInventory> totalTokenInventory = token721InventoryMapper.selectByExample(token721Example);
-        Map<String, Long> map = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
-        ids.getResult().forEach(tokenHolder -> {
-            QueryTokenHolderListResp resp = new QueryTokenHolderListResp();
-            resp.setAddress(tokenHolder.getAddress());
-            BigDecimal originBalance = getAddressBalance(tokenHolder);
-            originBalance = (originBalance == null) ? BigDecimal.ZERO : originBalance;
-            if (tokenHolder.getDecimal() != null) {
-                //金额转换成对应的值
-                BigDecimal balance = ConvertUtil.convertByFactor(originBalance, tokenHolder.getDecimal());
-                resp.setBalance(balance);
-                //erc20
-                if (ErcTypeEnum.ERC20.getDesc().equalsIgnoreCase(tokenHolder.getType())) {
-
-                    //计算总供应量
-                    String originTotalSupply = tokenHolder.getTotalSupply();
-                    if (StrUtil.isBlank(originTotalSupply) || Convert.toLong(originTotalSupply, 0L).compareTo(0L) <= 0) {
-                        // 总供应量小于等于0，则占比设置为0%
-                        resp.setPercent("0.0000%");
-                    } else {
-                        BigDecimal totalSupply = ConvertUtil.convertByFactor(new BigDecimal(originTotalSupply), tokenHolder.getDecimal());
-                        // 总供应量大于0, 使用实际的余额除以总供应量
-                        resp.setPercent(balance.divide(totalSupply, decimal, RoundingMode.HALF_UP)
-                                               .multiply(BigDecimal.valueOf(100))
-                                               .setScale(decimal, RoundingMode.HALF_UP)
-                                               .stripTrailingZeros()
-                                               .toPlainString() + "%");
-                    }
-                } else if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(tokenHolder.getType())) {
-                    //erc721
-                    int holderNum = map.get(tokenHolder.getAddress()).intValue();
-                    long total = totalTokenInventory.size();
-                    String percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP)
-                                                              .multiply(BigDecimal.valueOf(100))
-                                                              .setScale(decimal, RoundingMode.HALF_UP)
-                                                              .stripTrailingZeros()
-                                                              .toPlainString() + "%";
-                    resp.setPercent(percent);
-                }
-            } else {
-                resp.setBalance(originBalance);
-                resp.setPercent("0.0000%");
-            }
-            respList.add(resp);
-        });
-        Token token = tokenMapper.selectByPrimaryKey(req.getContract());
-        if (ErcTypeEnum.ERC721.getDesc().equalsIgnoreCase(token.getType())) {
-            respList.sort((v1, v2) -> {
-                BigDecimal value1 = new BigDecimal(StrUtil.removeAll(v1.getPercent(), '%'));
-                BigDecimal value2 = new BigDecimal(StrUtil.removeAll(v2.getPercent(), '%'));
-                return value2.subtract(value1).compareTo(BigDecimal.ZERO);
-            });
+        // 查询分页汇总信息
+        CustomTokenHolder summary = customTokenHolderMapper.summaryTokenHolderList(req.getContract());
+        result.setTotalCount(summary.getHolderCount());
+        result.setDisplayTotalCount(summary.getHolderCount());
+        result.setTotalPages(summary.getHolderCount() % req.getPageSize() == 0 ? summary.getHolderCount() / req.getPageSize() : summary.getHolderCount() / req.getPageSize() + 1);
+        if(summary.getHolderCount() == 0){
+            return result;
         }
-        result.init(ids, respList);
+
+        int limitBegin = (req.getPageNo() - 1) * req.getPageSize();
+        int limitSize = req.getPageSize();
+        List<CustomTokenHolder> itemList = customTokenHolderMapper.selectTokenHolderList(req.getContract(), limitBegin, limitSize);
+        if(itemList.isEmpty()){
+            return result;
+        }
+
+        BigInteger tokenTotalSupply = Convert.toBigInteger(token.getTotalSupply(), BigInteger.ZERO);
+        if(tokenTotalSupply.compareTo(BigInteger.ZERO) == 0){
+            tokenTotalSupply = Convert.toBigInteger(summary.getHolderSumBalance(), BigInteger.ZERO);
+        }
+
+        BigInteger finalTokenTotalSupply = tokenTotalSupply;
+        result.setData(itemList.stream().map(item -> {
+            QueryTokenHolderListResp converted = new QueryTokenHolderListResp();
+            converted.setAddress(item.getAddress());
+            converted.setBalance(Convert.toBigDecimal(item.getBalance(), BigDecimal.ZERO));
+            if(finalTokenTotalSupply.compareTo(BigInteger.ZERO) == 0){
+                converted.setPercent("0.0000%");
+            } else {
+                converted.setPercent(converted.getBalance().divide(new BigDecimal(finalTokenTotalSupply), decimal, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100))
+                        .setScale(decimal, RoundingMode.HALF_UP)
+                        .stripTrailingZeros()
+                        .toPlainString() + "%");
+            }
+
+            return converted;
+        }).collect(Collectors.toList()));
         return result;
     }
 

@@ -29,4 +29,8 @@ public class CustomTokenHolder {
 
     private Date createTime;
 
+    private Long holderCount;
+
+    private String holderSumBalance;
+
 }

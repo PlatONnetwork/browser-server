@@ -28,6 +28,27 @@
         </where>
         order by balance desc
     </select>
+
+    <select id="summaryTokenHolderList" resultType="com.platon.browser.bean.CustomTokenHolder">
+        select
+        count(1) as holderCount,
+        sum(cast(th.`balance` as decimal(64,0))) as holderSumBalance
+        from token_holder th
+        where th.token_address = #{tokenAddress} and th.`balance` != 0
+    </select>
+
+    <select id="selectTokenHolderList" resultType="com.platon.browser.bean.CustomTokenHolder">
+        select
+        th.token_address as tokenAddress,
+        th.address,
+        th.balance,
+        th.token_tx_qty as txCount
+        from token_holder th
+        where th.token_address = #{tokenAddress} and th.`balance` != 0
+        order by cast(th.`balance` as decimal(64 ,0)) desc
+        limit #{limitBegin}, #{limitSize}
+    </select>
+
     <select id="selectERC721Holder" parameterType="java.lang.String"
             resultType="com.platon.browser.bean.CustomTokenHolder">
         select th.token_address as tokenAddress,
