@@ -32,7 +32,7 @@
     <select id="summaryTokenHolderList" resultType="com.platon.browser.bean.CustomTokenHolder">
         select
         count(1) as holderCount,
-        sum(cast(th.`balance` as decimal(64,0))) as holderSumBalance
+        ifnull(sum(cast(th.`balance` as decimal(64,0))), 0) as holderSumBalance
         from token_holder th
         where th.token_address = #{tokenAddress} and th.`balance` != 0
     </select>
