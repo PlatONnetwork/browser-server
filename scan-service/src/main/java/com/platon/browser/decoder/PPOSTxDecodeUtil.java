@@ -3,11 +3,11 @@ package com.platon.browser.decoder;
 import com.platon.browser.decoder.ppos.*;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.param.OthersTxParam;
-import com.platon.protocol.core.methods.response.Log;
 import com.platon.rlp.solidity.RlpDecoder;
 import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.rlp.solidity.RlpType;
+import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -29,8 +29,21 @@ public class PPOSTxDecodeUtil {
     private PPOSTxDecodeUtil() {
     }
 
-    public static PPOSTxDecodeResult decode(String txInput, List<Log> logs) {
+    public static PPOSTxDecodeResult decode(String txInput, String logDataHex) {
         PPOSTxDecodeResult result = new PPOSTxDecodeResult();
+
+
+        result.setTxErrCode(-1);
+        List<RlpType> rlpDataList = null;
+        // 如果datas为空, log data =  rlp([errCodeString]),
+        // 如果datas不为空, log data =  rlp([errCodeString,rlp(data1),rlp(data2)...]),
+        if(StringUtils.isNotBlank(logDataHex)){
+            RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logDataHex));
+            rlpDataList = ((RlpList) (rlp.getValues().get(0))).getValues();
+            byte[] errCode =((RlpString) rlpDataList.remove(0)).getBytes(); //把errCode从队列中移出，剩余正真的返回值
+            result.setTxErrCode(Integer.parseInt(new String(errCode)));
+        }
+
         try {
             if (StringUtils.isNotEmpty(txInput) && !txInput.equals("0x")) {
                 RlpList rlpList = RlpDecoder.decode(Hex.decode(txInput.replace("0x", "")));
@@ -69,9 +82,9 @@ public class PPOSTxDecodeUtil {
                     case DELEGATE_CREATE: // 1004 发起委托
                         return result.setParam(DelegateCreateDecoder.decode(rootList));
                     case DELEGATE_EXIT: // 1005 减持/撤销委托
-                        return result.setParam(DelegateExitDecoder.decode(rootList, logs));
+                        return result.setParam(DelegateExitDecoder.decode(rootList, result.getTxErrCode(), rlpDataList));
                     case REDEEM_DELEGATION: // 1006 领取解锁的委托
-                        return result.setParam(RedeemDelegationDecoder.decode(rootList, logs));
+                        return result.setParam(RedeemDelegationDecoder.decode(rootList, result.getTxErrCode(), rlpDataList));
                     case PROPOSAL_TEXT: // 2000 提交文本提案
                         return result.setParam(ProposalTextDecoder.decode(rootList));
                     case PROPOSAL_UPGRADE: // 2001 提交升级提案
@@ -90,10 +103,10 @@ public class PPOSTxDecodeUtil {
                         return result.setParam(RestrictingCreateDecoder.decode(rootList));
                     case CLAIM_REWARDS: // 5000 领取委托奖励
                         // 如果日志为空则不解析
-                        if (logs.isEmpty()) {
+                        if (StringUtils.isBlank(logDataHex)) {
                             return result;
                         }
-                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList, logs));
+                        return result.setParam(DelegateRewardClaimDecoder.decode(rootList, result.getTxErrCode(), rlpDataList));
                     default:
                         break;
                 }
@@ -103,5 +116,50 @@ public class PPOSTxDecodeUtil {
         }
         return result;
     }
-
+/*
+    public static PPOSTxDecodeResult decode(ImplicitPPOSTx implicitPPOSTx) {
+        PPOSTxDecodeResult result = new PPOSTxDecodeResult();
+        Transaction.TypeEnum typeEnum = Transaction.TypeEnum.getEnum(implicitPPOSTx.getFnCode());
+        switch (typeEnum) {
+            case STAKE_CREATE: // 1000 发起质押
+                return result.setParam(StakeCreateDecoder.decode(implicitPPOSTx));
+            case STAKE_MODIFY: // 1001 修改质押
+                return result.setParam(StakeModifyDecoder.decode(implicitPPOSTx));
+           case STAKE_INCREASE: // 1002 增持质押
+                return result.setParam(StakeIncreaseDecoder.decode(implicitPPOSTx));
+            case STAKE_EXIT: // 1003 撤销质押
+                return result.setParam(StakeExitDecoder.decode(implicitPPOSTx));
+            case DELEGATE_CREATE: // 1004 发起委托
+                return result.setParam(DelegateCreateDecoder.decode(implicitPPOSTx));
+            case DELEGATE_EXIT: // 1005 减持/撤销委托
+                return result.setParam(DelegateExitDecoder.decode(implicitPPOSTx));
+            case REDEEM_DELEGATION: // 1006 领取解锁的委托
+                return result.setParam(RedeemDelegationDecoder.decode(implicitPPOSTx));
+            case PROPOSAL_TEXT: // 2000 提交文本提案
+                return result.setParam(ProposalTextDecoder.decode(implicitPPOSTx));
+            case PROPOSAL_UPGRADE: // 2001 提交升级提案
+                return result.setParam(ProposalUpgradeDecoder.decode(implicitPPOSTx));
+            case PROPOSAL_PARAMETER: // 2002 提交参数提案
+                return result.setParam(ProposalParameterDecoder.decode(implicitPPOSTx));
+            case PROPOSAL_CANCEL: // 2005 提交取消提案
+                return result.setParam(ProposalCancelDecoder.decode(implicitPPOSTx));
+            case PROPOSAL_VOTE: // 2003 给提案投票
+                return result.setParam(ProposalVoteDecoder.decode(implicitPPOSTx));
+            case VERSION_DECLARE: // 2004 版本声明
+                return result.setParam(VersionDeclareDecoder.decode(implicitPPOSTx));
+            case REPORT: // 3000 举报双签
+                return result.setParam(ReportDecoder.decode(implicitPPOSTx));
+            case RESTRICTING_CREATE: // 4000 创建锁仓计划
+                return result.setParam(RestrictingCreateDecoder.decode(implicitPPOSTx));
+            case CLAIM_REWARDS: // 5000 领取委托奖励
+                // 如果日志为空则不解析
+                if (log == null) {
+                    return result;
+                }
+                return result.setParam(DelegateRewardClaimDecoder.decode(implicitPPOSTx));
+            default:
+                break;
+        }
+        return result;
+    }*/
 }

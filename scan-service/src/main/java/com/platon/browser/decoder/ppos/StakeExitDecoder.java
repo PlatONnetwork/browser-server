@@ -12,6 +12,13 @@ import com.platon.rlp.solidity.RlpString;
  **/
 public class StakeExitDecoder extends AbstractPPOSDecoder {
     private StakeExitDecoder(){}
+
+    /**
+     * 质押合约，退出质押
+     * withdrewStaking(nodeId discover.NodeID)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         //被质押的节点的NodeId
         String nodeId = stringResolver((RlpString) rootList.getValues().get(1));

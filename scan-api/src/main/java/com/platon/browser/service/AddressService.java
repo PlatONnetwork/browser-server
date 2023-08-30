@@ -327,4 +327,14 @@ public class AddressService {
         return resp;
     }
 
+    public BigInteger totalRestrictingAmount(String addresses) {
+         try {
+            // 锁仓可用余额查询特殊节点接口
+            return specialApi.totalRestrictingAmount(platonClient.getWeb3jWrapper().getWeb3j(), addresses);
+        } catch (Exception e) {
+            logger.error("totalRestrictingAmount error", e);
+            throw new BusinessException(i18n.i(I18nEnum.SYSTEM_EXCEPTION));
+        }
+
+    }
 }

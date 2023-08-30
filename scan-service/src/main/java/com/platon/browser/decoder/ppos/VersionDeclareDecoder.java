@@ -14,6 +14,13 @@ import java.math.BigInteger;
  **/
 public class VersionDeclareDecoder extends AbstractPPOSDecoder {
     private VersionDeclareDecoder(){}
+
+    /**
+     * 治理合约，版本声明的参数：
+     * declareVersion(activeNode discover.NodeID, programVersion uint32, programVersionSign common.VersionSign)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 版本声明
         //声明的节点，只能是验证人/候选人

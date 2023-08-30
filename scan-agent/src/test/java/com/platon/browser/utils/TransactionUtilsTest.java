@@ -1,26 +1,22 @@
 package com.platon.browser.utils;//package com.platon.browser.utils;
 
 import com.platon.browser.AgentTestData;
-import com.platon.browser.bean.*;
+import com.platon.browser.bean.ComplementInfo;
+import com.platon.browser.bean.DtoTransactionUtil;
+import com.platon.browser.bean.PPosInvokeContractInput;
+import com.platon.browser.bean.TransData;
 import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.client.PlatOnClient;
-import com.platon.browser.client.SpecialApi;
 import com.platon.browser.client.Web3jWrapper;
 import com.platon.browser.elasticsearch.dto.Block;
 import com.platon.browser.elasticsearch.dto.Transaction;
 import com.platon.browser.enums.ContractTypeEnum;
 import com.platon.browser.enums.InnerContractAddrEnum;
 import com.platon.browser.exception.BeanCreateOrUpdateException;
-import com.platon.browser.exception.BlankResponseException;
-import com.platon.browser.exception.ContractInvokeException;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.core.Request;
 import com.platon.protocol.core.methods.response.Log;
 import com.platon.protocol.core.methods.response.PlatonGetCode;
-import com.platon.rlp.solidity.RlpEncoder;
-import com.platon.rlp.solidity.RlpList;
-import com.platon.rlp.solidity.RlpString;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -123,55 +119,5 @@ public class TransactionUtilsTest extends AgentTestData {
         when(this.newAddressCache.isEvmContractAddress(any())).thenReturn(true);
         TransactionUtil.resolveGeneralTransferTxComplementInfo(dtoTransaction, ci, this.newAddressCache);
         Assertions.assertTrue(true);
-    }
-
-    @Test
-    public void processVirtualTx() throws ContractInvokeException, BlankResponseException {
-        Logger logger = LoggerFactory.getLogger("123");
-        Long bn = 100l;
-        CollectionBlock collectionBlock = CollectionBlock.newInstance();
-        collectionBlock.setNum(bn);
-        SpecialApi specialApi = mock(SpecialApi.class);
-        com.platon.browser.elasticsearch.dto.Transaction dtoTransaction = DtoTransactionUtil.newDtoTransaction();
-        Receipt receipt = new Receipt();
-        List<PPosInvokeContractInput> pPosInvokeContractInput4Blocks = new ArrayList<>();
-        PPosInvokeContractInput pPosInvokeContractInput = new PPosInvokeContractInput();
-        pPosInvokeContractInput.setTxHash("123");
-        List<TransData> transDatas = new ArrayList<>();
-        TransData transData = new TransData();
-        transData.setCode("0x21345698");
-        transDatas.add(transData);
-        TransData transData2 = new TransData();
-        transData2.setInput("0xf858838203ed83820d70b842b84077fffc999d9f9403b65009f1eb27bae65774e2d8ea36f7b20a89f82642a5067557430e6edfe5320bb81c3666a19cf4a5172d6533117d7ebcd0f2c820554990508b8a69e10de76676d0800000");
-        transData2.setCode("0");
-        transDatas.add(transData2);
-        TransData transData3 = new TransData();
-        byte[] data = RlpEncoder.encode(new RlpList(RlpString.create(RlpEncoder.encode(RlpString.create(5000)))));
-        String txInput = Hex.toHexString(data);
-        transData3.setInput(txInput);
-        transData3.setCode("0");
-        transDatas.add(transData3);
-        pPosInvokeContractInput.setTransDatas(transDatas);
-        pPosInvokeContractInput4Blocks.add(pPosInvokeContractInput);
-//        PPosInvokeContractInputCache.update(bn, pPosInvokeContractInput4Blocks);
-        when(specialApi.getPPosInvokeInfo(any(), any())).thenReturn(pPosInvokeContractInput4Blocks);
-        dtoTransaction.setHash("0x123");
-        dtoTransaction.setStatus(1);
-
-        Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
-        when(this.platOnClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
-        Web3j web3j = mock(Web3j.class);
-        when(web3jWrapper.getWeb3j()).thenReturn(web3j);
-
-        List<Log> logs = new ArrayList<>();
-        Log log = new Log();
-        log.setData("0xf84e30b84bf849f847b840362003c50ed3a523cdede37a001803b8f0fed27cb402b3d6127a1a96661ec202318f68f4c76d9b0bfbabfd551a178d4335eaeaa9b7981a4df30dfc8c0bfe3384830f424064");
-        logs.add(log);
-        Log log2 = new Log();
-        log2.setData("0xf84e30b84bf849f847b840362003c50ed3a523cdede37a001803b8f0fed27cb402b3d6127a1a96661ec202318f68f4c76d9b0bfbabfd551a178d4335eaeaa9b7981a4df30dfc8c0bfe3384830f424064");
-        logs.add(log);
-        logs.add(log2);
-        receipt.setLogs(logs);
-        TransactionUtil.processVirtualTx(collectionBlock, specialApi, this.platOnClient, dtoTransaction, receipt, newAddressCache);
     }
 }

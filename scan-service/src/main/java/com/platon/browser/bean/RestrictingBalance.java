@@ -10,15 +10,16 @@ import java.util.List;
  * @Date: 2019/8/15 19:27
  * @Description:
  */
+
 public class RestrictingBalance {
 
     private String account;
 
     private BigInteger freeBalance; //EOA帐号余额
 
-    private BigInteger lockBalance; //EOA的锁仓未释放余额
+    private BigInteger lockBalance; //EOA的锁仓未释放余额, 即可用于质押或委托的锁仓金额
 
-    private BigInteger pledgeBalance;
+    private BigInteger pledgeBalance; // 已用于质押或委托的锁仓金额
 
     /**
      * 委托锁定待提取中余额部分
@@ -43,8 +44,17 @@ public class RestrictingBalance {
         this.lockBalance = Numeric.decodeQuantity(lockBalance);
     }
 
+    public void setLockBalance(BigInteger lockBalance) {
+        this.lockBalance =lockBalance;
+    }
+
+
     public void setPledgeBalance(String pledgeBalance) {
         this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
+    }
+
+    public void setPledgeBalance(BigInteger pledgeBalance) {
+        this.pledgeBalance = pledgeBalance;
     }
 
     public String getAccount() {

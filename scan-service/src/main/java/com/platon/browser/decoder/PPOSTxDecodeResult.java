@@ -13,6 +13,16 @@ public class PPOSTxDecodeResult {
     private TxParam param= new OthersTxParam();
     private Transaction.TypeEnum typeEnum= Transaction.TypeEnum.OTHERS;
 
+    private Integer txErrCode;
+
+    public Integer getTxErrCode() {
+        return txErrCode;
+    }
+
+    public void setTxErrCode(Integer txErrCode) {
+        this.txErrCode = txErrCode;
+    }
+
     public TxParam getParam() {
         return param;
     }

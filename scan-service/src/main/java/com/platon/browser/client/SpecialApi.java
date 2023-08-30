@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -278,6 +279,8 @@ public class SpecialApi {
         }
         return this.getRestrictingBalance(web3j, addresses, blockParameter);
     }
+
+
     public List<RestrictingBalance> getRestrictingBalance(Web3j web3j, String addresses, DefaultBlockParameter blockParameter) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE, Collections.singletonList(new Utf8String(addresses)));
         CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), blockParameter);
@@ -387,6 +390,9 @@ public class SpecialApi {
      * @param blockNumber
      * @return
      * @throws Exception
+     *
+     * @deprecated 不再使用，有特殊节点收集代理PPOS调用和结果
+     *
      */
     public List<PPosInvokeContractInput> getPPosInvokeInfo(Web3j web3j, BigInteger blockNumber) throws ContractInvokeException, BlankResponseException {
         final Function function = new Function(GET_PPOS_INFO_FUNC_TYPE, Collections.singletonList(new Uint256(blockNumber)));
@@ -437,4 +443,59 @@ public class SpecialApi {
         }
     }
 
+    public BigInteger totalRestrictingAmount(Web3j web3j, String addresses) throws ContractInvokeException, BlankResponseException {
+        final Function function = new Function(GET_RESTRICTING_BALANCE_FUNC_TYPE, Collections.singletonList(new Utf8String(addresses)));
+        CallResponse<String> br = rpc(web3j, function, InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), InnerContractAddrEnum.RESTRICTING_PLAN_CONTRACT.getAddress(), DefaultBlockParameterName.LATEST);
+        if (br == null || br.getData() == null) {
+            throw new BlankResponseException(String.format("查询锁仓余额出错【addresses:%s)】,返回为空!", addresses));
+        }
+        if (br.isStatusOk()) {
+            String data = br.getData();
+            log.debug("查询锁仓余额特殊节点返回：{}", data);
+            if (data == null) {
+                throw new BlankResponseException(BLANK_RES);
+            }
+            List<RestrictingBalance> restrictingBalanceList =  JSON.parseArray(data, RestrictingBalance.class);
+            return restrictingBalanceList.stream().reduce(BigInteger.ZERO, (tempResult, obj) -> tempResult.add((obj.getLockBalance()==null?BigInteger.ZERO:obj.getLockBalance()).add( obj.getPledgeBalance()==null?BigInteger.ZERO:obj.getPledgeBalance())), BigInteger::add);
+
+        } else {
+            String msg = JSON.toJSONString(br);
+            throw new ContractInvokeException(String.format("【查询锁仓余额出错】地址:%s,返回数据:%s", addresses, msg));
+        }
+    }
+
+    public static void main(String[] args){
+        List<RestrictingBalance> list = new ArrayList<>();
+        RestrictingBalance obj1 = new RestrictingBalance();
+        obj1.setLockBalance((BigInteger)null);
+        obj1.setPledgeBalance((BigInteger)null);
+
+        RestrictingBalance obj2 = new RestrictingBalance();
+        obj2.setLockBalance((BigInteger)null);
+        obj2.setPledgeBalance((BigInteger)null);
+
+        RestrictingBalance obj3 = new RestrictingBalance();
+        obj3.setLockBalance((BigInteger)null);
+        obj3.setPledgeBalance((BigInteger)null);
+
+        list.add(obj1);
+        list.add(obj2);
+        list.add(obj3);
+
+        BigInteger ss3 = list.stream().map((o) -> {
+            if (o.getLockBalance()==null){
+                o.setLockBalance(BigInteger.ZERO);
+            }
+            if (o.getPledgeBalance()==null){
+                o.setPledgeBalance(BigInteger.ZERO);
+            }
+            return o.getLockBalance().add(o.getPledgeBalance());
+        }).reduce(BigInteger.ZERO, (x, y) -> x.add(y));
+        System.out.println("ss3:" + ss3);
+
+
+        //这个需要保证不是null
+        BigInteger ss = list.stream().reduce(BigInteger.ZERO, (tempResult, obj) -> tempResult.add((obj.getLockBalance()==null?BigInteger.ZERO:obj.getLockBalance()).add( obj.getPledgeBalance()==null?BigInteger.ZERO:obj.getPledgeBalance())), BigInteger::add);
+        System.out.println("ss:" + ss);
+    }
 }

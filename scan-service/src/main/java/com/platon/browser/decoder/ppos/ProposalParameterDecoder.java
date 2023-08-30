@@ -13,6 +13,13 @@ import com.platon.utils.Numeric;
  **/
 public class ProposalParameterDecoder extends AbstractPPOSDecoder {
     private ProposalParameterDecoder(){}
+
+    /**
+     * 治理合约，提交参数提案的的参数：
+     * submitParam(verifier discover.NodeID, pipID string, module, name, newValue string)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 提交升级提案
         //提交提案的验证人

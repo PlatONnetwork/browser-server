@@ -71,7 +71,7 @@ public abstract class TestBase {
 			"PPOS RESULT:"
 			+"\nOne:"+new String(event.oneEvent)+"("+ERRORS.getProperty(new String(event.oneEvent))+")"
 			+"\nTwo:"+new String(event.twoEvent)+"("+ERRORS.getProperty(new String(event.twoEvent))+")"
-			+"\nLog:"+JSON.toJSONString(event.log,true)
+			+"\nLog:"+JSON.toJSONString(event.log)
 		));
 		System.out.println("===============================================");
 		System.out.println("===============================================");

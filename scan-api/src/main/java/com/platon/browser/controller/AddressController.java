@@ -12,11 +12,13 @@ import com.platon.browser.utils.I18nUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.math.BigInteger;
 
 /**
  * 地址具体实现Controller 提供地址详情页面使用
@@ -66,4 +68,18 @@ public class AddressController {
         });
     }
 
+    /**
+     * 查询多个地址的锁仓总额
+     * 这个接口目前没有前端调用，准备用于运维统计大户相关地址的锁仓总额。（还未实施，并且即使实施也是临时方案，最终方案是: 在特殊节点实现一个rpc api，输入多地址，返回锁仓总额）
+     *
+     * @param addresses， 多个地址间，用;分隔
+     * @return 锁仓总额（每个地址的锁仓总额=已用于质押和委托的金额+剩余可用于质押和锁仓的金额）
+     */
+    @PostMapping("address/totalRestrictingAmount")
+    public Mono<BigInteger> totalRestrictingAmount(@RequestParam(value="addresses", required=true) String addresses) {
+        return Mono.create(sink -> {
+            BigInteger totalAmount = addressService.totalRestrictingAmount(addresses);
+            sink.success(totalAmount);
+        });
+    }
 }

@@ -30,6 +30,15 @@ import java.math.BigInteger;
  **/
 public class StakeCreateDecoder extends AbstractPPOSDecoder {
     private StakeCreateDecoder(){}
+
+    /**
+     * 质押合约，创建质押
+     * createStaking(typ uint16, benefitAddress common.Address, nodeId discover.NodeID,
+     * 	externalId, nodeName, website, details string, amount *big.Int, rewardPer uint16, programVersion uint32,
+     * 	programVersionSign common.VersionSign, blsPubKey bls.PublicKeyHex, blsProof bls.SchnorrProofHex)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 发起质押
         //typ  表示使用账户自由金额还是账户的锁仓金额做质押 0: 自由金额； 1: 锁仓金额
@@ -70,4 +79,5 @@ public class StakeCreateDecoder extends AbstractPPOSDecoder {
                 .delegateRewardPer(rewardPer.intValue()) // 必填
                 .build();
     }
+
 }

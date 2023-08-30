@@ -151,19 +151,20 @@ public class NewAddressCache {
         AddressTypeEnum addressTypeEnum = this.getAddressType(address);
         if (addressTypeEnum == null) { //地址在db中没有，是新地址
             this.addAddressTypeCache(address, AddressTypeEnum.ACCOUNT);
-            CustomAddress customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.NEW);
-            blockRelatedAddressCache.put(address, customAddress);
+            /*CustomAddress customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.NEW);
+            blockRelatedAddressCache.put(address, customAddress);*/
         }
+
         // 1. 在address表，已经有此地址
         // 2. 在之前，已经有加入过addressTypeCache。
         // 2.1 如果是以前区块加入的，说明已经保存到address表
         // 2.2 如果是本区块加入的，说明已经保存到blockRelatedAddressCache中，并设置了Option，这里无需重复操作
         //那么在blockRelatedAddressCache，是否加入了过
-        /*CustomAddress customAddress = blockRelatedAddressCache.get(address);
+        CustomAddress customAddress = blockRelatedAddressCache.get(address);
         if (customAddress == null) {
             customAddress = CustomAddress.createDefaultAccountAddress(address, CustomAddress.Option.PENDING);
             blockRelatedAddressCache.put(address, customAddress);
-        }*/
+        }
     }
 
     public void addRewardClaimAddressToBlockCtx(String address, BigDecimal delegateReward){

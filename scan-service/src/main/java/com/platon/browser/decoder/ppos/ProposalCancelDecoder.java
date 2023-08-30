@@ -16,6 +16,13 @@ import java.math.BigInteger;
  **/
 public class ProposalCancelDecoder extends AbstractPPOSDecoder {
     private ProposalCancelDecoder(){}
+
+    /**
+     * 治理合约，提交取消提案的的参数：
+     * submitCancel(verifier discover.NodeID, pipID string, endVotingRounds uint64, tobeCanceledProposalID common.Hash)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 提交取消提案
         //提交提案的验证人

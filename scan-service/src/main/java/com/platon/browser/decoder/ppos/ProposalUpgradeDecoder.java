@@ -16,6 +16,13 @@ import java.math.BigInteger;
  **/
 public class ProposalUpgradeDecoder extends AbstractPPOSDecoder {
     private ProposalUpgradeDecoder(){}
+
+    /**
+     * 治理合约，提交升级提案的的参数：
+     * submitVersion(verifier discover.NodeID, pipID string, newVersion uint32, endVotingRounds uint64)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 提交升级提案
         //提交提案的验证人

@@ -179,11 +179,13 @@ public class TransactionAnalyzer {
         // 原始交易成功，非常规转账才会成功;
         if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
             log.info("交易回执的非常规转账：{}", JSON.toJSONString(receipt.getEmbedTransfers()));
-            List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
-            embedTransferTxList.stream().forEach(embedTransferTx ->{
-                newAddressCache.addCommonAddressToBlockCtx(embedTransferTx.getFrom());
-                newAddressCache.addCommonAddressToBlockCtx(embedTransferTx.getTo());
+            receipt.getEmbedTransfers().forEach(embedTransfer -> {
+                newAddressCache.addCommonAddressToBlockCtx(embedTransfer.getFrom());
+                newAddressCache.addCommonAddressToBlockCtx(embedTransfer.getTo());
             });
+
+            List<TxTransferBak> embedTransferTxList = resolveEmbedTransferTx(collectionBlock, dtoTransaction, receipt);
+
             dtoTransaction.setTransferTxList(embedTransferTxList);
             dtoTransaction.setTransferTxInfo(JSON.toJSONString(embedTransferTxList));
         }
@@ -206,12 +208,19 @@ public class TransactionAnalyzer {
                 //特殊节点只是从bincode来分析得到合约类型，缺省就是EVM合约
                 ContractTypeEnum proxyContractType = ContractTypeEnum.getEnum(proxyContract.getContractType());
                 ErcTypeEnum proxyErcType = proxyContractType.convertToErcType();
+                if (proxyErcType!=null){
+                    log.warn("识别到虚假合约代理:{}", JSON.toJSONString(proxyPattern));
+                    continue;
+                }
 
                 //implContract 包含着token.name, symbol, decimals, totalSupply等信息
                 ContractInfo implContract = proxyPattern.getImplementation();
                 ContractTypeEnum implContractType = ContractTypeEnum.getEnum(implContract.getContractType());
                 ErcTypeEnum implErcType = implContractType.convertToErcType();
-
+                if (implErcType==null){
+                    log.warn("识别到虚假合约代理:{}", JSON.toJSONString(proxyPattern));
+                    continue;
+                }
 
                 //交换合约类型
                 proxyContract.setContractType(implContractType.getCode());
@@ -307,19 +316,30 @@ public class TransactionAnalyzer {
                     if (dtoTransaction.getStatus() == com.platon.browser.elasticsearch.dto.Transaction.StatusEnum.SUCCESS.getCode()) {
                         // 普通合约调用成功, 取成功的代理PPOS虚拟交易列表
                         watch.start("普通合约调用结果成功，解析token内部虚拟交易");
+
+                        if (CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
+                            List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions =  TransactionUtil.processImplicitPPOSTx(collectionBlock,
+                                    receipt.getImplicitPPOSTxs(),
+                                    dtoTransaction,
+                                    receipt,
+                                    newAddressCache);
+                            dtoTransaction.setVirtualTransactions(successVirtualTransactions);
+                        }
+
+
                         // todo:
                         // 2023/04/25 lvxiaoyi 每次合约调用成功后，都会rpc调用特殊节点，这个影响同步性能，参考：com.platon.browser.bean.Receipt.contractSuicided的使用，添加一个proxiedPPosTxList
                         // 通过 platon_getTransactionByBlock 来返回内置的ppos交易。
                         // 所谓的VirtualTx，实际上是指ppos交易，不过这些ppos交易，不是EOA账户直接调用ppos合约的，而是通过一个用户合约来调用ppos合约
                         // proxiedPPosTxList
-                        List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
+                       /* List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions = TransactionUtil.processVirtualTx(collectionBlock,
                                 specialApi,
                                 platOnClient,
                                 dtoTransaction,
                                 receipt,
                                 newAddressCache);
                         // 把成功的虚拟交易挂到当前普通合约交易上
-                        dtoTransaction.setVirtualTransactions(successVirtualTransactions);
+                        dtoTransaction.setVirtualTransactions(successVirtualTransactions);*/
                         watch.stop();
                     }
                     log.debug("当前交易[{}]为普通合约调用,from[{}],to[{}],type为[{}],toType[{}],虚拟交易数为[{}]",

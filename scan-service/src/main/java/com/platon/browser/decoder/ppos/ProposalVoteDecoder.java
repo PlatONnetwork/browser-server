@@ -14,6 +14,13 @@ import java.math.BigInteger;
  **/
 public class ProposalVoteDecoder extends AbstractPPOSDecoder {
     private ProposalVoteDecoder(){}
+
+    /**
+     * 治理合约，投票的参数：
+     * vote(verifier discover.NodeID, proposalID common.Hash, op uint8, programVersion uint32, programVersionSign common.VersionSign)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 给提案投票
         //投票验证人
@@ -35,4 +42,5 @@ public class ProposalVoteDecoder extends AbstractPPOSDecoder {
                 .versionSign(versionSign)
                 .build();
     }
+
 }

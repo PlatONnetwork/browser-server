@@ -9,11 +9,6 @@ import com.platon.browser.dao.entity.Token1155Holder;
 import com.platon.browser.dao.entity.TokenHolder;
 import com.platon.browser.dao.entity.TokenHolderKey;
 import com.platon.browser.enums.ErcTypeEnum;
-import com.platon.browser.exception.BusinessException;
-import com.platon.browser.v0152.bean.ErcContractId;
-import com.platon.browser.v0152.contract.Erc1155Contract;
-import com.platon.browser.v0152.contract.Erc20Contract;
-import com.platon.browser.v0152.contract.Erc721Contract;
 import com.platon.browser.v0152.contract.ErcContract;
 import com.platon.browser.v0152.service.ErcDetectService;
 import com.platon.protocol.core.DefaultBlockParameterName;
@@ -39,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -144,34 +138,6 @@ public class ErcServiceImpl {
 
 
 
-    /**
-     * 获取地址代币余额, ERC20为金额，ERC721为tokenId数
-     *
-     * @param tokenAddress 合约地址
-     * @param type         合约类型
-     * @param account      用户地址
-     * @param id           tokenId
-     * @return java.math.BigInteger
-     * @date 2021/1/20
-     */
-    public BigInteger getBalance(String tokenAddress, ErcTypeEnum type, String account, BigInteger id) {
-        BigInteger balance = BigInteger.ZERO;
-        try {
-            ErcContract ercContract = getErcContract(tokenAddress, type);
-            if (ObjectUtil.isNotNull(ercContract)) {
-                balance = ercContract.balanceOf(account, id).send();
-            }
-        } catch (Exception e) {
-            log.warn(StrFormatter.format("获取地址代币余额异常,contractAddress:{},account:{}", tokenAddress, account), e);
-            try {
-                TimeUnit.MILLISECONDS.sleep(200);
-            } catch (InterruptedException interruptedException) {
-                log.warn("InterruptedException异常", interruptedException);
-            }
-            throw new BusinessException("查询Token余额失败！");
-        }
-        return balance;
-    }
 
     /**
      * 获取供应总量

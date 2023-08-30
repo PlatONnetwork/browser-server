@@ -4,12 +4,11 @@ import com.platon.browser.param.DelegateRewardClaimParam;
 import com.platon.browser.param.TxParam;
 import com.platon.browser.param.claim.Reward;
 import com.platon.browser.utils.HexUtil;
-import com.platon.protocol.core.methods.response.Log;
+import com.platon.contracts.ppos.dto.common.ErrorCode;
 import com.platon.rlp.solidity.RlpDecoder;
 import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.rlp.solidity.RlpType;
-import com.platon.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,21 +22,22 @@ import java.util.List;
  **/
 public class DelegateRewardClaimDecoder extends AbstractPPOSDecoder {
     private DelegateRewardClaimDecoder(){}
-    public static TxParam decode(RlpList rootList,List<Log> logs) {
-
-        String logData = logs.get(0).getData();
-        RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logData));
-        List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
-//        String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
-//        int statusCode = Integer.parseInt(decodedStatus);
-
+    /**
+     * @param rootList
+     * @param errCode
+     * @param rlpDataList
+     * @return
+             */
+    public static TxParam decode(RlpList rootList, int errCode, List<RlpType> rlpDataList) {
         DelegateRewardClaimParam param = DelegateRewardClaimParam.builder()
-                 .rewardList(new ArrayList<>())
+                .rewardList(new ArrayList<>())
                 .build();
-        if(rlpList.size() < 2) {
-        	return param;
+
+        if (errCode != ErrorCode.SUCCESS) {
+            return param;
         }
-        ((RlpList)RlpDecoder.decode(((RlpString)rlpList.get(1)).getBytes())
+
+        ((RlpList)RlpDecoder.decode(((RlpString)rlpDataList.get(0)).getBytes())
                 .getValues()
                 .get(0))
                 .getValues()
@@ -57,4 +57,5 @@ public class DelegateRewardClaimDecoder extends AbstractPPOSDecoder {
                 });
         return param;
     }
+
 }

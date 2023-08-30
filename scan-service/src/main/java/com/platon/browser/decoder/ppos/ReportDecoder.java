@@ -15,6 +15,13 @@ import java.math.BigInteger;
  **/
 public class ReportDecoder extends AbstractPPOSDecoder {
     private ReportDecoder(){}
+
+    /**
+     * 惩罚合约，举报双签的参数：
+     *  reportDuplicateSign(dupType uint8, data string)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 举报双签
         //type

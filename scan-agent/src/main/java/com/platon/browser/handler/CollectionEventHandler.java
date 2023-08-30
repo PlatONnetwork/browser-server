@@ -134,7 +134,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
 
         newAddressCache.clearBlockRelatedAddressCache();
 
-        log.info("开始分析CollectionEvent，块高：{}", event.getBlock().getNum());
+        log.info("开始分析CollectionEvent，块高：50138389{}", event.getBlock().getNum());
 
         StopWatch watch = new StopWatch("分析CollectionEvent");
         try {

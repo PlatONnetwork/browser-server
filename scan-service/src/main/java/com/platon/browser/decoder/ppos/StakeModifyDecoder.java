@@ -16,6 +16,13 @@ import java.math.BigInteger;
  */
 public class StakeModifyDecoder extends AbstractPPOSDecoder {
     private StakeModifyDecoder(){}
+
+    /**
+     * 质押合约，修改节点质押信息
+     * editCandidate(benefitAddress *common.Address, nodeId discover.NodeID, rewardPer *uint16, externalId, nodeName, website, details *string)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 修改质押信息
         //用于接受出块奖励和质押奖励的收益账户

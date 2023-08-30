@@ -2,10 +2,7 @@ package com.platon.browser.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.platon.bech32.Bech32;
-import com.platon.browser.bean.ComplementInfo;
-import com.platon.browser.bean.PPosInvokeContractInput;
-import com.platon.browser.bean.Receipt;
-import com.platon.browser.bean.TransData;
+import com.platon.browser.bean.*;
 import com.platon.browser.cache.NewAddressCache;
 import com.platon.browser.cache.PPosInvokeContractInputCache;
 import com.platon.browser.client.PlatOnClient;
@@ -39,7 +36,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,6 +57,8 @@ public class TransactionUtil {
      * @param parentTx            合约调用交易本身
      * @param invokeContractInput 合约内部调用PPOS操作的输入信息
      * @return
+     *
+     * @deprecated 不再使用，
      */
     public static List<Transaction> getVirtualTxList(Block block, Transaction parentTx, PPosInvokeContractInput invokeContractInput, NewAddressCache newAddressCache) {
         List<Transaction> transactionList = new ArrayList<>();
@@ -74,7 +72,7 @@ public class TransactionUtil {
         List<TransData> trans = invokeContractInput.getTransDatas();
         for (int i = 0; i < trans.size(); i++) {
             TransData tran = trans.get(i);
-            PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(tran.getInput(), Collections.emptyList());
+            PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(tran.getInput(), null);
             if (result.getTypeEnum() == null) {
                 continue;
             }
@@ -161,16 +159,27 @@ public class TransactionUtil {
      * @param platOnClient
      * @param contractInvokeTx
      * @param contractInvokeTxReceipt
-     * @param logger
      * @return
      * @throws ContractInvokeException
      * @throws BlankResponseException
+     *
+     * @deprecated 不再使用，
+     * 参考：com.platon.browser.utils.TransactionUtil#processImplicitPPOSTx(com.platon.browser.elasticsearch.dto.Block, java.util.List, com.platon.browser.elasticsearch.dto.Transaction, com.platon.browser.bean.Receipt, com.platon.browser.cache.NewAddressCache)
      */
     public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi, PlatOnClient platOnClient, com.platon.browser.elasticsearch.dto.Transaction contractInvokeTx, Receipt contractInvokeTxReceipt, NewAddressCache newAddressCache) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
             List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
-            log.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs, true));
+            // todo: 2023-08-22 lvxiaoyi
+            // 如果为空，现在特殊节点返回的是[{}]，造成list.size=1,但是唯一的元素的属性都是null。应该返回：[]，这样就是list.size()==0了
+
+            inputs.removeIf(input -> input.getTxHash() == null || input.getFrom() == null || input.getTo() == null || input.getTransDatas() == null);
+
+            if (inputs.size() == 0) {
+                return new ArrayList<>();
+            }
+            log.debug("更新缓存-PPos调用合约输入参数：{}", JSON.toJSONString(inputs));
+
             List<PPosInvokeContractInput> ppremoveList = new ArrayList<>();
             for (PPosInvokeContractInput input : inputs) {
                 List<TransData> removeList = new ArrayList<>();
@@ -224,7 +233,7 @@ public class TransactionUtil {
                     // 领取委托奖励
                     DelegateRewardClaimParam delegateRewardClaimParam = DelegateRewardClaimParam.builder().rewardList(new ArrayList<>()).build();
                     List<Log> logs = Arrays.asList(log);
-                    PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(vt.getInput(), logs);
+                    PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(vt.getInput(), logs.get(0).getData());
                     TxParam param = result.getParam();
                     if (param != null) {
                         delegateRewardClaimParam = (DelegateRewardClaimParam) param;
@@ -244,11 +253,83 @@ public class TransactionUtil {
     }
 
     /**
-     * 内置合约调用交易,解析补充信息
+     * 在特殊节点，已经把调用vrf 和 validator的过滤了。
+     * @param block
+     * @param implicitPPOSTxList
+     * @param originTx
+     * @param contractInvokeTxReceipt
+     * @param newAddressCache
+     * @return
+     * @throws ContractInvokeException
+     * @throws BlankResponseException
      */
+    public static List<Transaction> processImplicitPPOSTx(Block block, List<ImplicitPPOSTx> implicitPPOSTxList, com.platon.browser.elasticsearch.dto.Transaction originTx, Receipt contractInvokeTxReceipt, NewAddressCache newAddressCache) throws ContractInvokeException, BlankResponseException {
+
+        // 把成功的虚拟交易过滤出来
+        List<Transaction> successImplicitPPOSTxs = new ArrayList<>();
+
+        if ( Transaction.StatusEnum.SUCCESS.getCode() != originTx.getStatus()){
+            return successImplicitPPOSTxs;
+        }
+
+        for (int i = 0; i < implicitPPOSTxList.size(); i++) {
+            ImplicitPPOSTx implicitPPOSTx = implicitPPOSTxList.get(i);
+            /**
+             * 合约代理PPOS时，回执中的logs的内部结构： List- - 虚拟交易1的log - ... - 虚拟交易n的log - 合约调用的log
+             * todo:
+             * 2023-08-23, lvxiaoyi，为什么会有这个结论？
+             * 有特殊节点采集每个每次调用的log data
+             */
+            PPOSTxDecodeResult result = PPOSTxDecodeUtil.decode(implicitPPOSTx.getInputHex(), implicitPPOSTx.getLogDataHex());
+
+            if (result.getTxErrCode()!=null && result.getTxErrCode() == 0){
+                Transaction virtualTx = new Transaction();
+                virtualTx.setTime(originTx.getTime());
+                virtualTx.setContractType(ContractTypeEnum.INNER.getCode());
+                virtualTx.setNonce(originTx.getNonce());
+                virtualTx.setContractAddress(originTx.getContractAddress());
+                virtualTx.setCost(originTx.getCost());
+                virtualTx.setGasLimit(originTx.getGasLimit());
+                virtualTx.setGasPrice(originTx.getGasPrice());
+                virtualTx.setGasUsed(originTx.getGasUsed());
+                virtualTx.setCreTime(originTx.getCreTime());
+
+                //2023/04/14 lvxiaoyi 如何用户合约发起内置合约调用时，是用其它私钥前面的话（按理不可能把私钥放到用户合约中）
+                //这里可以设置下以防万一
+                newAddressCache.addCommonAddressToBlockCtx(originTx.getFrom());
+
+                virtualTx.setFrom(implicitPPOSTx.getFrom());
+                virtualTx.setTo(implicitPPOSTx.getTo());
+                //2023/04/14 lvxiaoyi to地址肯定是内置合约地址，无需再加入地址缓存
+                virtualTx.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());
+                virtualTx.setHash(originTx.getHash() + "-" + i);
+                virtualTx.setType(result.getTypeEnum().getCode());
+                virtualTx.setIndex(i);
+                //virtualTx.setInput(JSON.toJSONString(implicitPPOSTx.getFnParams()));
+                virtualTx.setInfo(result.getParam().toJSONString());
+                virtualTx.setSeq((long) i);
+
+                virtualTx.setStatus(originTx.getStatus());
+                if (result.getTxErrCode() > 0) {
+                    // 虚拟交易失败,交易状态码设置为失败
+                    virtualTx.setStatus(Transaction.StatusEnum.FAILURE.getCode());
+                }
+                successImplicitPPOSTxs.add(virtualTx);
+            }
+        }
+        return successImplicitPPOSTxs;
+    }
+
+        /**
+         * 内置合约调用交易,解析补充信息
+         */
     public static void resolveInnerContractInvokeTxComplementInfo(com.platon.browser.elasticsearch.dto.Transaction tx, List<Log> logs, ComplementInfo ci) {
         // 解析交易的输入及交易回执log信息
-        PPOSTxDecodeResult decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logs);
+        String logDataHex = null;
+        if (logs.size()>0){
+            logDataHex = logs.get(0).getData();
+        }
+        PPOSTxDecodeResult decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logDataHex);
         ci.setType(decodedResult.getTypeEnum().getCode());
         ci.setInfo(decodedResult.getParam().toJSONString());
         ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());

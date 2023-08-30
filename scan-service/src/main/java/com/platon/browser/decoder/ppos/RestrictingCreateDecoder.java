@@ -14,6 +14,13 @@ import java.util.List;
  **/
 public class RestrictingCreateDecoder extends AbstractPPOSDecoder {
     private RestrictingCreateDecoder(){}
+
+    /**
+     * 锁仓计划合约，创建锁仓计划的参数：
+     * createRestrictingPlan(account common.Address, plans []restricting.RestrictingPlan)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         //创建锁仓计划
         //锁仓释放到账账户
@@ -26,4 +33,5 @@ public class RestrictingCreateDecoder extends AbstractPPOSDecoder {
                 .plans(plans)
                 .build();
     }
+
 }

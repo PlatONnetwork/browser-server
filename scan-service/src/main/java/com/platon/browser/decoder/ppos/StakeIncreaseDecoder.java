@@ -15,6 +15,13 @@ import java.math.BigInteger;
  **/
 public class StakeIncreaseDecoder extends AbstractPPOSDecoder {
     private StakeIncreaseDecoder(){}
+
+    /**
+     * 质押合约，增加质押
+     * increaseStaking(nodeId discover.NodeID, typ uint16, amount *big.Int)
+     * @param rootList
+     * @return
+     */
     public static TxParam decode(RlpList rootList) {
         // 增持质押
         //被质押的节点的NodeId
