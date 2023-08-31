@@ -436,11 +436,17 @@ public class ErcTxService {
         result.setData(itemList.stream().map(item -> {
             QueryTokenHolderListResp converted = new QueryTokenHolderListResp();
             converted.setAddress(item.getAddress());
-            converted.setBalance(Convert.toBigDecimal(item.getBalance(), BigDecimal.ZERO));
+            BigDecimal balance = Convert.toBigDecimal(item.getBalance(), BigDecimal.ZERO);
+            if(token.getDecimal() != null && token.getDecimal() > 0){
+                converted.setBalance(ConvertUtil.convertByFactor(balance, token.getDecimal()));
+            } else {
+                converted.setBalance(balance);
+            }
+
             if(finalTokenTotalSupply.compareTo(BigInteger.ZERO) == 0){
                 converted.setPercent("0.0000%");
             } else {
-                converted.setPercent(converted.getBalance().divide(new BigDecimal(finalTokenTotalSupply), decimal, RoundingMode.HALF_UP)
+                converted.setPercent(balance.divide(new BigDecimal(finalTokenTotalSupply), decimal, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100))
                         .setScale(decimal, RoundingMode.HALF_UP)
                         .stripTrailingZeros()
@@ -556,77 +562,28 @@ public class ErcTxService {
     }
 
     public AccountDownload exportTokenHolderList(String contract, String local, String timeZone, String ercType) {
-        if (ercType.equalsIgnoreCase(TokenTypeEnum.ERC1155.getType())) {
-            return exportErc1155TokenHolderList(contract, local, timeZone);
-        } else {
-            return exportErc20And721TokenHolderList(contract, local, timeZone);
-        }
-    }
-
-    public AccountDownload exportErc1155TokenHolderList(String contract, String local, String timeZone) {
-        PageHelper.startPage(1, 30000);
-        Page<Token1155HolderListBean> token1155HolderList = customToken1155HolderMapper.findToken1155HolderList(contract);
-        List<QueryTokenHolderListResp> list = new ArrayList<>();
+        QueryTokenHolderListReq req = new QueryTokenHolderListReq();
+        req.setContract(contract);
+        req.setErcType(ercType);
+        req.setPageNo(1);
+        req.setPageSize(30000);
+        RespPage<QueryTokenHolderListResp> resp = tokenHolderList(req);
         List<Object[]> rows = new ArrayList<>();
-        if (CollUtil.isNotEmpty(token1155HolderList)) {
-            for (Token1155HolderListBean token1155HolderListBean : token1155HolderList) {
-                Object[] row = {token1155HolderListBean.getAddress(), HexUtil.append(token1155HolderListBean.getBalance()), token1155HolderListBean.getPercent()
-                                                                                                                                                   .multiply(BigDecimal.valueOf(100))
-                                                                                                                                                   .setScale(decimal, RoundingMode.HALF_UP)
-                                                                                                                                                   .stripTrailingZeros()
-                                                                                                                                                   .toPlainString() + "%"};
+        if (CollUtil.isNotEmpty(resp.getData())) {
+            for (QueryTokenHolderListResp item : resp.getData()) {
+                Object[] row = {
+                        item.getAddress(),
+                        HexUtil.append(item.getBalance().toPlainString()),
+                        item.getPercent()
+                };
                 rows.add(row);
             }
         }
-
-        String[] headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
-                                                                                                                local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
-        return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
-    }
-
-    public AccountDownload exportErc20And721TokenHolderList(String contract, String local, String timeZone) {
-        PageHelper.startPage(1, 30000);
-        Page<CustomTokenHolder> rs = this.customTokenHolderMapper.selectListByParams(contract, null, null);
-        List<Object[]> rows = new ArrayList<>();
-        TokenInventoryExample example = new TokenInventoryExample();
-        example.createCriteria().andTokenAddressEqualTo(contract);
-        Page<TokenInventory> totalTokenInventory = token721InventoryMapper.selectByExample(example);
-        Map<String, Long> maps = totalTokenInventory.getResult().stream().collect(Collectors.groupingBy(TokenInventory::getOwner, Collectors.counting()));
-        String[] headers = new String[0];
-        for (CustomTokenHolder customTokenHolder : rs) {
-            BigDecimal balance = this.getAddressBalance(customTokenHolder);
-            BigDecimal originBalance = ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal());
-            String percent = "";
-            if (ErcTypeEnum.ERC20.getDesc().equalsIgnoreCase(customTokenHolder.getType())) {
-                //计算总供应量
-                String originTotalSupply = customTokenHolder.getTotalSupply();
-                if (StrUtil.isBlank(originTotalSupply) || Convert.toLong(originTotalSupply, 0L).compareTo(0L) <= 0) {
-                    // 总供应量小于等于0，则占比设置为0%
-                    percent = "0.0000%";
-                } else {
-                    BigDecimal totalSupply = ConvertUtil.convertByFactor(new BigDecimal(originTotalSupply), customTokenHolder.getDecimal());
-                    // 总供应量大于0, 使用实际的余额除以总供应量
-                    percent = originBalance.divide(totalSupply, decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
-                }
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
-                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
-            } else {
-                //erc721 erc1155
-                int holderNum = maps.get(customTokenHolder.getAddress()).intValue();
-                long total = totalTokenInventory.size();
-                percent = new BigDecimal(holderNum).divide(new BigDecimal(total), decimal, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString() + "%";
-                headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_AMOUNT,
-                                                                                                               local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
-            }
-            Object[] row = {customTokenHolder.getAddress(), HexUtil.append(ConvertUtil.convertByFactor(balance, customTokenHolder.getDecimal()).toString()), percent};
-            rows.add(row);
-        }
-        if (CollUtil.isEmpty(rows)) {
-            headers = new String[]{this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE,
-                                                                                                           local), this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)};
-            Object[] row = {"", "", ""};
-            rows.add(row);
-        }
+        String[] headers = new String[]{
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_ADDRESS, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_BALANCE, local),
+                this.i18n.i(I18nEnum.DOWNLOAD_CONTRACT_CSV_PERCENT, local)
+        };
         return this.downFileCommon.writeDate("TokenHolder-" + contract + "-" + System.currentTimeMillis() + ".CSV", rows, headers);
     }
 
