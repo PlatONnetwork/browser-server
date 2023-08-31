@@ -120,7 +120,7 @@ public class PlatOnClient {
         return retryableClient.getWeb3jWrapper().getWeb3j().platonBlockNumber().send().getBlockNumber();
     }
 
-    @Cacheable("addressCodeFromChain")
+    @Cacheable(cacheNames = "addressCodeFromChain", cacheManager = "caffeineCacheManagerOf60")
     public String getAddressCode(String address) throws IOException {
         return retryableClient.getWeb3jWrapper().getWeb3j().platonGetCode(address, DefaultBlockParameterName.LATEST).send().getCode();
     }

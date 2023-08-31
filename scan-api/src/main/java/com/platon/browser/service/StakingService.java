@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -113,6 +114,7 @@ public class StakingService {
         return stakingStatisticNewResp;
     }
 
+    @Cacheable(cacheNames = "aliveStakingList",  key = "'pageNo_' + #req.pageNo + '_pageSize_' + #req.pageSize + '_queryStatus_' + #req.queryStatus + '_key_' + #req.key ", cacheManager = "caffeineCacheManagerOf1")
     public RespPage<AliveStakingListResp> aliveStakingList(AliveStakingListReq req) {
         PageHelper.startPage(req.getPageNo(), req.getPageSize());
         Integer status = null;
