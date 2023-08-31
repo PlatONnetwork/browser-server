@@ -7,8 +7,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.platon.browser.bean.CustomToken;
 import com.platon.browser.bean.CustomTokenDetail;
+import com.platon.browser.bean.CustomTokenHolder;
 import com.platon.browser.bean.CustomTokenInventory;
 import com.platon.browser.config.DownFileCommon;
+import com.platon.browser.dao.custommapper.CustomTokenHolderMapper;
 import com.platon.browser.dao.custommapper.CustomTokenInventoryMapper;
 import com.platon.browser.dao.custommapper.CustomTokenMapper;
 import com.platon.browser.dao.entity.TokenInventory;
@@ -55,6 +57,9 @@ public class TokenService {
     private CustomTokenInventoryMapper customTokenInventoryMapper;
 
     @Resource
+    private CustomTokenHolderMapper customTokenHolderMapper;
+
+    @Resource
     private I18nUtil i18n;
 
     @Resource
@@ -77,13 +82,9 @@ public class TokenService {
         CustomTokenDetail customTokenDetail = customTokenMapper.selectDetailByAddress(req.getAddress());
         if (!customTokenDetail.getType().equalsIgnoreCase(TokenTypeEnum.ERC1155.getType())) {
             // 总供应量为0，则取值总库存量
-            int total = 0;
-            if (ObjectUtil.isNotNull(customTokenDetail) && CommonUtil.ofNullable(() -> customTokenDetail.getTotalSupply()).orElse("0").equalsIgnoreCase("0")) {
-                TokenInventoryExample example = new TokenInventoryExample();
-                example.createCriteria().andTokenAddressEqualTo(req.getAddress());
-                Page<TokenInventory> totalTokenInventory = tokenInventoryMapper.selectByExample(example);
-                total = totalTokenInventory.size();
-                customTokenDetail.setTotalSupply(Convert.toStr(total));
+            if(customTokenDetail.getTotalSupply() == null || StringUtils.equals(customTokenDetail.getTotalSupply().trim(), "0")){
+                CustomTokenHolder summary = customTokenHolderMapper.summaryTokenHolderList(req.getAddress());
+                customTokenDetail.setTotalSupply(summary.getHolderSumBalance());
             }
         }
         return QueryTokenDetailResp.fromTokenDetail(customTokenDetail);
