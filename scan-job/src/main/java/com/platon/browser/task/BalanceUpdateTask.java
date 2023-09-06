@@ -9,7 +9,6 @@ import com.platon.browser.dao.entity.NetworkStat;
 import com.platon.browser.dao.mapper.NetworkStatMapper;
 import com.platon.browser.enums.InternalAddressType;
 import com.platon.browser.utils.AppStatusUtil;
-import com.platon.protocol.Web3j;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +101,7 @@ public class BalanceUpdateTask {
             currentBlockNumber = networkStat.getCurNumber();
         }
 
-        Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
+        //Web3j web3j = platOnClient.getWeb3jWrapper().getWeb3j();
 
         int pageNo = 1;
         int pageSize = 100;
@@ -124,12 +123,12 @@ public class BalanceUpdateTask {
             String addresses = String.join(";", internalAddressMap.keySet());
 
             try {
-                List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(web3j, addresses, currentBlockNumber);
+                List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper(), addresses, currentBlockNumber);
                 balanceList.stream().forEach(balance -> {
                     InternalAddress internalAddress = internalAddressMap.get(balance.getAccount());
                     if (internalAddress != null) {
                         internalAddress.setBalance(new BigDecimal(balance.getFreeBalance()));
-                        internalAddress.setRestrictingBalance(new BigDecimal(balance.getLockBalance().subtract(balance.getPledgeBalance())));
+                        internalAddress.setRestrictingBalance(new BigDecimal(balance.getRestrictingPlanLockedAmount().subtract(balance.getRestrictingPlanPledgeAmount())));
                     }
                 });
             }catch (Exception e){

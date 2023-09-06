@@ -155,15 +155,15 @@ public class AddressService {
         }
         List<LockDelegate> lockDelegateList = new ArrayList<>();
         try {
-            List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+            List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper(), req.getAddress());
             // 已解冻的委托金额/待提取委托
             BigDecimal unLockBalance = BigDecimal.ZERO;
             // 未解冻的委托金额/待赎回委托
             BigDecimal lockBalance = BigDecimal.ZERO;
             if (CollUtil.isNotEmpty(restrictingBalances)) {
-                unLockBalance = new BigDecimal(restrictingBalances.get(0).getDlFreeBalance().add(restrictingBalances.get(0).getDlRestrictingBalance()));
+                unLockBalance = new BigDecimal(restrictingBalances.get(0).getDelegationUnLockedFreeBalance().add(restrictingBalances.get(0).getDelegationUnLockedRestrictingPlanAmount()));
                 unLockBalance = ConvertUtil.convertByFactor(unLockBalance, 18);
-                if (CollUtil.isNotEmpty(restrictingBalances.get(0).getDlLocks())) {
+                if (CollUtil.isNotEmpty(restrictingBalances.get(0).getDelegationLockedItems())) {
                     NetworkStat networkStat = statisticCacheService.getNetworkStatCache();
                     Block block = null;
                     try {
@@ -171,12 +171,12 @@ public class AddressService {
                     } catch (Exception e) {
                         logger.error("获取区块错误。", e);
                     }
-                    for (DlLock dlLock : restrictingBalances.get(0).getDlLocks()) {
-                        BigDecimal accLockBalance = new BigDecimal(dlLock.getFreeBalance().add(dlLock.getLockBalance()));
+                    for (DlLock dlLock : restrictingBalances.get(0).getDelegationLockedItems()) {
+                        BigDecimal accLockBalance = new BigDecimal(dlLock.getFreeBalance().add(dlLock.getRestrictingPlanAmount()));
                         accLockBalance = ConvertUtil.convertByFactor(accLockBalance, 18);
                         lockBalance = lockBalance.add(accLockBalance);
                         LockDelegate lockDelegate = new LockDelegate();
-                        lockDelegate.setBlockNum(dlLock.getEpoch().multiply(blockChainConfig.getSettlePeriodBlockCount()));
+                        lockDelegate.setBlockNum(dlLock.getExpiredEpoch().multiply(blockChainConfig.getSettlePeriodBlockCount()));
                         // 预计时间：预计块高减去当前块高乘以出块时间再加上区块时间
                         BigDecimal diff = new BigDecimal(lockDelegate.getBlockNum().subtract(BigInteger.valueOf(networkStat.getCurNumber())));
                         if (block != null) {
@@ -211,12 +211,12 @@ public class AddressService {
         QueryRPPlanDetailResp queryRPPlanDetailResp = new QueryRPPlanDetailResp();
         try {
             // 锁仓可用余额查询特殊节点接口
-            List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+            List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper(), req.getAddress());
             if (restrictingBalances != null && !restrictingBalances.isEmpty()) {
                 /**
                  * 可用余额为balance减去质押金额
                  */
-                queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+                queryRPPlanDetailResp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getRestrictingPlanLockedAmount().subtract(restrictingBalances.get(0).getRestrictingPlanPledgeAmount())));
             }
             // 质押金额和待释放金额查询锁仓合约
             RestrictingPlanContract restrictingPlanContract = platonClient.getRestrictingPlanContract();
@@ -298,10 +298,10 @@ public class AddressService {
      * @date 2021/6/7
      */
     private QueryDetailResp getAddressInfo(QueryDetailRequest req, QueryDetailResp resp) throws Exception {
-        List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper().getWeb3j(), req.getAddress());
+        List<RestrictingBalance> restrictingBalances = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper(), req.getAddress());
         if (restrictingBalances != null && !restrictingBalances.isEmpty()) {
             resp.setBalance(new BigDecimal(restrictingBalances.get(0).getFreeBalance()));
-            resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getLockBalance().subtract(restrictingBalances.get(0).getPledgeBalance())));
+            resp.setRestrictingBalance(new BigDecimal(restrictingBalances.get(0).getRestrictingPlanLockedAmount().subtract(restrictingBalances.get(0).getRestrictingPlanPledgeAmount())));
         }
         /** 特殊账户余额直接查询链  */
         if (resp.getBalance().compareTo(BigDecimal.valueOf(10000000000L)) > 0) {
@@ -330,7 +330,9 @@ public class AddressService {
     public BigInteger totalRestrictingAmount(String addresses) {
          try {
             // 锁仓可用余额查询特殊节点接口
-            return specialApi.totalRestrictingAmount(platonClient.getWeb3jWrapper().getWeb3j(), addresses);
+             List<RestrictingBalance> restrictingBalanceList = specialApi.getRestrictingBalance(platonClient.getWeb3jWrapper(), addresses);
+             return restrictingBalanceList.stream().reduce(BigInteger.ZERO, (tempResult, obj) -> tempResult.add((obj.getRestrictingPlanLockedAmount()==null?BigInteger.ZERO:obj.getRestrictingPlanLockedAmount()).add( obj.getRestrictingPlanPledgeAmount()==null?BigInteger.ZERO:obj.getRestrictingPlanPledgeAmount())), BigInteger::add);
+
         } catch (Exception e) {
             logger.error("totalRestrictingAmount error", e);
             throw new BusinessException(i18n.i(I18nEnum.SYSTEM_EXCEPTION));

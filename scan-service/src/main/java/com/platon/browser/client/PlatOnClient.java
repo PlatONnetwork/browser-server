@@ -1,6 +1,7 @@
 package com.platon.browser.client;
 
 import com.alibaba.fastjson.JSON;
+import com.platon.browser.bean.Receipt;
 import com.platon.browser.bean.ReceiptResult;
 import com.platon.browser.exception.BusinessException;
 import com.platon.browser.exception.ConfigLoadingException;
@@ -8,6 +9,7 @@ import com.platon.contracts.ppos.*;
 import com.platon.contracts.ppos.dto.resp.GovernParam;
 import com.platon.contracts.ppos.dto.resp.Node;
 import com.platon.protocol.core.DefaultBlockParameterName;
+import com.platon.protocol.core.Response;
 import com.platon.protocol.core.methods.response.bean.EconomicConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -92,11 +94,21 @@ public class PlatOnClient {
         return retryableClient.getWeb3jWrapper();
     }
 
-    public ReceiptResult getReceiptResult(Long blockNumber) throws IOException, InterruptedException {
+    public ReceiptResult getReceiptResult(Long blockNumber) throws Exception {
         ReceiptResult receiptResult = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(), BigInteger.valueOf(blockNumber));
-        receiptResult.resolve(blockNumber, logDecodeExecutor);
+        // 2023-08-31，不需要在这里解码log，因为根本不知道如何解码。
+        // 如果是为了解码内置合约的交易log，那由com.platon.browser.analyzer.TransactionAnalyzer.analyze处理内置合约交易时处理
+        //receiptResult.resolve(blockNumber, logDecodeExecutor);
+        //receiptResult.toMap();
         return receiptResult;
     }
+
+    public Response<List<Receipt>> getReceiptExtResponse(Long blockNumber) throws Exception {
+        Response<List<Receipt>> getReceiptExtResponse  = specialApi.getReceiptResult(retryableClient.getWeb3jWrapper(), BigInteger.valueOf(blockNumber));
+        return getReceiptExtResponse;
+    }
+
+
 
     @Retryable(value = Exception.class, maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(value = 3000L))
     public EconomicConfig getEconomicConfig() throws ConfigLoadingException {

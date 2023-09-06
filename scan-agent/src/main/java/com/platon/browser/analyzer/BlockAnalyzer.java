@@ -54,7 +54,8 @@ public class BlockAnalyzer {
         if (receipt.getResult().isEmpty())
             throw new BusinessException("区块[" + result.getNum() + "]有[" + rawBlock.getTransactions().size() + "]笔交易,但查询不到回执!");
 
-        result.setReceiptMap(receipt.getMap());
+        //把区块中的所有交易的回执列表转成map,以便后续处理时，方便根据txHash获取相应回执
+        result.setReceiptMap(receipt.getReceiptMap());
 
         // 分析交易
         List<PlatonBlock.TransactionResult> transactionResults = rawBlock.getTransactions();

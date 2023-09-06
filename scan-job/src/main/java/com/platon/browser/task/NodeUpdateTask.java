@@ -66,7 +66,7 @@ public class NodeUpdateTask {
             Map<String, Optional<KeyBaseUserInfo>> cache = new HashMap<>();
             List<Node> updateNodeList = new ArrayList<>();
             // 查询节点版本号列表
-            List<NodeVersion> versionList = specialApi.getNodeVersionList(platOnClient.getWeb3jWrapper().getWeb3j());
+            List<NodeVersion> versionList = specialApi.getNodeVersionList(platOnClient.getWeb3jWrapper());
             Map<String, NodeVersion> versionMap = new HashMap<>();
             versionList.forEach(v -> versionMap.put(v.getNodeId(), v));
             // 请求URL前缀

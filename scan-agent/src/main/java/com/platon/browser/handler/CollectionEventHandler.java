@@ -144,7 +144,9 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
                 watch.start("分析Transaction");
                 //
                 // 重要：
-                // 解析区块中的交易，特别是token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
+                // 解析区块中的交易，特别是：
+                // 1：token交易，按token类型分别解析出交易信息，放入各自类型的列表中；并把token的holder，以及holder持有token的余额，交易次数等信息，保存到本地db中
+                // 2: PPOS交易(包括两种类型的PPOS交易，一是直接发给内置合约的ppos交易，二是有用户合约调用内置合约而形成的ppos交易)，解析成dto.Transaction，后续有PPOSService继续处理，
                 com.platon.browser.elasticsearch.dto.Transaction dtoTransaction = transactionAnalyzer.analyze(event.getBlock(), rawTx, receiptMap.get(rawTx.getHash()));
                 watch.stop();
                 // 把解析好的交易添加到当前区块的交易列表（交易类型已经设置号）
@@ -169,6 +171,7 @@ public class CollectionEventHandler implements EventHandler<CollectionEvent> {
             watch.start("分析ppos");
             //2023/04/07 lvixaoyi  入参event.transactions中的每个对象会被设置seq, txInfo值，并且会设置addressCache
             //但是这些对如此的改变，即使是重复执行，也没有关系，都是重置操作（没有增量操作）
+            //pposService.analyze()分析的是经过一次分析过后的交易信息：dtoTransaction，已经得到确切的交易类型（包括ppos类型）
             TxAnalyseResult txAnalyseResult = pposService.analyze(event);
             watch.stop();
             // 汇总操作记录

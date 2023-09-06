@@ -169,7 +169,8 @@ public class TransactionUtil {
     public static List<Transaction> processVirtualTx(Block block, SpecialApi specialApi, PlatOnClient platOnClient, com.platon.browser.elasticsearch.dto.Transaction contractInvokeTx, Receipt contractInvokeTxReceipt, NewAddressCache newAddressCache) throws ContractInvokeException, BlankResponseException {
         if (!PPosInvokeContractInputCache.hasCache(block.getNum())) {
             // 如果当前交易所在块的PPOS调用合约输入信息不存在，则查询特殊节点，并更新缓存
-            List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
+            //List<PPosInvokeContractInput> inputs = specialApi.getPPosInvokeInfo(platOnClient.getWeb3jWrapper().getWeb3j(), BigInteger.valueOf(block.getNum()));
+            List<PPosInvokeContractInput> inputs = new ArrayList<>();
             // todo: 2023-08-22 lvxiaoyi
             // 如果为空，现在特殊节点返回的是[{}]，造成list.size=1,但是唯一的元素的属性都是null。应该返回：[]，这样就是list.size()==0了
 
@@ -330,6 +331,7 @@ public class TransactionUtil {
             logDataHex = logs.get(0).getData();
         }
         PPOSTxDecodeResult decodedResult = PPOSTxDecodeUtil.decode(tx.getInput(), logDataHex);
+        ci.setInnerContractTxErrCode(decodedResult.getTxErrCode());
         ci.setType(decodedResult.getTypeEnum().getCode());
         ci.setInfo(decodedResult.getParam().toJSONString());
         ci.setToType(Transaction.ToTypeEnum.INNER_CONTRACT.getCode());

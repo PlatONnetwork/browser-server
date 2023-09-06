@@ -12,26 +12,26 @@ import java.math.BigInteger;
 public class DlLock {
 
     /**
-     * 锁仓金额
+     * 处于锁定期的委托金，资金来源是锁仓计划
      */
-    private BigInteger lockBalance;
+    private BigInteger restrictingPlanAmount;
 
     /**
-     * 自由金金额
+     * 处于锁定期的委托金，资金来源是用户账户余额
      */
     private BigInteger freeBalance;
 
     /**
-     * 解锁结算周期
+     * 解锁结算周期,锁定截止周期
      */
-    private BigInteger epoch;
+    private BigInteger expiredEpoch;
 
-    public BigInteger getLockBalance() {
-        return lockBalance;
+    public BigInteger getRestrictingPlanAmount() {
+        return restrictingPlanAmount;
     }
 
-    public void setLockBalance(String lockBalance) {
-        this.lockBalance = Numeric.decodeQuantity(lockBalance);
+    public void setRestrictingPlanAmount(String restrictingPlanAmount) {
+        this.restrictingPlanAmount = Numeric.decodeQuantity(restrictingPlanAmount);
     }
 
     public BigInteger getFreeBalance() {
@@ -42,12 +42,12 @@ public class DlLock {
         this.freeBalance = Numeric.decodeQuantity(freeBalance);
     }
 
-    public BigInteger getEpoch() {
-        return epoch;
+    public BigInteger getExpiredEpoch() {
+        return expiredEpoch;
     }
 
-    public void setEpoch(BigInteger epoch) {
-        this.epoch = epoch;
+    public void setExpiredEpoch(BigInteger expiredEpoch) {
+        this.expiredEpoch = expiredEpoch;
     }
 
 }

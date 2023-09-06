@@ -1,6 +1,7 @@
 package com.platon.browser.bean;
 
 public class ComplementInfo {
+    int innerContractTxErrCode;
     // 交易类型
     Integer type = null;
     Integer toType = null;
@@ -12,6 +13,14 @@ public class ComplementInfo {
     Integer contractType = null;
     // tx info信息
     String info = "{}";
+
+    public int getInnerContractTxErrCode() {
+        return innerContractTxErrCode;
+    }
+
+    public void setInnerContractTxErrCode(int innerContractTxErrCode) {
+        this.innerContractTxErrCode = innerContractTxErrCode;
+    }
 
     public Integer getType() {
         return this.type;

@@ -92,6 +92,7 @@ public class TransactionAnalyzer {
 
     /**
      * 交易解析
+     *  特别是把PPOS交易，解析成dto.Transaction，后续有PPOSService继续处理，包括两种类型的PPOS交易，一是直接发给内置合约的ppos交易，二是有用户合约调用内置合约而形成的ppos交易。
      *
      * @param collectionBlock 区块
      * @param rawTransaction  交易
@@ -274,7 +275,7 @@ public class TransactionAnalyzer {
         if (InnerContractAddrEnum.getAddresses().contains(dtoTransaction.getTo()) && StringUtils.isNotBlank(inputWithoutPrefix)) {
             // 如果to地址是内置合约地址，则解码交易输入。并且不需要加入相关地址缓存
             watch.start("内置合约处理");
-
+            //解析出内置合约执行的错误代码
             TransactionUtil.resolveInnerContractInvokeTxComplementInfo(dtoTransaction, receipt.getLogs(), ci);
             watch.stop();
             log.debug("当前交易[{}]为内置合约,from[{}],to[{}],解码交易输入", dtoTransaction.getHash(), dtoTransaction.getFrom(), dtoTransaction.getTo());
@@ -318,6 +319,7 @@ public class TransactionAnalyzer {
                         watch.start("普通合约调用结果成功，解析token内部虚拟交易");
 
                         if (CollUtil.isNotEmpty(receipt.getImplicitPPOSTxs())) {
+                            //用户合约调用，产生了PPOS交易，则把成功的ppos交易过滤出来
                             List<com.platon.browser.elasticsearch.dto.Transaction> successVirtualTransactions =  TransactionUtil.processImplicitPPOSTx(collectionBlock,
                                     receipt.getImplicitPPOSTxs(),
                                     dtoTransaction,
@@ -375,7 +377,10 @@ public class TransactionAnalyzer {
         int status = receipt.getStatus();
         if (InnerContractAddrEnum.getAddresses().contains(dtoTransaction.getTo()) && ci.getType() != com.platon.browser.elasticsearch.dto.Transaction.TypeEnum.TRANSFER.getCode()) {
             // 如果接收者为内置合约且不为转账, 取日志中的状态作为交易成功与否的状态
-            status = receipt.getLogStatus();
+            //status = receipt.getLogStatus();
+            //todo: 如果交易失败，但是业务成功，会有这样的case吗？那最终的状态应该是什么呢？
+            //如果是内置合约交易，前面已经对log解码过了
+            status =  ci.getInnerContractTxErrCode()==0 ? Receipt.SUCCESS : Receipt.FAILURE ;
         }
 
         // 交易信息

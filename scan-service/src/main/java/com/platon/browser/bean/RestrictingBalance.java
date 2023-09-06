@@ -17,44 +17,40 @@ public class RestrictingBalance {
 
     private BigInteger freeBalance; //EOA帐号余额
 
-    private BigInteger lockBalance; //EOA的锁仓未释放余额, 即可用于质押或委托的锁仓金额
+    private BigInteger restrictingPlanLockedAmount; //EOA的锁仓未释放余额, 即可用于质押或委托的锁仓金额
 
-    private BigInteger pledgeBalance; // 已用于质押或委托的锁仓金额
+    private BigInteger restrictingPlanPledgeAmount; // 已用于质押或委托的锁仓金额
 
-    /**
-     * 委托锁定待提取中余额部分
-     */
-    private BigInteger dlFreeBalance;
+    // 锁定结束的委托金，资金来源是用户账户余额
+    private BigInteger delegationUnLockedFreeBalance;
 
-    /**
-     * 委托锁定待提取中锁仓部分
-     */
-    private BigInteger dlRestrictingBalance;
+    // 锁定结束的委托金，资金来源是锁仓计划。用户来领取委托金时，一部分可以直接释放到用户账户；一部分可能重新回到锁仓计划中
+    private BigInteger delegationUnLockedRestrictingPlanAmount;
 
     /**
      * 委托锁定中锁定的列表
      */
-    private List<DlLock> dlLocks;
+    private List<DlLock> delegationLockedItems;
 
     public void setFreeBalance(String freeBalance) {
         this.freeBalance = Numeric.decodeQuantity(freeBalance);
     }
 
-    public void setLockBalance(String lockBalance) {
-        this.lockBalance = Numeric.decodeQuantity(lockBalance);
+    public void setRestrictingPlanLockedAmount(String restrictingPlanLockedAmount) {
+        this.restrictingPlanLockedAmount = Numeric.decodeQuantity(restrictingPlanLockedAmount);
     }
 
     public void setLockBalance(BigInteger lockBalance) {
-        this.lockBalance =lockBalance;
+        this.restrictingPlanLockedAmount =lockBalance;
     }
 
 
-    public void setPledgeBalance(String pledgeBalance) {
-        this.pledgeBalance = Numeric.decodeQuantity(pledgeBalance);
+    public void setRestrictingPlanPledgeAmount(String restrictingPlanPledgeAmount) {
+        this.restrictingPlanPledgeAmount = Numeric.decodeQuantity(restrictingPlanPledgeAmount);
     }
 
     public void setPledgeBalance(BigInteger pledgeBalance) {
-        this.pledgeBalance = pledgeBalance;
+        this.restrictingPlanPledgeAmount = pledgeBalance;
     }
 
     public String getAccount() {
@@ -69,36 +65,36 @@ public class RestrictingBalance {
         return freeBalance;
     }
 
-    public BigInteger getLockBalance() {
-        return lockBalance;
+    public BigInteger getRestrictingPlanLockedAmount() {
+        return restrictingPlanLockedAmount;
     }
 
-    public BigInteger getPledgeBalance() {
-        return pledgeBalance;
+    public BigInteger getRestrictingPlanPledgeAmount() {
+        return restrictingPlanPledgeAmount;
     }
 
-    public BigInteger getDlFreeBalance() {
-        return dlFreeBalance;
+    public BigInteger getDelegationUnLockedFreeBalance() {
+        return delegationUnLockedFreeBalance;
     }
 
-    public void setDlFreeBalance(String dlFreeBalance) {
-        this.dlFreeBalance = Numeric.decodeQuantity(dlFreeBalance);
+    public void setDelegationUnLockedFreeBalance(String delegationUnLockedFreeBalance) {
+        this.delegationUnLockedFreeBalance = Numeric.decodeQuantity(delegationUnLockedFreeBalance);
     }
 
-    public BigInteger getDlRestrictingBalance() {
-        return dlRestrictingBalance;
+    public BigInteger getDelegationUnLockedRestrictingPlanAmount() {
+        return delegationUnLockedRestrictingPlanAmount;
     }
 
-    public void setDlRestrictingBalance(String dlRestrictingBalance) {
-        this.dlRestrictingBalance = Numeric.decodeQuantity(dlRestrictingBalance);
+    public void setDelegationUnLockedRestrictingPlanAmount(String delegationUnLockedRestrictingPlanAmount) {
+        this.delegationUnLockedRestrictingPlanAmount = Numeric.decodeQuantity(delegationUnLockedRestrictingPlanAmount);
     }
 
-    public List<DlLock> getDlLocks() {
-        return dlLocks;
+    public List<DlLock> getDelegationLockedItems() {
+        return delegationLockedItems;
     }
 
-    public void setDlLocks(List<DlLock> dlLocks) {
-        this.dlLocks = dlLocks;
+    public void setDelegationLockedItems(List<DlLock> delegationLockedItems) {
+        this.delegationLockedItems = delegationLockedItems;
     }
 
 }

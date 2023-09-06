@@ -13,13 +13,13 @@ public class RestrictingBalanceTest {
         RestrictingBalance rb = new RestrictingBalance();
         rb.setAccount("sfsdfsfs");
         rb.setFreeBalance("0x99999");
-        rb.setLockBalance("0x99999");
-        rb.setPledgeBalance("0x99999");
+        rb.setRestrictingPlanLockedAmount("0x99999");
+        rb.setRestrictingPlanPledgeAmount("0x99999");
 
         rb.getAccount();
         rb.getFreeBalance();
-        rb.getLockBalance();
-        rb.getPledgeBalance();
+        rb.getRestrictingPlanLockedAmount();
+        rb.getRestrictingPlanPledgeAmount();
 
         assertTrue(true);
     }

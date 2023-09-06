@@ -111,8 +111,8 @@ public class AddressServiceTest extends ApiTestMockBase {
         RestrictingBalance restrictingBalance = new RestrictingBalance();
         restrictingBalance.setAccount("0x0000000000000000000000000000000000000000");
         restrictingBalance.setFreeBalance("0x10");
-        restrictingBalance.setLockBalance("0x10");
-        restrictingBalance.setPledgeBalance("0x10");
+        restrictingBalance.setRestrictingPlanLockedAmount("0x10");
+        restrictingBalance.setRestrictingPlanPledgeAmount("0x10");
         restrictingBalances.add(restrictingBalance);
         when(specialApi.getRestrictingBalance(any(), any())).thenReturn(restrictingBalances);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
@@ -155,8 +155,8 @@ public class AddressServiceTest extends ApiTestMockBase {
         RestrictingBalance restrictingBalance = new RestrictingBalance();
         restrictingBalance.setAccount("0x1000000000000000000000000000000000000001");
         restrictingBalance.setFreeBalance("0x10");
-        restrictingBalance.setLockBalance("0x10");
-        restrictingBalance.setPledgeBalance("0x10");
+        restrictingBalance.setRestrictingPlanLockedAmount("0x10");
+        restrictingBalance.setRestrictingPlanPledgeAmount("0x10");
         restrictingBalances.add(restrictingBalance);
         when(specialApi.getRestrictingBalance(any(), any())).thenReturn(restrictingBalances);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);

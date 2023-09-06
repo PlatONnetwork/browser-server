@@ -148,8 +148,8 @@ public class CommonService {
             if (!CollectionUtils.isEmpty(addressList)){
                 String addressParamStr = String.join(";", addressList);
                 try {
-                    List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper().getWeb3j(), addressParamStr, blockNumber);
-                    BigInteger value = balanceList.stream().map(RestrictingBalance::getDlFreeBalance).reduce(BigInteger.ZERO, BigInteger::add);
+                    List<RestrictingBalance> balanceList = specialApi.getRestrictingBalance(platOnClient.getWeb3jWrapper(), addressParamStr, blockNumber);
+                    BigInteger value = balanceList.stream().map(RestrictingBalance::getDelegationUnLockedFreeBalance).reduce(BigInteger.ZERO, BigInteger::add);
                     foundationValue = new BigDecimal(value);
                 } catch (Exception e) {
                     log.error("获取基金会余额异常", e);
@@ -262,7 +262,7 @@ public class CommonService {
         // 上一结算周期最后一个块号
         BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(BigInteger.valueOf(currentNumber), blockChainConfig.getSettlePeriodBlockCount());
         // 从特殊接口获取
-        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
+        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper(), preSettleEpochLastBlockNumber);
         // 第几年
         int yearNum = epochInfo.getYearNum().intValue();
         if (yearNum < 1) {

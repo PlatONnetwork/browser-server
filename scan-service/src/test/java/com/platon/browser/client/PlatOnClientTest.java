@@ -13,7 +13,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import static org.junit.Assert.assertTrue;
@@ -35,7 +34,7 @@ public class PlatOnClientTest {
 	private PlatOnClient target;
 
 	@Test
-	public void testInit() throws IOException, InterruptedException {
+	public void testInit() throws Exception {
 		ReflectionTestUtils.setField(target,"logDecodeExecutor",logDecodeExecutor);
 		ReflectionTestUtils.setField(target,"retryableClient",retryableClient);
 		ReflectionTestUtils.setField(target,"specialApi",specialApi);

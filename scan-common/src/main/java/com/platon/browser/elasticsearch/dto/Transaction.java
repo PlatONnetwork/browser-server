@@ -103,13 +103,14 @@ public class Transaction {
     private List<TxTransferBak> transferTxList = new ArrayList<>();
 
     /**
+     * todo: 这个好像没有地方赋值？
      * PPOS调用交易
      */
     @JSONField(serialize = false)
     private List<Transaction> pposTxList = new ArrayList<>();
 
     /**
-     * 虚拟交易
+     * 用户合约调用ppos的交易
      */
     @JSONField(serialize = false)
     private List<Transaction> virtualTransactions = new ArrayList<>();

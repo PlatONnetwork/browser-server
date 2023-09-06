@@ -133,7 +133,7 @@ public class StatisticsNetworkAnalyzer {
         // 上一结算周期最后一个块号
         BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(Convert.toBigInteger(currentNumber), chainConfig.getSettlePeriodBlockCount());
         // 从特殊接口获取
-        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper().getWeb3j(), preSettleEpochLastBlockNumber);
+        EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper(), preSettleEpochLastBlockNumber);
         // 第几年
         int yearNum = epochInfo.getYearNum().intValue();
         if (yearNum < 1) {

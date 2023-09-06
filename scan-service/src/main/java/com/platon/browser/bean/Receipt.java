@@ -48,6 +48,8 @@ public class Receipt {
 
     /**
      * 解码log
+     * 2023-08-31，不需要在这里解码log，因为根本不着调如何解码。
+     * @deprecated
      */
     public void decodeLogs() {
         if (this.logs == null || this.logs.isEmpty()) {
@@ -62,6 +64,9 @@ public class Receipt {
         }
         RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(data));
         List<RlpType> rlpList = ((RlpList)(rlp.getValues().get(0))).getValues();
+        // 2023-08-31，这个至是内置合约交易才是返回这个数据结构
+        // 如果datas为空, log data =  rlp([errCodeString]),
+        // 如果datas不为空, log data =  rlp([errCodeString,rlp(data1),rlp(data2)...]),
         String decodedStatus = new String(((RlpString)rlpList.get(0)).getBytes());
         int statusCode = Integer.parseInt(decodedStatus);
         if (statusCode == 0) {
