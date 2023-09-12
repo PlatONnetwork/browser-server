@@ -15,6 +15,7 @@ public class EpochUtil {
     private EpochUtil(){}
     /**
      * 取周期，向上取整
+     * 从1开始（0特殊处理，表示0区块时）
      * @param blockNumber 当前区块号
      * @param blockCountPerEpoch 每个周期的区块数量
      * @return
@@ -32,6 +33,7 @@ public class EpochUtil {
      * @return
      */
     public static BigInteger getPreEpochLastBlockNumber(BigInteger blockNumber, BigInteger blockCountPerEpoch) throws BlockNumberException {
+        //当 blockNumber ==0时，返回的curEpoch = 0；否则从1开始计算epoch
         BigInteger curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
         if(BigInteger.ZERO.compareTo(curEpoch)>0) throw new BlockNumberException("当前周期为("+curEpoch+"),没有上一周期");
         if(BigInteger.ZERO.compareTo(curEpoch)==0) return curEpoch;
@@ -48,5 +50,11 @@ public class EpochUtil {
     public static BigInteger getCurEpochLastBlockNumber(BigInteger blockNumber, BigInteger blockCountPerEpoch) throws BlockNumberException {
         BigInteger curEpoch = getEpoch(blockNumber,blockCountPerEpoch);
         return curEpoch.multiply(blockCountPerEpoch);
+    }
+
+    public static void main(String[] args) throws BlockNumberException {
+        BigInteger epoch = EpochUtil.getEpoch(BigInteger.valueOf(10L), BigInteger.valueOf(10L));
+        System.out.println("epoch:" + epoch);
+
     }
 }

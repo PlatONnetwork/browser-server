@@ -175,8 +175,9 @@ public class TransactionAnalyzer {
             }
         }
 
-        // 合约内部转账记录
-        // 都是指LAT的转账：1.调用合约时，带有VALUE值；2.合约内部向其它地址转账；3.合约销毁时的转账
+        //收集合约内置的转账交易（不包括初始交易是带value的合约调用）
+        //1. 合约内部的lat转账
+        //2. 合约销毁时，合约上的原生代币，将转给合约的受益人（beneficiary，这个受益人，究竟是合约调用人？合约部署人？）
         // 原始交易成功，非常规转账才会成功;
         if(CollUtil.isNotEmpty(receipt.getEmbedTransfers())){
             log.info("交易回执的非常规转账：{}", JSON.toJSONString(receipt.getEmbedTransfers()));

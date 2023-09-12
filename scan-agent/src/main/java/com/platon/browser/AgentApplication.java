@@ -108,6 +108,7 @@ public class AgentApplication implements ApplicationRunner {
         // 启动自检和初始化完成后,把应用置为RUNNING运行状态,让定时任务可以执行业务逻辑
         AppStatusUtil.setStatus(AppStatus.RUNNING);
         // 已采最高块号
+        // 初始第一次采集时: collectedNumber = -1
         long collectedNumber = initialResult.getCollectedBlockNumber();
         // 前一个块号
         long preBlockNum;
@@ -118,6 +119,8 @@ public class AgentApplication implements ApplicationRunner {
                 traceId = CommonUtil.createTraceId();
                 CommonUtil.putTraceId(traceId);
                 preBlockNum = collectedNumber++;
+                // 经过上面这行代码执行后，初始第一次采集时: preBlockNum = -1，collectedNumber = 0
+
                 // 检查区块号是否合法
                 blockService.checkBlockNumber(collectedNumber);
                 // 异步获取区块

@@ -33,9 +33,9 @@ public class ReceiptServiceTest extends AgentTestBase {
         // 异步获取交易回执
         CompletableFuture<ReceiptResult> receiptCF = receiptService.getReceiptAsync(58035682L);
         ReceiptResult receiptResult = receiptCF.get();
-        System.out.println("receiptResult.getMap().size():" + receiptResult.getMap().size());
+        System.out.println("receiptResult.getMap().size():" + receiptResult.getReceiptMap().size());
 
-        Iterator<Receipt> receiptIt = receiptResult.getMap().values().iterator();
+        Iterator<Receipt> receiptIt = receiptResult.getReceiptMap().values().iterator();
         int idx = 0;
         while (receiptIt.hasNext()){
             System.out.println("idx:" + (idx++));

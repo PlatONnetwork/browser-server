@@ -51,12 +51,14 @@ public class EpochService {
     /**
      * 使用区块号更新服务内部状态
      *
-     * @param blockNumber
+     * @param blockNumber，待采集的区块号，从0开始
      */
     public EpochMessage getEpochMessage(Long blockNumber) throws BlockNumberException {
         // 每个周期第一个块计算下一个周期的相关数据
         currentBlockNumber = BigInteger.valueOf(blockNumber);
         BigInteger prevBlockNumber = currentBlockNumber.subtract(BigInteger.ONE);
+        //当 prevBlockNumber = -1时，后续的判断 == 0 都是false
+
 
         // 为防止在增发、结算、共识三个周期重叠时奖励金额计算错误，规定执行顺序为：增发周期变更->结算周期变更->共识周期变更
         issueEpochRound = EpochUtil.getEpoch(currentBlockNumber, chainConfig.getAddIssuePeriodBlockCount());
@@ -73,6 +75,8 @@ public class EpochService {
         if (prevBlockNumber.longValue() % chainConfig.getSettlePeriodBlockCount().longValue() == 0) {
             // 结算周期变更
             try {
+                //currentBlockNumber是待采集的块，prevBlockNumber是前一个块，如果prevBlockNumber=结算周期的最后一块（10750*N块）
+                //说明currentBlockNumber是新结算周期的第一个块
                 epochRetryService.settlementChange(currentBlockNumber);
             } catch (Exception e) {
                 log.error("结算周期变更执行失败:", e);
