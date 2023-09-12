@@ -175,7 +175,7 @@ public class EpochRetryService {
      * 3、更新当前周期区块奖励
      * 4、更新当前周期质押奖励
      *
-     * @param currentBlockNumber 结算周期内的任意块
+     * @param currentBlockNumber 结算周期的第一个块，或者是0块
      */
     @Retryable(value = Exception.class, maxAttempts = CommonConstant.reTryNum)
     public void settlementChange(BigInteger currentBlockNumber) {
@@ -197,8 +197,8 @@ public class EpochRetryService {
             preVerifiers.addAll(preNodes);
 
             // 当前周期的验证人
-            List<Node> curNodes = Collections.emptyList();
-            if (latestEpoch.compareTo(currentEpoch) > 0) {
+            List<Node> curNodes = specialApi.getHistoryVerifierList(platOnClient.getWeb3jWrapper(), currentBlockNumber);
+            /*if (latestEpoch.compareTo(currentEpoch) > 0) {
                 // >>>>如果链上最新块所在周期>当前块所处周期, 则查询特殊节点历史接口
                 // 如果前一个周期的最后一个块是0，则查第0块时的验证人作为当前验证人
                 BigInteger targetBlockNumber = lastBlockNumberOfPrevSettlePeriod.compareTo(BigInteger.ZERO) == 0 ? BigInteger.ZERO : lastBlockNumberOfPrevSettlePeriod.add(BigInteger.ONE);
@@ -207,7 +207,7 @@ public class EpochRetryService {
             if (latestEpoch.compareTo(currentEpoch) == 0) {
                 // >>>>如果链上最新块所在周期==当前块所处周期, 则查询实时接口
                 curNodes = platOnClient.getLatestVerifiers();
-            }
+            }*/
             curNodes.forEach(n -> n.setNodeId(HexUtil.prefix(n.getNodeId())));
             curVerifiers.clear();
             curVerifiers.addAll(curNodes);
@@ -215,13 +215,15 @@ public class EpochRetryService {
             // 上一结算周期最后一个块号
             BigInteger preSettleEpochLastBlockNumber = EpochUtil.getPreEpochLastBlockNumber(currentBlockNumber, chainConfig.getSettlePeriodBlockCount());
             // 从特殊接口获取
+            // 当到达一个epoch的结束块高时，需要知道上一个epoch的信息。
+            // 因此计算上一个epoch结束块高，并通过接口获取epochInfo，因为特殊节点存储epochInfo都是以epoch的序号（从1开始）为key的。
             EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper(), preSettleEpochLastBlockNumber);
             // 区块奖励
-            blockReward = epochInfo.getPackageReward();
+           // blockReward = epochInfo.getPackageReward();
             // 当前增发周期内每个结算周期的质押奖励
-            settleStakeReward = epochInfo.getStakingReward();
+            //settleStakeReward = epochInfo.getStakingReward();
             // 前一结算周期质押奖励轮换
-            preStakeReward = stakeReward;
+            //preStakeReward = stakeReward;
             // 计算当前结算周期内每个验证人的质押奖励
             stakeReward = handleStakeReward(preSettleEpochLastBlockNumber, currentEpoch.subtract(BigInteger.ONE), epochInfo.getCurStakingReward());
             ConfigChange configChange = new ConfigChange();
