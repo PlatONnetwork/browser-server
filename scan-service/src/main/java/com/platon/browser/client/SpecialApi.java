@@ -150,6 +150,9 @@ public class SpecialApi {
 
     private DefaultBlockParameter convertBlockNumber(BigInteger number) {
         DefaultBlockParameter blockParameter = DefaultBlockParameterName.LATEST;
+        if(number.longValue() < 0){
+            number = BigInteger.ZERO;
+        }
         if(number!=null){
             blockParameter = DefaultBlockParameter.valueOf(number);
         }
