@@ -82,15 +82,15 @@ public class ProposalInfoTask {
                 //发送rpc请求查询提案结果
                 ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), networkStat.get(0).getCurBlockHash());
                 //设置参与人数
-                if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
+                if (pps.getAccuVerifierAccount() != null && !pps.getAccuVerifierAccount().equals(proposal.getAccuVerifiers())) {
                     TaskUtil.console("当前块高[{}],提案结束块高[{}],提案投票[{}]的验证人总数[{}]->[{}]更新",
                                      networkStat.get(0).getCurNumber(),
                                      proposal.getEndVotingBlock(),
                                      proposal.getHash(),
                                      proposal.getAccuVerifiers(),
-                                     pps.getVoterCount());
+                                     pps.getAccuVerifierAccount());
                     // 有变更
-                    proposal.setAccuVerifiers(pps.getVoterCount());
+                    proposal.setAccuVerifiers(pps.getAccuVerifierAccount());
                 }
                 /**
                  * 当同步区块号小于结束区块且相应的取消提案未成功时候则跳过更新状态，防止追块时候提案提前结束造成数据错误

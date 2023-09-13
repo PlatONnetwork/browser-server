@@ -11,7 +11,7 @@ public class NodeVersionTest {
     @Test
     public void test(){
         NodeVersion nv = new NodeVersion();
-        nv.setBigVersion("3333");
+        nv.setProgramVersion(65321);
         nv.setNodeId("0xdsfsdffs");
         nv.getBigVersion();
         nv.getNodeId();

@@ -1,7 +1,5 @@
 package com.platon.browser.bean;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 import java.math.BigInteger;
 
 /**
@@ -11,10 +9,10 @@ import java.math.BigInteger;
  **/
 public class HistoryLowRateSlash {
     // 被处罚节点Id
-    @JSONField(name = "NodeId")
+    //@JSONField(name = "NodeId")
     private String nodeId;
     // 处罚金额
-    @JSONField(name = "Amount")
+    //@JSONField(name = "Amount")
     private BigInteger amount;
 
     public String getNodeId() {

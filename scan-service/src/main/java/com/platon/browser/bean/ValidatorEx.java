@@ -15,7 +15,7 @@ public class ValidatorEx {
 
     private String stakingAddress;
 
-    private String benifitAddress;
+    private String benefitAddress;
 
     private BigInteger rewardPer;
 

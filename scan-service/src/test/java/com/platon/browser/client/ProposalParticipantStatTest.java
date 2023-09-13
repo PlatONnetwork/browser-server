@@ -13,15 +13,15 @@ public class ProposalParticipantStatTest {
     public void test(){
         ProposalParticipantStat pps = new ProposalParticipantStat();
 
-        pps.setAbstainCount(8L);
-        pps.setOpposeCount(4L);
-        pps.setSupportCount(998L);
-        pps.setVoterCount(8798L);
+        pps.setAbstentions(8L);
+        pps.setNays(4L);
+        pps.setYeas(998L);
+        pps.setAccuVerifierAccount(8798L);
 
-        pps.getAbstainCount();
-        pps.getOpposeCount();
-        pps.getSupportCount();
-        pps.getVoterCount();
+        pps.getAbstentions();
+        pps.getNays();
+        pps.getYeas();
+        pps.getAccuVerifierAccount();
 
         assertTrue(true);
     }

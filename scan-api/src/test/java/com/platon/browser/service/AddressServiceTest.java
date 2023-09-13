@@ -114,7 +114,7 @@ public class AddressServiceTest extends ApiTestMockBase {
         restrictingBalance.setRestrictingPlanLockedAmount("0x10");
         restrictingBalance.setRestrictingPlanPledgeAmount("0x10");
         restrictingBalances.add(restrictingBalance);
-        when(specialApi.getRestrictingBalance(any(), any())).thenReturn(restrictingBalances);
+        when(specialApi.getRestrictingBalance(any(), anyString())).thenReturn(restrictingBalances);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(platonClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
         Web3j web3j = mock(Web3j.class);
@@ -158,7 +158,7 @@ public class AddressServiceTest extends ApiTestMockBase {
         restrictingBalance.setRestrictingPlanLockedAmount("0x10");
         restrictingBalance.setRestrictingPlanPledgeAmount("0x10");
         restrictingBalances.add(restrictingBalance);
-        when(specialApi.getRestrictingBalance(any(), any())).thenReturn(restrictingBalances);
+        when(specialApi.getRestrictingBalance(any(), anyString())).thenReturn(restrictingBalances);
         Web3jWrapper web3jWrapper = mock(Web3jWrapper.class);
         when(platonClient.getWeb3jWrapper()).thenReturn(web3jWrapper);
 

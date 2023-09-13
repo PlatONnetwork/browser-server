@@ -128,18 +128,18 @@ public class ProposalUpdateTask {
                 try {
                     ProposalParticipantStat pps = proposalService.getProposalParticipantStat(proposal.getHash(), currentBlockHash);
                     //设置参与人数
-                    if (pps.getVoterCount() != null && !pps.getVoterCount().equals(proposal.getAccuVerifiers())) {
+                    if (pps.getAccuVerifierAccount() != null && !pps.getAccuVerifierAccount().equals(proposal.getAccuVerifiers())) {
                         TaskUtil.console("当前块高[{}],提案结束块高[{}],提案投票[{}]的验证人总数[{}]->[{}]更新",
                                 networkStat.get(0).getCurNumber(),
                                 proposal.getEndVotingBlock(),
                                 proposal.getHash(),
                                 proposal.getAccuVerifiers(),
-                                pps.getVoterCount());
+                                pps.getAccuVerifierAccount());
                         // 投票的动态信息
-                        proposal.setYeas(pps.getSupportCount());
-                        proposal.setNays(pps.getOpposeCount());
-                        proposal.setAbstentions(pps.getAbstainCount());
-                        proposal.setAccuVerifiers(pps.getVoterCount());
+                        proposal.setYeas(pps.getYeas());
+                        proposal.setNays(pps.getNays());
+                        proposal.setAbstentions(pps.getAbstentions());
+                        proposal.setAccuVerifiers(pps.getAccuVerifierAccount());
                     }
                 } catch ( Exception e) {
                     log.error("获取提案可投票人数出错", e);
