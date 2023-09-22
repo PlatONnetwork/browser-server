@@ -43,7 +43,7 @@ public class ApiService {
         BigDecimal expectedIncome = BigDecimal.ZERO;
         BigDecimal deleAnnualizedRate   = BigDecimal.ZERO;
         int size = itemList.size();
-        resp.setValidatorsNumber(size);
+        resp.setValidatorsNumber(aliveStakingListPage.getData().size());
         for (AliveStakingListResp item: itemList) {
             expectedIncome = expectedIncome.add(new BigDecimal(item.getExpectedIncome()));
             deleAnnualizedRate = deleAnnualizedRate.add(new BigDecimal(item.getDeleAnnualizedRate()));
