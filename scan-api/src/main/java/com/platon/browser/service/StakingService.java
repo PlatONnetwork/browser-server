@@ -643,4 +643,7 @@ public class StakingService {
         return respPage;
     }
 
+    public Integer countCandidate() {
+        return  customNodeMapper.selectCountByActive();
+    }
 }
