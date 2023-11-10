@@ -64,5 +64,5 @@ public interface Token1155InventoryMapper {
      */
     List<NftObject> listValidTokenInventoryWithEmptyImage(@Param("offset")int offset, @Param("pageSize")int pageSize);
 
-    List<NftObject> listValidTokenInventoryWithEmptyUrl(int offset, int batchSize);
+    List<NftObject> listValidTokenInventoryWithEmptyUrl(@Param("offset")int offset, @Param("pageSize")int pageSize);
 }

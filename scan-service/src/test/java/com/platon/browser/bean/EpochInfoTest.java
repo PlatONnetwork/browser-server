@@ -17,15 +17,15 @@ public class EpochInfoTest {
         epochInfo.setPackageReward("0x1");
         epochInfo.setRemainEpoch(BigDecimal.ONE);
         epochInfo.setStakingReward("0x1");
-        epochInfo.setYearEndNum(BigDecimal.ONE);
-        epochInfo.setYearNum(BigDecimal.ONE);
-        epochInfo.setYearStartNum(BigDecimal.ONE);
+        epochInfo.setYearEndBlockNum(BigDecimal.ONE);
+        epochInfo.setChainAge(BigDecimal.ONE);
+        epochInfo.setYearStartBlockNum(BigDecimal.ONE);
         assertEquals(epochInfo.getAvgPackTime(), BigDecimal.ONE);
         assertEquals(epochInfo.getPackageReward(), BigDecimal.ONE);
         assertEquals(epochInfo.getRemainEpoch(), BigDecimal.ONE);
         assertEquals(epochInfo.getStakingReward(), BigDecimal.ONE);
-        assertEquals(epochInfo.getYearEndNum(), BigDecimal.ONE);
-        assertEquals(epochInfo.getYearNum(), BigDecimal.ONE);
-        assertEquals(epochInfo.getYearStartNum(), BigDecimal.ONE);
+        assertEquals(epochInfo.getYearEndBlockNum(), BigDecimal.ONE);
+        assertEquals(epochInfo.getChainAge(), BigDecimal.ONE);
+        assertEquals(epochInfo.getYearStartBlockNum(), BigDecimal.ONE);
     }
 }

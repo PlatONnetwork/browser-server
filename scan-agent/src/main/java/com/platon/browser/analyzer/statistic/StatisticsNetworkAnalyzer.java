@@ -135,7 +135,7 @@ public class StatisticsNetworkAnalyzer {
         // 从特殊接口获取
         EpochInfo epochInfo = specialApi.getEpochInfo(platOnClient.getWeb3jWrapper(), preSettleEpochLastBlockNumber);
         // 第几年
-        int yearNum = epochInfo.getYearNum().intValue();
+        int yearNum = epochInfo.getChainAge().intValue();
         if (yearNum < 1) {
             throw new Exception(StrUtil.format("当前区块[{}],上一结算周期最后一个块号[{}]获取年份[{}]异常", currentNumber, preSettleEpochLastBlockNumber, yearNum));
         }

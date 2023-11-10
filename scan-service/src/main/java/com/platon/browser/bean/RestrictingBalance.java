@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.platon.utils.Numeric;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * @Date: 2019/8/15 19:27
  * @Description:
  */
-
+@Data
 public class RestrictingBalance {
 
     private String account;
@@ -31,70 +31,4 @@ public class RestrictingBalance {
      * 委托锁定中锁定的列表
      */
     private List<DlLock> delegationLockedItems;
-
-    public void setFreeBalance(String freeBalance) {
-        this.freeBalance = Numeric.decodeQuantity(freeBalance);
-    }
-
-    public void setRestrictingPlanLockedAmount(String restrictingPlanLockedAmount) {
-        this.restrictingPlanLockedAmount = Numeric.decodeQuantity(restrictingPlanLockedAmount);
-    }
-
-    public void setLockBalance(BigInteger lockBalance) {
-        this.restrictingPlanLockedAmount =lockBalance;
-    }
-
-
-    public void setRestrictingPlanPledgeAmount(String restrictingPlanPledgeAmount) {
-        this.restrictingPlanPledgeAmount = Numeric.decodeQuantity(restrictingPlanPledgeAmount);
-    }
-
-    public void setPledgeBalance(BigInteger pledgeBalance) {
-        this.restrictingPlanPledgeAmount = pledgeBalance;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public BigInteger getFreeBalance() {
-        return freeBalance;
-    }
-
-    public BigInteger getRestrictingPlanLockedAmount() {
-        return restrictingPlanLockedAmount;
-    }
-
-    public BigInteger getRestrictingPlanPledgeAmount() {
-        return restrictingPlanPledgeAmount;
-    }
-
-    public BigInteger getDelegationUnLockedFreeBalance() {
-        return delegationUnLockedFreeBalance;
-    }
-
-    public void setDelegationUnLockedFreeBalance(String delegationUnLockedFreeBalance) {
-        this.delegationUnLockedFreeBalance = Numeric.decodeQuantity(delegationUnLockedFreeBalance);
-    }
-
-    public BigInteger getDelegationUnLockedRestrictingPlanAmount() {
-        return delegationUnLockedRestrictingPlanAmount;
-    }
-
-    public void setDelegationUnLockedRestrictingPlanAmount(String delegationUnLockedRestrictingPlanAmount) {
-        this.delegationUnLockedRestrictingPlanAmount = Numeric.decodeQuantity(delegationUnLockedRestrictingPlanAmount);
-    }
-
-    public List<DlLock> getDelegationLockedItems() {
-        return delegationLockedItems;
-    }
-
-    public void setDelegationLockedItems(List<DlLock> delegationLockedItems) {
-        this.delegationLockedItems = delegationLockedItems;
-    }
-
 }

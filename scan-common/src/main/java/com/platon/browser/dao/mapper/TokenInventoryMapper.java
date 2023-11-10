@@ -70,5 +70,5 @@ public interface TokenInventoryMapper {
      * @param pageSize
      * @return
      */
-    List<com.platon.browser.dao.entity.NftObject> listValidTokenInventoryWithEmptyUrl(int offset, int pageSize);
+    List<com.platon.browser.dao.entity.NftObject> listValidTokenInventoryWithEmptyUrl(@Param("offset")int offset, @Param("pageSize")int pageSize);
 }

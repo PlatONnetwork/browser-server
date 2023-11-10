@@ -130,7 +130,7 @@ public class InitializationService {
         initEs();
         // 检查数据库network_stat表,如果没有记录则添加一条,并从链上查询最新内置验证人节点入库至staking表和node表
         NetworkStat networkStat = networkStatMapper.selectByPrimaryKey(1);
-        if (networkStat == null) {
+        if (networkStat == null || networkStat.getCurNumber() == -1) {
             // 确保chainConfig先就绪
             try {
                 parameterService.initConfigTable();

@@ -35,8 +35,11 @@ public class PPOSTxDecodeUtil {
 
         result.setTxErrCode(-1);
         List<RlpType> rlpDataList = null;
-        // 如果datas为空, log data =  rlp([errCodeString]),
-        // 如果datas不为空, log data =  rlp([errCodeString,rlp(data1),rlp(data2)...]),
+        // 参考：x/xcom/common_types.go:func AddLogWithRes(state StateDB, blockNumber uint64, contractAddr common.Address, event, code string, datas ...interface{})
+        // 可知ppos交易的log data组成和编码规则
+        // Log.data字段编码规则:
+        // 如果datas为空,  rlp([code]),
+        // 如果datas不为空,rlp([code,rlp(data1),rlp(data2)...]),
         if(StringUtils.isNotBlank(logDataHex)){
             RlpList rlp = RlpDecoder.decode(Numeric.hexStringToByteArray(logDataHex));
             rlpDataList = ((RlpList) (rlp.getValues().get(0))).getValues();

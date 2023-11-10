@@ -1,6 +1,6 @@
 package com.platon.browser.bean;
 
-import com.platon.utils.Numeric;
+import lombok.Data;
 
 import java.math.BigInteger;
 
@@ -9,6 +9,7 @@ import java.math.BigInteger;
  *
  * @date: 2022/8/26
  */
+@Data
 public class DlLock {
 
     /**
@@ -25,29 +26,4 @@ public class DlLock {
      * 解锁结算周期,锁定截止周期
      */
     private BigInteger expiredEpoch;
-
-    public BigInteger getRestrictingPlanAmount() {
-        return restrictingPlanAmount;
-    }
-
-    public void setRestrictingPlanAmount(String restrictingPlanAmount) {
-        this.restrictingPlanAmount = Numeric.decodeQuantity(restrictingPlanAmount);
-    }
-
-    public BigInteger getFreeBalance() {
-        return freeBalance;
-    }
-
-    public void setFreeBalance(String freeBalance) {
-        this.freeBalance = Numeric.decodeQuantity(freeBalance);
-    }
-
-    public BigInteger getExpiredEpoch() {
-        return expiredEpoch;
-    }
-
-    public void setExpiredEpoch(BigInteger expiredEpoch) {
-        this.expiredEpoch = expiredEpoch;
-    }
-
 }

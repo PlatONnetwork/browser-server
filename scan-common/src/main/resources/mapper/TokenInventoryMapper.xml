@@ -523,7 +523,7 @@
     SELECT ti.id AS tokenInventoryId, ti.token_url as tokenUrl, ti.token_id as tokenId, ti.token_address as tokenAddress, ti.retry_num as retryNum, tok.type as tokenType, tok.created_block_number as createdBlockNumber
     FROM token_inventory ti
     INNER JOIN token tok ON ti.token_address = tok.address
-    WHERE ti.token_url IS NOT NULL AND tok.contract_destroy_block = 0 AND ti.retry_num <![CDATA[ < ]]> 3
+    WHERE ti.token_url IS NOT NULL AND ti.image IS NULL AND tok.contract_destroy_block = 0 AND ti.retry_num <![CDATA[ < ]]> 3
     ORDER BY ti.id
     LIMIT #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
   </select>
