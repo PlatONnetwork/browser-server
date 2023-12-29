@@ -121,6 +121,7 @@ public class HomeController {
      * @date: 2021/8/17
      */
     @GetMapping("home/circulationValue")
+    @CrossOrigin(origins = "*")
     public Mono<String> getCirculationValue() {
         return Mono.create(sink -> {
             BigDecimal circulationValue = commonService.getCirculationValue();
