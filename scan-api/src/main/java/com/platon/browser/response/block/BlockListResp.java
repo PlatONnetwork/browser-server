@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 /**
  *  区块列表返回对象
  *  @file BlockListResp.java
- *  @description 
+ *  @description
  *	@author zhangrj
  *  @data 2019年8月31日
  */
@@ -23,6 +23,8 @@ public class BlockListResp {
     private String gasUsed;
     private String statTxGasLimit;
     private BigDecimal blockReward;
+	private BigDecimal baseFeePerGas;
+
 	public Long getNumber() {
 		return number;
 	}
@@ -84,5 +86,12 @@ public class BlockListResp {
 	public void setBlockReward(BigDecimal blockReward) {
 		this.blockReward = blockReward;
 	}
-    
+
+	public BigDecimal getBaseFeePerGas() {
+		return baseFeePerGas;
+	}
+
+	public void setBaseFeePerGas(BigDecimal baseFeePerGas) {
+		this.baseFeePerGas = baseFeePerGas;
+	}
 }

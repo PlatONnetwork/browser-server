@@ -46,7 +46,9 @@ public class BlockAnalyzer {
                 .setNodeId(nodeId)
                 .setTxFee("0")
                 .setGasLimit(rawBlock.getGasLimit().toString())
-                .setGasUsed(rawBlock.getGasUsed().toString());
+                .setGasUsed(rawBlock.getGasUsed().toString())
+                .setBaseFeePerGas(rawBlock.getBaseFeePerGasRaw());
+
         result.setSeq(new AtomicLong(result.getNum() * 100000));
         if (rawBlock.getTransactions().isEmpty())
             return result;

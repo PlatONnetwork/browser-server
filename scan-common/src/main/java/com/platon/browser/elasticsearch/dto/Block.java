@@ -67,6 +67,8 @@ public class Block {
 
     private String extra;
 
+    private String baseFeePerGas;
+
     /**
      * 序号ID,用于计算区块下的交易seq自增
      */
@@ -102,5 +104,7 @@ public class Block {
         return new BigDecimal(this.getReward());
     }
 
-
+    public BigDecimal decimalBaseFeePerGas() {
+        return new BigDecimal(this.getBaseFeePerGas());
+    }
 }

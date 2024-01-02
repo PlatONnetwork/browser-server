@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Data
@@ -30,7 +29,8 @@ public class CollectionBlock extends Block {
              .setGasUsed(BigDecimal.ZERO.toString())
              .setTxFee(BigDecimal.ZERO.toString())
              .setSize(0)
-             .setTxGasLimit(BigDecimal.ZERO.toString());
+             .setTxGasLimit(BigDecimal.ZERO.toString())
+             .setBaseFeePerGas(BigDecimal.ZERO.toString());
         return block;
     }
 
