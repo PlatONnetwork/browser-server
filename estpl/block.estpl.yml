@@ -69,6 +69,11 @@ mappings:
       index: false
       type: text
       doc_values: false
+    baseFeePerGas:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
     upd_time:
       format: yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis
       type: date

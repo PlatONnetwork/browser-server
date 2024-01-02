@@ -107,3 +107,28 @@ mappings:
       index: false
       type: text
       doc_values: false
+    chainId:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    rawEthTxType:
+      norms: false
+      index: false
+      type: integer
+      doc_values: false
+    maxFeePerGas:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    maxPriorityFeePerGas:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
+    accessListInfo:
+      norms: false
+      index: false
+      type: text
+      doc_values: false
