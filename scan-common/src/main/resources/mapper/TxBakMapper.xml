@@ -24,6 +24,13 @@
     <result column="upd_time" jdbcType="TIMESTAMP" property="updTime" />
     <result column="contract_type" jdbcType="INTEGER" property="contractType" />
     <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
+
+    <result column="chain_id" jdbcType="BIGINT" property="chainId" />
+    <result column="raw_eth_tx_type" jdbcType="INTEGER" property="rawEthTxType" />
+    <result column="max_fee_per_gas" jdbcType="VARCHAR" property="maxFeePerGas" />
+    <result column="max_priority_fee_per_gas" jdbcType="VARCHAR" property="maxPriorityFeePerGas" />
+
+
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.platon.browser.dao.entity.TxBakWithBLOBs">
     <result column="input" jdbcType="LONGVARCHAR" property="input" />
@@ -35,6 +42,7 @@
     <result column="ppos_tx_info" jdbcType="LONGVARCHAR" property="pposTxInfo" />
     <result column="fail_reason" jdbcType="LONGVARCHAR" property="failReason" />
     <result column="method" jdbcType="LONGVARCHAR" property="method" />
+    <result column="access_list_info" jdbcType="VARCHAR" property="accessListInfo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -95,13 +103,13 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
-    `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type, 
-    contract_address
+    id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit,
+    `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type,
+    contract_address, chain_id, raw_eth_tx_type, max_fee_per_gas, max_priority_fee_per_gas
   </sql>
   <sql id="Blob_Column_List">
-    `input`, info, erc1155_tx_info, erc721_tx_info, erc20_tx_info, transfer_tx_info, 
-    ppos_tx_info, fail_reason, `method`
+    `input`, info, erc1155_tx_info, erc721_tx_info, erc20_tx_info, transfer_tx_info,
+    ppos_tx_info, fail_reason, `method`, access_list_info
   </sql>
   <select id="selectByExampleWithBLOBs" parameterType="com.platon.browser.dao.entity.TxBakExample" resultMap="ResultMapWithBLOBs">
     select
@@ -134,7 +142,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
-    select 
+    select
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -152,26 +160,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.platon.browser.dao.entity.TxBakWithBLOBs">
-    insert into tx_bak (id, hash, b_hash, 
-      num, `index`, `time`, 
-      nonce, `status`, gas_price, 
-      gas_used, gas_limit, `from`, 
-      `to`, `value`, `type`, cost, 
-      to_type, seq, cre_time, 
-      upd_time, contract_type, contract_address, 
-      `input`, info, erc1155_tx_info, 
-      erc721_tx_info, erc20_tx_info, transfer_tx_info, 
+    insert into tx_bak (id, hash, b_hash,
+      num, `index`, `time`,
+      nonce, `status`, gas_price,
+      gas_used, gas_limit, `from`,
+      `to`, `value`, `type`, cost,
+      to_type, seq, cre_time,
+      upd_time, contract_type, contract_address,
+      `input`, info, erc1155_tx_info,
+      erc721_tx_info, erc20_tx_info, transfer_tx_info,
       ppos_tx_info, fail_reason, `method`
       )
-    values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{bHash,jdbcType=VARCHAR}, 
-      #{num,jdbcType=BIGINT}, #{index,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, 
-      #{nonce,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{gasPrice,jdbcType=VARCHAR}, 
-      #{gasUsed,jdbcType=VARCHAR}, #{gasLimit,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR}, 
-      #{to,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{cost,jdbcType=VARCHAR}, 
-      #{toType,jdbcType=INTEGER}, #{seq,jdbcType=BIGINT}, #{creTime,jdbcType=TIMESTAMP}, 
-      #{updTime,jdbcType=TIMESTAMP}, #{contractType,jdbcType=INTEGER}, #{contractAddress,jdbcType=VARCHAR}, 
-      #{input,jdbcType=LONGVARCHAR}, #{info,jdbcType=LONGVARCHAR}, #{erc1155TxInfo,jdbcType=LONGVARCHAR}, 
-      #{erc721TxInfo,jdbcType=LONGVARCHAR}, #{erc20TxInfo,jdbcType=LONGVARCHAR}, #{transferTxInfo,jdbcType=LONGVARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{hash,jdbcType=VARCHAR}, #{bHash,jdbcType=VARCHAR},
+      #{num,jdbcType=BIGINT}, #{index,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP},
+      #{nonce,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{gasPrice,jdbcType=VARCHAR},
+      #{gasUsed,jdbcType=VARCHAR}, #{gasLimit,jdbcType=VARCHAR}, #{from,jdbcType=VARCHAR},
+      #{to,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{cost,jdbcType=VARCHAR},
+      #{toType,jdbcType=INTEGER}, #{seq,jdbcType=BIGINT}, #{creTime,jdbcType=TIMESTAMP},
+      #{updTime,jdbcType=TIMESTAMP}, #{contractType,jdbcType=INTEGER}, #{contractAddress,jdbcType=VARCHAR},
+      #{input,jdbcType=LONGVARCHAR}, #{info,jdbcType=LONGVARCHAR}, #{erc1155TxInfo,jdbcType=LONGVARCHAR},
+      #{erc721TxInfo,jdbcType=LONGVARCHAR}, #{erc20TxInfo,jdbcType=LONGVARCHAR}, #{transferTxInfo,jdbcType=LONGVARCHAR},
       #{pposTxInfo,jdbcType=LONGVARCHAR}, #{failReason,jdbcType=LONGVARCHAR}, #{method,jdbcType=LONGVARCHAR}
       )
   </insert>
@@ -702,23 +710,23 @@
       @project https://github.com/itfsw/mybatis-generator-plugin
     -->
     insert into tx_bak
-    (id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit, 
-      `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type, 
-      contract_address, `input`, info, erc1155_tx_info, erc721_tx_info, erc20_tx_info, 
+    (id, hash, b_hash, num, `index`, `time`, nonce, `status`, gas_price, gas_used, gas_limit,
+      `from`, `to`, `value`, `type`, cost, to_type, seq, cre_time, upd_time, contract_type,
+      contract_address, `input`, info, erc1155_tx_info, erc721_tx_info, erc20_tx_info,
       transfer_tx_info, ppos_tx_info, fail_reason, `method`)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.bHash,jdbcType=VARCHAR}, 
-        #{item.num,jdbcType=BIGINT}, #{item.index,jdbcType=INTEGER}, #{item.time,jdbcType=TIMESTAMP}, 
-        #{item.nonce,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER}, #{item.gasPrice,jdbcType=VARCHAR}, 
-        #{item.gasUsed,jdbcType=VARCHAR}, #{item.gasLimit,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR}, 
-        #{item.to,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER}, 
-        #{item.cost,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.seq,jdbcType=BIGINT}, 
-        #{item.creTime,jdbcType=TIMESTAMP}, #{item.updTime,jdbcType=TIMESTAMP}, #{item.contractType,jdbcType=INTEGER}, 
-        #{item.contractAddress,jdbcType=VARCHAR}, #{item.input,jdbcType=LONGVARCHAR}, #{item.info,jdbcType=LONGVARCHAR}, 
-        #{item.erc1155TxInfo,jdbcType=LONGVARCHAR}, #{item.erc721TxInfo,jdbcType=LONGVARCHAR}, 
-        #{item.erc20TxInfo,jdbcType=LONGVARCHAR}, #{item.transferTxInfo,jdbcType=LONGVARCHAR}, 
-        #{item.pposTxInfo,jdbcType=LONGVARCHAR}, #{item.failReason,jdbcType=LONGVARCHAR}, 
+      (#{item.id,jdbcType=BIGINT}, #{item.hash,jdbcType=VARCHAR}, #{item.bHash,jdbcType=VARCHAR},
+        #{item.num,jdbcType=BIGINT}, #{item.index,jdbcType=INTEGER}, #{item.time,jdbcType=TIMESTAMP},
+        #{item.nonce,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER}, #{item.gasPrice,jdbcType=VARCHAR},
+        #{item.gasUsed,jdbcType=VARCHAR}, #{item.gasLimit,jdbcType=VARCHAR}, #{item.from,jdbcType=VARCHAR},
+        #{item.to,jdbcType=VARCHAR}, #{item.value,jdbcType=VARCHAR}, #{item.type,jdbcType=INTEGER},
+        #{item.cost,jdbcType=VARCHAR}, #{item.toType,jdbcType=INTEGER}, #{item.seq,jdbcType=BIGINT},
+        #{item.creTime,jdbcType=TIMESTAMP}, #{item.updTime,jdbcType=TIMESTAMP}, #{item.contractType,jdbcType=INTEGER},
+        #{item.contractAddress,jdbcType=VARCHAR}, #{item.input,jdbcType=LONGVARCHAR}, #{item.info,jdbcType=LONGVARCHAR},
+        #{item.erc1155TxInfo,jdbcType=LONGVARCHAR}, #{item.erc721TxInfo,jdbcType=LONGVARCHAR},
+        #{item.erc20TxInfo,jdbcType=LONGVARCHAR}, #{item.transferTxInfo,jdbcType=LONGVARCHAR},
+        #{item.pposTxInfo,jdbcType=LONGVARCHAR}, #{item.failReason,jdbcType=LONGVARCHAR},
         #{item.method,jdbcType=LONGVARCHAR})
     </foreach>
   </insert>

@@ -1,15 +1,14 @@
 package com.platon.browser.elasticsearch.dto;
 
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import com.platon.browser.dao.entity.TxTransferBak;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Data
 @Accessors(chain = true)
@@ -78,6 +77,17 @@ public class Transaction {
     private String bin;
 
     private String contractAddress;
+
+    //1.5.0
+    private long chainId;         //链id
+    private String accessListInfo;
+
+    @JSONField(serialize = false)
+    private List<String> accessList = new ArrayList<>();    //accessList
+
+    private int rawEthTxType;       // "0x2" 0 - 传统交易（旧） 1 - AccessList交易 2 - DynamicFee交易
+    private String maxFeePerGas;    //10进制字符串
+    private String maxPriorityFeePerGas;  //10进制字符串
 
     /**
      * erc1155交易列表

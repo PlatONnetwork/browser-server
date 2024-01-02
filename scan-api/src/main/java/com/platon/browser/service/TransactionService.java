@@ -737,6 +737,17 @@ public class TransactionService {
                         break;
                 }
             }
+
+            //适配底层1.5.0
+            resp.setChainId(transaction.getChainId());
+            if(StringUtils.isNotBlank(transaction.getAccessListInfo()) && !"[]".equals(transaction.getAccessListInfo())){
+                List<String> accessList = JSONObject.parseArray(transaction.getAccessListInfo(), String.class);
+                resp.setAccessList(accessList);
+            }
+            resp.setRawEthTxType(transaction.getRawEthTxType());
+            resp.setMaxFeePerGas(new BigDecimal(transaction.getMaxFeePerGas()));
+            resp.setMaxPriorityFeePerGas(new BigDecimal(transaction.getMaxPriorityFeePerGas()));
+
             //补充填充合约的相关数据
             switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
                 /**

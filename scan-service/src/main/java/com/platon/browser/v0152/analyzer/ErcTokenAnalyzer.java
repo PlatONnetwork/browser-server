@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
@@ -363,6 +364,10 @@ public class ErcTokenAnalyzer {
             tx.setErc20TxInfo(getErcTxInfo(tx.getErc20TxList()));
             tx.setErc721TxInfo(getErcTxInfo(tx.getErc721TxList()));
             tx.setErc1155TxInfo(getErcTxInfo(tx.getErc1155TxList()));
+            if(!CollectionUtils.isEmpty(tx.getAccessList())){
+                tx.setAccessListInfo(JSON.toJSONString(tx.getAccessList()));
+            }
+
             log.info("当前交易[{}]有[{}]笔log,其中token交易有[{}]笔，其中erc20有[{}]笔,其中erc721有[{}]笔,其中erc1155有[{}]笔",
                      tx.getHash(),
                      CommonUtil.ofNullable(() -> receipt.getLogs().size()).orElse(0),

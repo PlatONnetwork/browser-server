@@ -5,7 +5,8 @@
         insert into tx_bak (
         `hash`,`b_hash`,`num`,`index`,`time`,`nonce`,`status`,`gas_price`,`gas_used`,`gas_limit`,`from`,`to`,
         `value`,`type`,`cost`,`to_type`,`seq`,`input`,`info`,`erc1155_tx_info`,`erc721_tx_info`,`erc20_tx_info`,`transfer_tx_info`,
-        `ppos_tx_info`,`fail_reason`,`contract_type`,`method`,`contract_address`
+        `ppos_tx_info`,`fail_reason`,`contract_type`,`method`,`contract_address`,
+        `china_id`, `raw_eth_tx_type`, `max_fee_per_gas`, `max_priority_fee_per_gas`, `access_list_info`
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -37,7 +38,13 @@
             #{item.failReason,jdbcType=LONGVARCHAR},
             #{item.contractType,jdbcType=INTEGER},
             #{item.method,jdbcType=LONGVARCHAR},
-            #{item.contractAddress,jdbcType=VARCHAR}
+            #{item.contractAddress,jdbcType=VARCHAR},
+
+            #{item.chainId,jdbcType=BIGINT},
+            #{item.rawEthTxType,jdbcType=INTEGER},
+            #{item.maxFeePerGas,jdbcType=VARCHAR},
+            #{item.maxPriorityFeePerGas,jdbcType=VARCHAR},
+            #{item.accessListInfo,jdbcType=LONGVARCHAR}
             )
         </foreach>
     </insert>

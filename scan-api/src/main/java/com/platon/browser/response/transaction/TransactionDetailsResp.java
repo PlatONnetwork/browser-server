@@ -151,6 +151,21 @@ public class TransactionDetailsResp {
      */
     private BigDecimal redeemDelegationValue;
 
+    // 适配1.5.0
+    private long chainId;
+
+    private List<String> accessList;    //accessList
+
+    // "0x2" 0 - 传统交易（旧） 1 - AccessList交易 2 - DynamicFee交易
+    private int rawEthTxType;
+
+    //10进制字符串
+    private  BigDecimal maxFeePerGas;
+
+    //10进制字符串
+    private BigDecimal maxPriorityFeePerGas;
+
+
     public String getTxHash() {
         return this.txHash;
     }
@@ -680,5 +695,45 @@ public class TransactionDetailsResp {
 
     public void setRedeemDelegationValue(BigDecimal redeemDelegationValue) {
         this.redeemDelegationValue = redeemDelegationValue;
+    }
+
+    public long getChainId() {
+        return chainId;
+    }
+
+    public void setChainId(long chainId) {
+        this.chainId = chainId;
+    }
+
+    public List<String> getAccessList() {
+        return accessList;
+    }
+
+    public void setAccessList(List<String> accessList) {
+        this.accessList = accessList;
+    }
+
+    public int getRawEthTxType() {
+        return rawEthTxType;
+    }
+
+    public void setRawEthTxType(int rawEthTxType) {
+        this.rawEthTxType = rawEthTxType;
+    }
+
+    public BigDecimal getMaxFeePerGas() {
+        return maxFeePerGas;
+    }
+
+    public void setMaxFeePerGas(BigDecimal maxFeePerGas) {
+        this.maxFeePerGas = maxFeePerGas;
+    }
+
+    public BigDecimal getMaxPriorityFeePerGas() {
+        return maxPriorityFeePerGas;
+    }
+
+    public void setMaxPriorityFeePerGas(BigDecimal maxPriorityFeePerGas) {
+        this.maxPriorityFeePerGas = maxPriorityFeePerGas;
     }
 }

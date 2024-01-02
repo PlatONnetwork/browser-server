@@ -10,6 +10,7 @@ import com.platon.rlp.solidity.RlpList;
 import com.platon.rlp.solidity.RlpString;
 import com.platon.rlp.solidity.RlpType;
 import com.platon.utils.Numeric;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -91,13 +92,19 @@ public class NodeUtil {
         result.add(RlpString.create(decodeHash(block.getExtraData().substring(0, 66))));
         //Nonce       BlockNonce     `json:"nonce"`
         result.add(RlpString.create(decodeHash(block.getNonceRaw())));
+
+        //底层1.5.0
+        if (StringUtils.isNotBlank(block.getBaseFeePerGasRaw())){
+            result.add(RlpString.create(block.getBaseFeePerGas()));
+        }
+
         return result;
     }
 
     static byte[] decodeHash(String hex) {
         return Hex.decode(Numeric.cleanHexPrefix(hex));
     }
-    
+
     static byte[] decodeAddress(String address) {
         return Bech32.addressDecode(address);
     }

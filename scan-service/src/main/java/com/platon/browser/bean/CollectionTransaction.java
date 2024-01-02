@@ -32,6 +32,12 @@ public class CollectionTransaction extends Transaction {
             .setIndex(transaction.getTransactionIndex().intValue()).setGasPrice(transaction.getGasPrice().toString())
             .setInput(transaction.getInput()).setTo(transaction.getTo()).setFrom(transaction.getFrom())
             .setGasLimit(transaction.getGas().toString()).setNonce(transaction.getNonce().toString());
+        //适配底层1.5.0
+        this.setAccessList(transaction.getAccessList());
+        this.setChainId(transaction.getChainId());
+        this.setRawEthTxType(transaction.getType());
+        this.setMaxFeePerGas(transaction.getMaxFeePerGas().toString());
+        this.setMaxPriorityFeePerGas(transaction.getMaxPriorityFeePerGas().toString());
         return this;
     }
 }
