@@ -36,8 +36,8 @@ public class CollectionTransaction extends Transaction {
         this.setAccessList(transaction.getAccessList());
         this.setChainId(transaction.getChainId());
         this.setRawEthTxType(transaction.getType());
-        this.setMaxFeePerGas(transaction.getMaxFeePerGas().toString());
-        this.setMaxPriorityFeePerGas(transaction.getMaxPriorityFeePerGas().toString());
+        this.setMaxFeePerGas(transaction.getMaxFeePerGas() == null ? "0" : transaction.getMaxFeePerGas().toString());
+        this.setMaxPriorityFeePerGas(transaction.getMaxPriorityFeePerGas() == null ? "0" :transaction.getMaxPriorityFeePerGas().toString());
         return this;
     }
 }

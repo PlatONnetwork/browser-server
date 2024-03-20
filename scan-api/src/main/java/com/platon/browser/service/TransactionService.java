@@ -745,8 +745,8 @@ public class TransactionService {
                 resp.setAccessList(accessList);
             }
             resp.setRawEthTxType(transaction.getRawEthTxType());
-            resp.setMaxFeePerGas(new BigDecimal(transaction.getMaxFeePerGas()));
-            resp.setMaxPriorityFeePerGas(new BigDecimal(transaction.getMaxPriorityFeePerGas()));
+            resp.setMaxFeePerGas(transaction.getMaxFeePerGas() == null ? BigDecimal.ZERO : new BigDecimal(transaction.getMaxFeePerGas()));
+            resp.setMaxPriorityFeePerGas(transaction.getMaxPriorityFeePerGas() == null ? BigDecimal.ZERO : new BigDecimal(transaction.getMaxPriorityFeePerGas()));
 
             //补充填充合约的相关数据
             switch (Transaction.TypeEnum.getEnum(transaction.getType())) {
