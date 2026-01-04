@@ -81,7 +81,7 @@ subprojects {
 //    }
 
     // 配置文件更新&生成
-    def bootApps = ['scan-agent', 'scan-api', 'scan-export', 'scan-press', 'scan-sync']
+    def bootApps = ['scan-agent', 'scan-api', 'scan-job']
     if (project.name in bootApps) {
         file("${projectDir.path}/conftpl").listFiles().each { tpl ->
             def txt = tpl.text

@@ -46,3 +46,5 @@ apidoc.zip
 /apolloCache/
 /adjust.log
 *info.md
+
+.vscode
