@@ -2157,17 +2157,17 @@ definitions:
         description: 区块高度
         type: array
         items:
-          $ref: integer
+          type : integer
       ya:
         description: 出块的时间
         type: array
         items:
-          $ref: integer
+          type: integer
       yb:
         description: 交易数量数量
         type: array
         items:
-          $ref: integer
+          type: integer
   BlockTrendPushResult:
     type: object
     properties:
