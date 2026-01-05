@@ -36,6 +36,7 @@ HELP.md
 /build/*
 /out/ 
 /bin/
+*/bin
 
 apidoc.zip
 
@@ -48,3 +49,7 @@ apidoc.zip
 *info.md
 
 .vscode
+.cursor
+
+### Generated API Documentation ###
+docs/apidef/browser.yml.json
