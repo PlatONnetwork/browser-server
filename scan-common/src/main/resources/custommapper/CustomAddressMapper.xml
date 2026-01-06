@@ -67,6 +67,19 @@
         <result column="transfer_tx_qty" jdbcType="INTEGER" property="transferTxQty"/>
     </resultMap>
 
+    <!-- 地址更新任务使用的精简ResultMap，只包含需要的字段 -->
+    <resultMap id="AddressUpdateResultMap" type="com.platon.browser.dao.entity.Address">
+        <id column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="staking_value" jdbcType="DECIMAL" property="stakingValue"/>
+        <result column="redeemed_value" jdbcType="DECIMAL" property="redeemedValue"/>
+        <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes"/>
+        <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked"/>
+        <result column="delegate_value" jdbcType="DECIMAL" property="delegateValue"/>
+        <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased"/>
+        <result column="candidate_count" jdbcType="INTEGER" property="candidateCount"/>
+    </resultMap>
+
     <select id="findAddressDetail" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT a.address,
                a.`type`,
@@ -180,12 +193,9 @@
         </foreach>
     </update>
 
-    <select id="selectByCursor" resultMap="AddressResultMap">
-        SELECT address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value,
-               tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes,
-               delegate_locked, delegate_released, contract_name, contract_create, contract_createHash,
-               contract_destroy_hash, create_time, update_time, have_reward, erc1155_tx_qty, erc721_tx_qty,
-               erc20_tx_qty, transfer_tx_qty
+    <select id="selectByCursor" resultMap="AddressUpdateResultMap">
+        SELECT address, create_time, staking_value, redeemed_value, delegate_hes, delegate_locked,
+               delegate_value, delegate_released, candidate_count
         FROM address
         <where>
             <if test="lastCreateTime != null and lastAddress != null">
