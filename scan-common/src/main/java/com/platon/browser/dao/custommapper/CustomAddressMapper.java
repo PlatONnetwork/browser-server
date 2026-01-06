@@ -67,4 +67,17 @@ public interface CustomAddressMapper {
     int batchUpdateAddressInfo(@Param("list") List<Address> list);
 
     void batchUpdateAddressTxTransferQty(@Param("list") Collection<AddressQty> list);
+
+    /**
+     * 基于游标分页查询地址列表
+     * @param lastCreateTime 上一批最后一条记录的 create_time
+     * @param lastAddress 上一批最后一条记录的 address
+     * @param size 查询数量
+     * @return 地址列表
+     */
+    List<Address> selectByCursor(
+        @Param("lastCreateTime") java.util.Date lastCreateTime,
+        @Param("lastAddress") String lastAddress,
+        @Param("size") int size
+    );
 }

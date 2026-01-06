@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 
@@ -71,9 +71,9 @@ public class AddressUpdateTask {
     private TxTransferBakMapper txTransferBakMapper;
 
     /**
-     * 用于地址表更新
+     * 地址更新任务的PointLog ID
      */
-    private AtomicLong addressStart = new AtomicLong(0L);
+    private static final int ADDRESS_UPDATE_POINT_LOG_ID = 13;
 
     /**
      * 地址表信息补充
@@ -92,8 +92,9 @@ public class AddressUpdateTask {
         }
         try {
             int batchSize = Convert.toInt(XxlJobHelper.getJobParam(), 1000);
-            batchUpdate(addressStart.intValue(), batchSize);
-            XxlJobHelper.handleSuccess(StrUtil.format("地址表信息补充成功,当前标识为[{}]", addressStart.get()));
+            batchUpdate(batchSize);
+            PointLog pointLog = pointLogMapper.selectByPrimaryKey(ADDRESS_UPDATE_POINT_LOG_ID);
+            XxlJobHelper.handleSuccess(StrUtil.format("地址表信息补充成功,当前游标为[{}]", pointLog != null ? pointLog.getPosition() : "null"));
         } catch (Exception e) {
             log.error("地址表信息补充异常", e);
             throw e;
@@ -103,21 +104,56 @@ public class AddressUpdateTask {
     /**
      * 执行任务
      *
-     * @param start 开始的块高
-     * @param size  执行的批次
+     * @param size 执行的批次大小
      * @return
      */
-    protected void batchUpdate(int start, int size) {
-        //查询待补充的地址
-        AddressExample addressExample = new AddressExample();
-        addressExample.setOrderByClause("create_time limit " + start + "," + size);
-        List<Address> addressList = addressMapper.selectByExample(addressExample);
-        if (CollUtil.isEmpty(addressList)) {
-            addressStart.set(0L);
-            return;
-        } else {
-            addressStart.set(addressStart.get() + addressList.size());
+    protected void batchUpdate(int size) {
+        // 1. 从 point_log 表获取游标
+        PointLog pointLog = pointLogMapper.selectByPrimaryKey(ADDRESS_UPDATE_POINT_LOG_ID);
+        if (pointLog == null) {
+            log.error("地址更新任务的point_log记录不存在，ID: {}", ADDRESS_UPDATE_POINT_LOG_ID);
+            throw new RuntimeException("地址更新任务的point_log记录不存在");
         }
+        String position = pointLog.getPosition();
+
+        Date lastCreateTime = null;
+        String lastAddress = null;
+
+        // 解析游标：格式为 "createTime|address"
+        if (StrUtil.isNotBlank(position) && !"0|0".equals(position)) {
+            String[] parts = position.split("\\|");
+            if (parts.length == 2) {
+                try {
+                    // 解析时间戳（格式：yyyy-MM-dd HH:mm:ss）
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    lastCreateTime = sdf.parse(parts[0]);
+                    lastAddress = parts[1];
+                } catch (Exception e) {
+                    log.warn("解析游标失败，重置游标: {}", position, e);
+                    lastCreateTime = null;
+                    lastAddress = null;
+                }
+            }
+        }
+
+        // 2. 使用游标分页查询地址列表
+        List<Address> addressList = customAddressMapper.selectByCursor(lastCreateTime, lastAddress, size);
+
+        if (CollUtil.isEmpty(addressList)) {
+            // 重置游标，开始新一轮
+            pointLog.setPosition("0|0");
+            pointLogMapper.updateByPrimaryKeySelective(pointLog);
+            log.info("地址列表为空，重置游标为 0|0");
+            return;
+        }
+
+        // 3. 更新游标：保存最后一条记录的值
+        Address lastAddr = addressList.get(addressList.size() - 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String newPosition = sdf.format(lastAddr.getCreateTime()) + "|" + lastAddr.getAddress();
+        pointLog.setPosition(newPosition);
+        pointLogMapper.updateByPrimaryKeySelective(pointLog);
+        log.debug("更新游标: {} -> {}", position, newPosition);
         List<String> addressStringList = addressList.stream().map(Address::getAddress).collect(Collectors.toList());
         //查询该地址发起的质押（有效的质押和赎回的质押）
         List<AddressStatistics> stakingList = statisticBusinessMapper.getAddressStatisticsFromStaking(addressStringList);

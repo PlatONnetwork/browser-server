@@ -36,6 +36,37 @@
         <result column="transfer_tx_qty" jdbcType="VARCHAR" property="transferTxQty"/>
     </resultMap>
 
+    <!-- Address实体类的ResultMap -->
+    <resultMap id="AddressResultMap" type="com.platon.browser.dao.entity.Address">
+        <id column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="restricting_balance" jdbcType="DECIMAL" property="restrictingBalance"/>
+        <result column="staking_value" jdbcType="DECIMAL" property="stakingValue"/>
+        <result column="delegate_value" jdbcType="DECIMAL" property="delegateValue"/>
+        <result column="redeemed_value" jdbcType="DECIMAL" property="redeemedValue"/>
+        <result column="tx_qty" jdbcType="INTEGER" property="txQty"/>
+        <result column="transfer_qty" jdbcType="INTEGER" property="transferQty"/>
+        <result column="delegate_qty" jdbcType="INTEGER" property="delegateQty"/>
+        <result column="staking_qty" jdbcType="INTEGER" property="stakingQty"/>
+        <result column="proposal_qty" jdbcType="INTEGER" property="proposalQty"/>
+        <result column="candidate_count" jdbcType="INTEGER" property="candidateCount"/>
+        <result column="delegate_hes" jdbcType="DECIMAL" property="delegateHes"/>
+        <result column="delegate_locked" jdbcType="DECIMAL" property="delegateLocked"/>
+        <result column="delegate_released" jdbcType="DECIMAL" property="delegateReleased"/>
+        <result column="contract_name" jdbcType="VARCHAR" property="contractName"/>
+        <result column="contract_create" jdbcType="VARCHAR" property="contractCreate"/>
+        <result column="contract_createHash" jdbcType="VARCHAR" property="contractCreatehash"/>
+        <result column="contract_destroy_hash" jdbcType="VARCHAR" property="contractDestroyHash"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="have_reward" jdbcType="DECIMAL" property="haveReward"/>
+        <result column="erc1155_tx_qty" jdbcType="INTEGER" property="erc1155TxQty"/>
+        <result column="erc721_tx_qty" jdbcType="INTEGER" property="erc721TxQty"/>
+        <result column="erc20_tx_qty" jdbcType="INTEGER" property="erc20TxQty"/>
+        <result column="transfer_tx_qty" jdbcType="INTEGER" property="transferTxQty"/>
+    </resultMap>
+
     <select id="findAddressDetail" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT a.address,
                a.`type`,
@@ -148,5 +179,21 @@
             where address = #{item.address}
         </foreach>
     </update>
+
+    <select id="selectByCursor" resultMap="AddressResultMap">
+        SELECT address, `type`, balance, restricting_balance, staking_value, delegate_value, redeemed_value,
+               tx_qty, transfer_qty, delegate_qty, staking_qty, proposal_qty, candidate_count, delegate_hes,
+               delegate_locked, delegate_released, contract_name, contract_create, contract_createHash,
+               contract_destroy_hash, create_time, update_time, have_reward, erc1155_tx_qty, erc721_tx_qty,
+               erc20_tx_qty, transfer_tx_qty
+        FROM address
+        <where>
+            <if test="lastCreateTime != null and lastAddress != null">
+                (create_time > #{lastCreateTime} OR (create_time = #{lastCreateTime} AND address > #{lastAddress}))
+            </if>
+        </where>
+        ORDER BY create_time ASC, address ASC
+        LIMIT #{size}
+    </select>
 
 </mapper>
